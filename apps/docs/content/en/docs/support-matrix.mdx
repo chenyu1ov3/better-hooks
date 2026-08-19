@@ -1,0 +1,40 @@
+---
+title: Support matrix
+description: Current runtime, rendering, module, and browser API support boundaries.
+section: Concepts
+order: 7
+---
+
+# Support matrix
+
+## Runtime and tooling
+
+| Surface                             | Current support                                  |
+| ----------------------------------- | ------------------------------------------------ |
+| React                               | `>=19.0.0 <20.0.0`                               |
+| Package modules                     | ESM only                                         |
+| TypeScript                          | declarations are generated from the typed source |
+| Node.js for repository tasks        | `>=22.12.0`                                      |
+| Package manager for this repository | pnpm                                             |
+
+## Rendering environments
+
+| Environment             | Support boundary                                           |
+| ----------------------- | ---------------------------------------------------------- |
+| Client-rendered React   | Supported                                                  |
+| SSR plus hydration      | Supported through documented server snapshots              |
+| React Server Components | Import-safe, but Hooks must be called in Client Components |
+| Browser workers         | Not a React DOM target and not claimed                     |
+| React Native            | Not tested or claimed                                      |
+
+## Browser APIs
+
+Hooks feature-detect the APIs they use. `useMediaQuery` falls back when `matchMedia` is unavailable. Storage Hooks preserve their current value and expose an error when storage access or serialization fails. Event Hooks skip missing targets.
+
+## Frameworks
+
+The project does not publish a framework compatibility matrix yet. A framework can consume the package when it supports React 19, ESM packages, and the relevant Client Component or hydration boundary. Named framework claims require dedicated integration tests.
+
+## Policy
+
+This matrix describes the current manifest and implementation. A broader claim belongs here only after it is represented in tests or release validation.

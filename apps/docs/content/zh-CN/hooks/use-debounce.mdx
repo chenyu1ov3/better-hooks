@@ -1,0 +1,54 @@
+---
+title: useDebounce
+description: 输入稳定达到指定延迟后再更新结果值。
+section: 异步
+order: 110
+---
+
+# useDebounce
+
+## 概览
+
+`useDebounce` 会等待输入停止变化后再更新结果，并支持 `leading`、`trailing` 与最长等待时间。
+
+## 函数签名
+
+```ts
+function useDebounce<T>(
+  value: T,
+  options: {
+    delay: number;
+    leading?: boolean;
+    trailing?: boolean;
+    maxWait?: number;
+  },
+): T;
+```
+
+## 参数
+
+`delay` 会被限制为不小于零。`leading` 默认为 `false`，`trailing` 默认为 `true`；有限的 `maxWait` 会在输入持续变化时强制更新结果。
+
+## 返回值
+
+返回最近一次更新后的值，初始值为第一次传入的 `value`。
+
+## 行为
+
+只有 `Object.is` 判断输入发生变化时才会开始计时。新的变化会替换延迟定时器，组件卸载时会清理全部定时器。
+
+## SSR / RSC
+
+SSR 时直接返回输入值；定时器只会在提交后的 Effect 中启动。请在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以在 `settledQuery` 变化后通过 `useAsync` 启动可取消任务；需要防抖事件调用时，请使用 `useDebounceFn`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-debounce/index.ts)。

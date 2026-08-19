@@ -1,0 +1,57 @@
+---
+title: useAsync
+description: Run abortable asynchronous tasks without stale state updates.
+section: Async
+order: 116
+---
+
+# useAsync
+
+## Overview
+
+`useAsync` manages an abort signal, status, result, and error for one task while protecting state from stale completions.
+
+## Signature
+
+```ts
+type AsyncTask<T> = (signal: AbortSignal) => Promise<T> | T;
+function useAsync<T>(
+  task: AsyncTask<T>,
+  options?: { immediate?: boolean },
+): {
+  status: 'idle' | 'pending' | 'success' | 'error';
+  data: T | undefined;
+  error: unknown;
+  run: () => Promise<T>;
+  cancel: () => void;
+  reset: () => void;
+};
+```
+
+## Parameters
+
+`task` receives a new `AbortSignal` for each run. `immediate` defaults to false and starts a run after commit when true.
+
+## Returns
+
+State plus stable `run`, `cancel`, and `reset` actions. `run` preserves the task's resolved value and rejection.
+
+## Behavior
+
+A new run aborts the prior controller. Sequence checks prevent older results from updating state. `cancel` keeps data and sets status to idle; `reset` also clears data and error.
+
+## SSR / RSC
+
+SSR starts in idle state. Even immediate work starts only in a client effect. Use the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Debounce an input value before changing the task, or cancel it when an associated disclosure closes.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-async/index.ts).

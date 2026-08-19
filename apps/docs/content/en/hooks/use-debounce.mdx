@@ -1,0 +1,54 @@
+---
+title: useDebounce
+description: Publish a value after changes settle for a configured delay.
+section: Async
+order: 110
+---
+
+# useDebounce
+
+## Overview
+
+`useDebounce` delays value publication until input changes settle, with optional leading, trailing, and maximum-wait behavior.
+
+## Signature
+
+```ts
+function useDebounce<T>(
+  value: T,
+  options: {
+    delay: number;
+    leading?: boolean;
+    trailing?: boolean;
+    maxWait?: number;
+  },
+): T;
+```
+
+## Parameters
+
+`delay` is clamped to zero or greater. `leading` defaults to `false`, `trailing` to `true`. A finite `maxWait` forces publication during a continuous cycle.
+
+## Returns
+
+The last published value, initialized from the first `value`.
+
+## Behavior
+
+A cycle starts only when `Object.is` detects a value change. Timers are replaced as changes arrive and cleared on unmount.
+
+## SSR / RSC
+
+The input value is returned during SSR; timers begin in effects after commit. Use in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useAsync` to run cancellable work when `settledQuery` changes. For event calls, prefer `useDebounceFn`.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-debounce/index.ts).

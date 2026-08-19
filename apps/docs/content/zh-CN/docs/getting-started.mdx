@@ -1,0 +1,43 @@
+---
+title: 快速开始
+description: 了解客户端边界、直接导入方式，并编写第一个 Better Hooks 组件。
+section: 文档
+order: 3
+---
+
+# 快速开始
+
+## 按生命周期问题选择 Hook
+
+先判断要解决的是状态切换、延迟任务、浏览器订阅、表单输入、存储，还是挂载边界，而不要从框架适配层入手。[Hooks 索引](/zh/hooks)已按这些场景整理全部公开 Hook。
+
+## 添加客户端边界
+
+Better Hooks 的所有入口都是 Client Component API。在使用 RSC 的框架中，请把客户端指令放在实际调用 Hook 的最小组件中：
+
+```tsx
+'use client';
+
+// 预览包发布后可用。
+import { useToggle } from 'better-hook/use-toggle';
+
+export function Disclosure() {
+  const [open, toggle] = useToggle(false);
+
+  return <button onClick={() => toggle()}>{open ? '收起' : '展开'}</button>;
+}
+```
+
+纯客户端 React 应用无需添加这条指令，但 Hook 仍运行在 React 的客户端生命周期中。
+
+## 示例优先使用直接入口
+
+文档示例使用 `better-hook/use-toggle` 这样的显式入口。根入口 `better-hook` 同样导出所有公开 Hook，但直接路径更能体现模块归属，也能让构建工具获得更小、更明确的依赖图。
+
+## 保持渲染结果确定
+
+服务端渲染时，请传入确定的初始值。订阅浏览器状态的 Hook 都有明确的服务端快照，例如 `useWindowSize` 初始为 `{ width: 0, height: 0 }`，`useMediaQuery` 则可通过 `defaultMatches` 配置回退值。
+
+## 把清理交给 Hook
+
+不要在 Hook 外重复创建定时器或原生监听器。只需更新输入，让 React 在依赖变化或组件卸载时执行 Hook 内部的清理逻辑。

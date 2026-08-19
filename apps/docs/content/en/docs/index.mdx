@@ -1,0 +1,30 @@
+---
+title: Introduction
+description: What Better Hooks is, what it guarantees, and where it fits in a React 19 application.
+section: Docs
+order: 1
+---
+
+# Introduction
+
+Better Hooks is a preview-stage collection of small, typed React 19 hooks. It focuses on the work around effects: subscriptions, timers, cancellation, browser fallbacks, and committed-value semantics.
+
+## What the library optimizes for
+
+- **Composition first.** Each hook solves one lifecycle problem and remains useful beside React's built-in hooks.
+- **Predictable cleanup.** Timers, listeners, subscriptions, and async work are released when dependencies change or a component unmounts.
+- **Server-safe rendering.** Browser APIs are not touched at import time. Browser-facing hooks document deterministic server snapshots.
+- **Direct imports.** Every public hook has an explicit package export, and the package declares `sideEffects: false`.
+- **Type inference.** Generic values, callback arguments, and event maps flow through the public API without wrapper casts.
+
+## Project status
+
+Better Hooks is currently a **Preview** project. The source and documentation are available on [GitHub](https://github.com/chenyu1ov3/better-hooks), but the npm release is pending. Installation commands are intentionally withheld until the published package can be verified.
+
+## Where to go next
+
+Read [Getting started](/docs/getting-started) for the client boundary and import conventions. Use the [Hooks explorer](/hooks) to choose by problem, or inspect [SSR and RSC](/docs/ssr-rsc) before adding a browser-facing hook to a server-rendered application.
+
+## Non-goals
+
+Better Hooks is headless and unstyled. It does not provide UI components, a data-fetching cache, a state container, or replacements for React APIs such as `useTransition`, `useOptimistic`, and `useActionState`.

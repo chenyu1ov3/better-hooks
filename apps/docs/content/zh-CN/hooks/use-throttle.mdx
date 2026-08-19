@@ -1,0 +1,53 @@
+---
+title: useThrottle
+description: 将结果更新频率限制为每个时间窗口最多一次。
+section: 异步
+order: 111
+---
+
+# useThrottle
+
+## 概览
+
+`useThrottle` 将快速变化的输入限制为每个指定时间窗口最多更新一次结果。
+
+## 函数签名
+
+```ts
+function useThrottle<T>(
+  value: T,
+  options: {
+    delay: number;
+    leading?: boolean;
+    trailing?: boolean;
+  },
+): T;
+```
+
+## 参数
+
+`delay` 用于定义时间窗口；`leading` 与 `trailing` 均默认为 `true`。
+
+## 返回值
+
+返回最近一次更新后的值，初始值为第一次输入。
+
+## 行为
+
+内部使用防抖调度器，并将 `maxWait` 设为 `delay`，因此即使输入持续变化，结果也会定期更新。
+
+## SSR / RSC
+
+SSR 会直接返回输入值且不调度任务；定时器只在客户端提交后启动。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以把 `useWindowSize` 或 `useEventListener` 作为数据来源，仅对开销较大的派生渲染进行节流。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-throttle/index.ts)。

@@ -1,0 +1,56 @@
+---
+title: useEventListener
+description: Subscribe to EventTarget events with typed Window overloads and automatic cleanup.
+section: Browser & DOM
+order: 120
+---
+
+# useEventListener
+
+## Overview
+
+`useEventListener` owns native event subscription cleanup and calls the latest committed listener without resubscribing for callback identity changes.
+
+## Signature
+
+```ts
+function useEventListener<K extends keyof WindowEventMap>(
+  type: K,
+  listener: (event: WindowEventMap[K]) => void,
+  options?: AddEventListenerOptions | boolean,
+): void;
+function useEventListener(
+  target: EventListenerTarget,
+  type: string,
+  listener: (event: Event) => void,
+  options?: AddEventListenerOptions | boolean,
+): void;
+```
+
+## Parameters
+
+Omit `target` to use `window`, or pass an `EventTarget`, nullable target, or ref-like `{ current }`. Native capture, passive, once, and signal options are supported.
+
+## Returns
+
+Nothing. Subscription lifetime follows the component and relevant inputs.
+
+## Behavior
+
+The callback ref updates at commit. The native listener is replaced when the target, type, or meaningful options change and is removed with the same capture value.
+
+## SSR / RSC
+
+When `window` or the explicit target is unavailable, no subscription is created. Use in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Combine with `useThrottleFn` when an event is frequent but downstream work should be limited.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-event-listener/index.ts).

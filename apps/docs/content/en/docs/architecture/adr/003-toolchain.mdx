@@ -1,0 +1,24 @@
+---
+title: ADR 003 — Package toolchain
+description: ESM exports, pnpm, TypeScript declarations, and Oxide-based repository checks.
+section: Architecture
+order: 22
+---
+
+# ADR 003 — Package toolchain
+
+## Status
+
+Accepted for the preview implementation.
+
+## Context
+
+A small library should keep its published surface unambiguous and its repository checks consistent with the generated package.
+
+## Decision
+
+The published package is ESM-only, has explicit root and per-Hook exports, emits TypeScript declarations, and declares `sideEffects: false`. The workspace uses pnpm. Static analysis and formatting use Oxlint and Oxfmt; ESLint and Prettier configuration are not part of the toolchain.
+
+## Consequences
+
+CommonJS `require` is not a supported package interface. Every new Hook needs a source directory, test coverage, an example, a package export, and documentation. Repository validation checks the packed artifact rather than assuming source imports match publication.

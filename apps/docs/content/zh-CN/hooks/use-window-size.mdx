@@ -1,0 +1,46 @@
+---
+title: useWindowSize
+description: 通过共享的 resize 订阅跟踪视口宽度与高度。
+section: 浏览器与 DOM
+order: 123
+---
+
+# useWindowSize
+
+## 概览
+
+`useWindowSize` 返回当前视口尺寸，并在所有订阅者之间共享一个 `resize` 监听器。
+
+## 函数签名
+
+```ts
+function useWindowSize(): Readonly<{ width: number; height: number }>;
+```
+
+## 参数
+
+无参数。
+
+## 返回值
+
+返回不可变快照，其中包含以 CSS 像素表示的 `width` 与 `height`。
+
+## 行为
+
+宽度和高度都未变化时不会通知订阅者。最后一个订阅者离开后，会移除共享监听器并重置快照。
+
+## SSR / RSC
+
+服务端快照为 `{ width: 0, height: 0 }`。不要根据该值选择完全不同的服务端节点树；请仅在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+只有下游渲染开销较高时，才需要用 `useThrottle` 处理派生值；尺寸源本身会随原生 `resize` 事件更新。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-window-size/index.ts)。

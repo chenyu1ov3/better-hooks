@@ -1,0 +1,46 @@
+---
+title: useMediaQuery
+description: 订阅 CSS 媒体查询，并提供确定的服务端快照。
+section: 浏览器与 DOM
+order: 122
+---
+
+# useMediaQuery
+
+## 概览
+
+`useMediaQuery` 通过 `useSyncExternalStore` 暴露 `MediaQueryList.matches`。同一 `window` 中相同的查询会共享原生订阅。
+
+## 函数签名
+
+```ts
+function useMediaQuery(query: string, options?: { readonly defaultMatches?: boolean }): boolean;
+```
+
+## 参数
+
+`query` 是 CSS 媒体查询。`defaultMatches` 是服务端及不受支持环境中的回退值，默认为 `false`。
+
+## 返回值
+
+当前媒体查询是否匹配。
+
+## 行为
+
+订阅者共享缓存的 `MediaQueryList`；最后一个订阅者离开时会移除原生监听器。只有现代方法不可用时，才会使用旧版 `addListener`。
+
+## SSR / RSC
+
+服务端快照为 `defaultMatches ?? false`。请根据初始界面有意识地选择该值，以减少 hydration 后的跳变，并在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+纯样式变化应优先使用 CSS；只有匹配状态会改变交互行为或节点语义时，才需要此 Hook。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-media-query/index.ts)。

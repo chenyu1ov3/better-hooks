@@ -1,0 +1,46 @@
+---
+title: useInterval
+description: Run the latest callback on a declarative interval.
+section: Async
+order: 115
+---
+
+# useInterval
+
+## Overview
+
+`useInterval` makes an interval a function of React state: pass a delay to run it or `null` to pause it.
+
+## Signature
+
+```ts
+function useInterval(callback: () => void, delay: number | null): void;
+```
+
+## Parameters
+
+`callback` follows the latest commit without recreating the timer. `delay` is clamped to zero and `null` pauses scheduling.
+
+## Returns
+
+Nothing. Control the interval by changing `delay`.
+
+## Behavior
+
+Changing `delay` replaces the native interval. Cleanup clears it on dependency changes and unmount.
+
+## SSR / RSC
+
+Intervals start only in client effects, never during SSR. Call it in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useToggle` to control the `running` state or `useOnline` to pause polling while offline.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-interval/index.ts).

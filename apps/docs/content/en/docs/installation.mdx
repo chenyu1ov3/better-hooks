@@ -1,0 +1,34 @@
+---
+title: Installation
+description: Preview release status, runtime requirements, and package entry conventions.
+section: Docs
+order: 2
+---
+
+# Installation
+
+## Preview status
+
+The `better-hook` npm release is pending. Do not add an installation command to production setup yet: there is no verified registry artifact for this documentation version.
+
+You can review the implementation and follow release progress in the [GitHub repository](https://github.com/chenyu1ov3/better-hooks). This page will publish the exact pnpm command only after the package has been released and its exports have been validated.
+
+## Runtime requirements
+
+The package manifest currently declares:
+
+| Requirement                        | Supported range    |
+| ---------------------------------- | ------------------ |
+| React                              | `>=19.0.0 <20.0.0` |
+| Node.js for development and builds | `>=22.12.0`        |
+| Module format                      | ESM only           |
+
+React is a peer dependency. The package has no runtime dependency beyond the React APIs supplied by the consuming application.
+
+## Import model
+
+The planned package name is `better-hook`. The root export is convenient, while every Hook also has an explicit direct entry such as `better-hook/use-toggle`. Direct entries make the requested module graph clear and work with the package's `sideEffects: false` declaration.
+
+## Release verification
+
+Before the install command is published, the release must pass export checks, declaration generation, package validation, size budgets, and a clean documentation build. Follow the [Changelog](/changelog) for the first published version.

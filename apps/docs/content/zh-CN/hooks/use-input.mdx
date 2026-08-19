@@ -1,0 +1,55 @@
+---
+title: useInput
+description: 管理 input 与 textarea 的受控或非受控字符串状态。
+section: 表单
+order: 130
+---
+
+# useInput
+
+## 概览
+
+`useInput` 将文本字段的 change 事件转换成一套精简的受控或非受控状态契约，并提供 `reset` 与 `clear` 操作。
+
+## 函数签名
+
+```ts
+function useInput(options?: {
+  initialValue?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}): {
+  value: string;
+  onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => void;
+  reset: () => void;
+  clear: () => void;
+};
+```
+
+## 参数
+
+`initialValue` 默认为 `''`，且只在首次渲染时捕获。提供 `value` 后进入受控模式；`onChange` 接收纯字符串。
+
+## 返回值
+
+返回可直接传给输入框的 `value` 与 `onChange`，以及引用稳定的 `reset` 和 `clear` 操作。
+
+## 行为
+
+受控模式只通知外部所有者，不会改变内部值。`reset` 会恢复首次捕获的值，而不是随后变化的 `initialValue` prop。
+
+## SSR / RSC
+
+渲染时不会检查 DOM。SSR 与 hydration 期间应保持受控值一致，并在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+开始筛选或异步任务前，可以先将 `search.value` 传给 `useDebounce`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-input/index.ts)。

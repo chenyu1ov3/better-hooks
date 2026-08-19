@@ -1,0 +1,46 @@
+---
+title: useMediaQuery
+description: Subscribe to a media query with a deterministic server snapshot.
+section: Browser & DOM
+order: 122
+---
+
+# useMediaQuery
+
+## Overview
+
+`useMediaQuery` exposes `MediaQueryList.matches` through `useSyncExternalStore` and shares one native subscription for equal queries in the same window.
+
+## Signature
+
+```ts
+function useMediaQuery(query: string, options?: { readonly defaultMatches?: boolean }): boolean;
+```
+
+## Parameters
+
+`query` is a CSS media query. `defaultMatches` is the server and unsupported-browser fallback, defaulting to `false`.
+
+## Returns
+
+Whether the query currently matches.
+
+## Behavior
+
+Subscribers share a cached `MediaQueryList`; the native listener is removed when the last subscriber leaves. Legacy `addListener` is used only when modern methods are absent.
+
+## SSR / RSC
+
+The server snapshot is `defaultMatches ?? false`. Choose it deliberately to reduce disruptive hydration changes, and call the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Prefer CSS for presentation-only changes. Use this Hook when matching state changes behavior or rendered semantics.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-media-query/index.ts).

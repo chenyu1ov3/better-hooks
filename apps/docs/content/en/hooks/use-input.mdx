@@ -1,0 +1,55 @@
+---
+title: useInput
+description: Controlled or uncontrolled string state for text inputs and textareas.
+section: Forms
+order: 130
+---
+
+# useInput
+
+## Overview
+
+`useInput` turns a text field's change event into a small controlled-or-uncontrolled state contract with reset and clear actions.
+
+## Signature
+
+```ts
+function useInput(options?: {
+  initialValue?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}): {
+  value: string;
+  onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => void;
+  reset: () => void;
+  clear: () => void;
+};
+```
+
+## Parameters
+
+`initialValue` defaults to `''` and is captured on first render. A defined `value` enables controlled mode. `onChange` receives plain strings.
+
+## Returns
+
+Input-compatible `value` and `onChange`, plus stable `reset` and `clear` actions.
+
+## Behavior
+
+Controlled calls notify the owner without changing internal state. `reset` returns to the initially captured value, not a later `initialValue` prop.
+
+## SSR / RSC
+
+The Hook does not inspect the DOM during render. Keep controlled values consistent across SSR and hydration and use it in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Pass `search.value` to `useDebounce` before starting filtering or asynchronous work.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-input/index.ts).

@@ -1,0 +1,52 @@
+---
+title: useBoolean
+description: 提供设为 true、设为 false 与切换操作的布尔状态。
+section: 状态
+order: 101
+---
+
+# useBoolean
+
+## 概览
+
+`useBoolean` 基于 `useToggle` 构建，适合需要在调用处明确表达“打开、关闭、切换”意图的界面。
+
+## 函数签名
+
+```ts
+function useBoolean(initialValue?: boolean): {
+  readonly value: boolean;
+  readonly boolean: boolean;
+  readonly setTrue: () => void;
+  readonly setFalse: () => void;
+  readonly toggle: (next?: ToggleUpdater) => void;
+};
+```
+
+## 参数
+
+可选参数 `initialValue` 默认为 `false`。
+
+## 返回值
+
+`value` 与 `boolean` 指向同一个布尔值。三个操作函数的引用保持稳定，值变化时结果对象会更新。
+
+## 行为
+
+具名操作通过 `useToggle` 更新状态；`toggle` 同样支持直接传值和函数式更新。
+
+## SSR / RSC
+
+该 Hook 不访问浏览器 API，服务端会渲染初始状态；但仍需在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以把稳定的 `setFalse` 直接交给 Esc 键或点击外部处理逻辑。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-boolean/index.ts)。

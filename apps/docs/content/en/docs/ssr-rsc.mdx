@@ -1,0 +1,36 @@
+---
+title: SSR and RSC
+description: Server snapshots, Client Component boundaries, and hydration rules for Better Hooks.
+section: Concepts
+order: 5
+---
+
+# SSR and RSC
+
+## Client Component boundary
+
+All Better Hooks call React client hooks and must run in a Client Component. A Server Component may render a child that uses Better Hooks, but it cannot call a Better Hook itself.
+
+## Import safety
+
+The package does not register listeners, start timers, read storage, or access the DOM as an import-time side effect. Importing a module in a server build is therefore distinct from calling its Hook in a Server Component.
+
+## Server snapshots
+
+Browser-facing Hooks use deterministic fallbacks:
+
+| Hook                     | Server result                                    |
+| ------------------------ | ------------------------------------------------ |
+| `useMediaQuery`          | `defaultMatches`, otherwise `false`              |
+| `useWindowSize`          | `{ width: 0, height: 0 }`                        |
+| `useOnline`              | `true`                                           |
+| storage Hooks            | the supplied initial value                       |
+| listener and timer Hooks | no subscription or timer during server rendering |
+
+## Hydration consistency
+
+Choose a server fallback that can render acceptable initial markup. React will reconcile the browser snapshot after hydration. Do not branch the server tree on an unknown browser measurement when a stable neutral layout will do.
+
+## RSC-friendly does not mean server-callable
+
+In this project, RSC-friendly means explicit client boundaries, import-time safety, serializable props into the client leaf, and documented server snapshots. It does not mean a Hook can execute inside a Server Component.

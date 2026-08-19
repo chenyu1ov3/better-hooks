@@ -1,0 +1,52 @@
+---
+title: useControllableState
+description: One state contract for controlled and uncontrolled components.
+section: State
+order: 102
+---
+
+# useControllableState
+
+## Overview
+
+`useControllableState` lets a headless component accept an owned `value` or manage its own `defaultValue` without changing its internal setter API.
+
+## Signature
+
+```ts
+function useControllableState<T>(options: {
+  value?: T;
+  defaultValue?: T | (() => T);
+  onChange?: (value: T) => void;
+}): readonly [T | undefined, (next: SetStateAction<T | undefined>) => void];
+```
+
+## Parameters
+
+- `value` makes the Hook controlled when the property is present, including when it is explicitly `undefined`.
+- `defaultValue` initializes uncontrolled state and may be lazy.
+- `onChange` receives a changed resolved value in either mode.
+
+## Returns
+
+A readonly `[value, setValue]` tuple. Providing `defaultValue` gives the overload a defined `T` result.
+
+## Behavior
+
+In controlled mode, the owner must supply the new value after `onChange`. In uncontrolled mode, consecutive event-phase functional updates observe the latest local value. `Object.is`-equal updates are ignored.
+
+## SSR / RSC
+
+No browser API is used. Keep `value` or `defaultValue` deterministic for server markup and call the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use it inside headless components; use `useToggle` directly when no controlled mode is required.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-controllable-state/index.ts).

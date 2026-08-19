@@ -1,0 +1,49 @@
+---
+title: useThrottleFn
+description: 通过 leading 与 trailing 选项控制函数调用频率。
+section: 异步
+order: 113
+---
+
+# useThrottleFn
+
+## 概览
+
+`useThrottleFn` 会限制回调的执行频率，同时保留最新参数和最近一次已提交的回调。
+
+## 函数签名
+
+```ts
+function useThrottleFn<Args extends unknown[], Result>(
+  fn: (...args: Args) => Result,
+  options: ThrottleOptions,
+): ThrottledFunction<Args, Result>;
+```
+
+## 参数
+
+`delay` 用于定义节流窗口；`leading` 与 `trailing` 均默认为 `true`。
+
+## 返回值
+
+返回与 `useDebounceFn` 相同的控制对象，包括 `run`、`cancel`、`flush` 和 `pending`。
+
+## 行为
+
+内部的 `maxWait` 等于 `delay`，因此连续事件流不会让执行时间无限后移。
+
+## SSR / RSC
+
+服务端渲染不会启动任务；只有客户端代码调用 `run` 后才会调度定时器。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以与 `useEventListener` 组合，让事件源保持响应，同时限制下游任务的执行频率。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-throttle-fn/index.ts)。

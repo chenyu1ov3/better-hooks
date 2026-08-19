@@ -1,0 +1,28 @@
+---
+title: React 19
+description: 了解 Better Hooks 如何遵循 React 19 的渲染、提交与 Strict Mode 语义。
+section: 核心概念
+order: 4
+---
+
+# React 19
+
+## 感知提交的值
+
+`useLatest` 与 `usePrevious` 在 Effect 中更新 ref，因此暴露的是已经提交的值，而不是被中断或放弃的渲染结果。当长生命周期回调在并发渲染期间读取状态时，这一区别尤其重要。
+
+## 可安全重放的清理
+
+开发环境中的 React Strict Mode 可能重放 Effect 和订阅。监听器、定时器、存储和外部状态源 Hook 都采用成对的建立与清理逻辑，避免重放后遗留重复的原生订阅。
+
+## 外部存储
+
+`useMediaQuery`、`useOnline`、`useWindowSize`、`useLocalStorage` 和 `useSessionStorage` 使用 `useSyncExternalStore` 连接浏览器状态。它们都提供稳定的服务端快照，并且只在组件提交后建立订阅。
+
+## React 已解决的问题继续用 React
+
+Better Hooks 不会只为换一个名字而包装 React API。请直接使用 `useTransition`、`useDeferredValue`、`useOptimistic`、`useActionState` 和 `use`。本库只补充这些 API 尚未覆盖的生命周期能力。
+
+## 支持范围
+
+包的 peer dependency 为 `react >=19.0.0 <20.0.0`。只有明确更新 package manifest 并通过相应测试后，才会声明对其他版本的兼容性。

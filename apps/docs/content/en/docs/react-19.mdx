@@ -1,0 +1,28 @@
+---
+title: React 19
+description: How Better Hooks follows React 19 rendering, commit, and Strict Mode semantics.
+section: Concepts
+order: 4
+---
+
+# React 19
+
+## Commit-aware values
+
+`useLatest` and `usePrevious` update their refs in effects. They therefore expose committed values, not values from an interrupted or abandoned render. This distinction matters when a long-lived callback observes state during concurrent rendering.
+
+## Replay-safe cleanup
+
+React Strict Mode may replay effects and subscriptions in development. Listener, timer, storage, and external-store Hooks use symmetric setup and cleanup so replay does not leave duplicate native subscriptions behind.
+
+## External stores
+
+`useMediaQuery`, `useOnline`, `useWindowSize`, `useLocalStorage`, and `useSessionStorage` use `useSyncExternalStore` for browser state. Each provides a stable server snapshot and subscribes only after commit.
+
+## Use React when React already owns the problem
+
+Better Hooks does not wrap an API simply to rename it. Continue to use React's `useTransition`, `useDeferredValue`, `useOptimistic`, `useActionState`, and `use` directly. Better Hooks is for lifecycle behavior those APIs do not provide.
+
+## Supported range
+
+The package peer dependency is `react >=19.0.0 <20.0.0`. Compatibility claims beyond that range require an explicit package update and test pass.

@@ -1,0 +1,47 @@
+---
+title: usePrevious
+description: Read the value from the previous committed render.
+section: State
+order: 103
+---
+
+# usePrevious
+
+## Overview
+
+`usePrevious` exposes the last committed value, which is useful for comparisons, transition labels, and change-sensitive effects.
+
+## Signature
+
+```ts
+function usePrevious<T>(value: T): T | undefined;
+function usePrevious<T, U>(value: T, initialValue: U): T | U;
+```
+
+## Parameters
+
+`value` is stored after commit. Optional `initialValue` is returned before that first commit.
+
+## Returns
+
+The previous committed `value`; on the first render it returns `initialValue` or `undefined`.
+
+## Behavior
+
+The ref updates in an effect. An abandoned concurrent render cannot become the reported previous value.
+
+## SSR / RSC
+
+Server rendering returns the initial fallback because effects do not run there. Use inside a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Pair it with `useDebounce` to compare the latest input with the last committed debounced result.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-previous/index.ts).

@@ -1,0 +1,50 @@
+---
+title: useControllableState
+description: 让受控与非受控组件共用一套状态契约。
+section: 状态
+order: 102
+---
+
+# useControllableState
+
+## 概览
+
+`useControllableState` 让无样式组件既能接收外部 `value`，也能通过 `defaultValue` 自行管理状态，内部更新逻辑无需为两种模式分支。
+
+## 函数签名
+
+```ts
+function useControllableState<T>(options: {
+  value?: T;
+  defaultValue?: T | (() => T);
+  onChange?: (value: T) => void;
+}): readonly [T | undefined, (next: SetStateAction<T | undefined>) => void];
+```
+
+## 参数
+
+只要存在 `value` 属性，就会进入受控模式，包括显式传入 `undefined`。`defaultValue` 可用于惰性初始化非受控状态；在两种模式下，`onChange` 都会接收变化后的值。
+
+## 返回值
+
+返回只读的 `[value, setValue]` 元组。提供 `defaultValue` 时，对应重载会将 `value` 推断为确定的 `T`。
+
+## 行为
+
+受控模式要求外部所有者在 `onChange` 后传回新值。非受控模式下，连续的事件更新能够读取最新的本地值。`Object.is` 判断相等的更新会被忽略。
+
+## SSR / RSC
+
+该 Hook 不访问浏览器 API。SSR 时请确保 `value` 或 `defaultValue` 保持确定，并在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+适合在无样式组件内部使用；不需要受控模式时，可直接使用 `useToggle`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-controllable-state/index.ts)。

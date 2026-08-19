@@ -1,0 +1,46 @@
+---
+title: useIsMounted
+description: 判断组件的挂载 Effect 当前是否处于活动状态。
+section: 生命周期
+order: 150
+---
+
+# useIsMounted
+
+## 概览
+
+`useIsMounted` 返回一个引用稳定的函数，用于判断组件的挂载 Effect 当前是否处于活动状态。
+
+## 函数签名
+
+```ts
+function useIsMounted(): () => boolean;
+```
+
+## 参数
+
+无参数。
+
+## 返回值
+
+返回引用稳定的函数：挂载 Effect 完成后返回 `true`，在此之前或清理完成后返回 `false`。
+
+## 行为
+
+Strict Mode 重放 Effect 时，配对的清理函数会正确重置并恢复标记。该结果表示组件生命周期状态，不表示节点在视觉上可见。
+
+## SSR / RSC
+
+SSR 期间和首次客户端 Effect 执行前返回 `false`。请在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+异步任务应优先使用 `useAsync` 提供的 `AbortSignal`；只有外部回调无法取消时，才需要此 Hook。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-is-mounted/index.ts)。

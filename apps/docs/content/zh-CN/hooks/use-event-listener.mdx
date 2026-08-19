@@ -1,0 +1,56 @@
+---
+title: useEventListener
+description: 根据 Window 事件类型推断订阅 EventTarget，并自动完成清理。
+section: 浏览器与 DOM
+order: 120
+---
+
+# useEventListener
+
+## 概览
+
+`useEventListener` 管理原生事件的订阅与清理，并调用最近一次已提交的监听函数，不会仅因回调引用变化就重新订阅。
+
+## 函数签名
+
+```ts
+function useEventListener<K extends keyof WindowEventMap>(
+  type: K,
+  listener: (event: WindowEventMap[K]) => void,
+  options?: AddEventListenerOptions | boolean,
+): void;
+function useEventListener(
+  target: EventListenerTarget,
+  type: string,
+  listener: (event: Event) => void,
+  options?: AddEventListenerOptions | boolean,
+): void;
+```
+
+## 参数
+
+省略 `target` 时使用 `window`；也可以传入 `EventTarget`、空目标或 `{ current }` ref。支持原生的 `capture`、`passive`、`once` 和 `signal` 选项。
+
+## 返回值
+
+无返回值；订阅生命周期会跟随组件与相关输入变化。
+
+## 行为
+
+回调 ref 会在组件提交时更新。目标、事件类型或有效选项变化时，Hook 会替换原生监听器，并使用相同的 `capture` 值移除旧监听器。
+
+## SSR / RSC
+
+`window` 或显式目标不可用时不会建立订阅。请在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+如果需要限制高频事件下游任务的执行频率，可以与 `useThrottleFn` 组合使用。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-event-listener/index.ts)。

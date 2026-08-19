@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+doc_build/
+.next/
+.next-dev/
+out/
+*.tsbuildinfo
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+.pnpm-store/
+packages/hooks/etc/
+packages/hooks/temp/

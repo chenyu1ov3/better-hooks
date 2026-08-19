@@ -1,0 +1,50 @@
+---
+title: useSessionStorage
+description: 在 sessionStorage 与类型安全的 React 状态之间保持同步。
+section: 存储
+order: 141
+---
+
+# useSessionStorage
+
+## 概览
+
+`useSessionStorage` 提供与 `useLocalStorage` 相同的类型安全外部状态源契约，但数据生命周期仅限当前标签页会话。
+
+## 函数签名
+
+```ts
+function useSessionStorage<T>(
+  key: string,
+  initialValue: T | (() => T),
+  options?: StorageOptions<T>,
+): UseStorageResult<T>;
+```
+
+## 参数
+
+`key` 指定存储项，`initialValue` 作为存储缺失时和服务端渲染时的值；可选的编解码函数可以替代 JSON 序列化。
+
+## 返回值
+
+返回 `value`、`error`、`setValue` 与 `remove`；更新函数支持直接传值和函数式更新。
+
+## 行为
+
+数据会在当前标签页刷新后保留，但不会跨标签页持久化。访问和编解码失败会记录到 `error`，不会在渲染期间直接抛出。
+
+## SSR / RSC
+
+服务端快照为首次捕获的初始值；只有浏览器存储可用时才会访问。请在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+如果希望在输入停止后再写入存储，可以与 `useDebounceFn` 组合使用。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-session-storage/index.ts)。

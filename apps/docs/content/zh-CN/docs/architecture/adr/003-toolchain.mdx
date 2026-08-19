@@ -1,0 +1,24 @@
+---
+title: ADR 003 — 包工具链
+description: ESM exports、pnpm、TypeScript 声明，以及基于 Oxc 的仓库检查。
+section: 架构
+order: 22
+---
+
+# ADR 003 — 包工具链
+
+## 状态
+
+已被预览版实现采用。
+
+## 背景
+
+小型库需要保持公开接口清晰，并确保仓库检查针对的内容与实际发布产物一致。
+
+## 决策
+
+发布包仅提供 ESM，包含显式根入口和各 Hook 的独立 exports，生成 TypeScript 声明，并设置 `sideEffects: false`。工作区使用 pnpm；静态分析与格式化分别使用 Oxlint 和 Oxfmt，不引入 ESLint 或 Prettier 配置。
+
+## 影响
+
+CommonJS `require` 不属于受支持的包接口。每个新 Hook 都必须提供源码目录、测试、示例、package export 和文档。仓库验证针对打包产物执行，不能把源码导入结果视为实际发布结果。

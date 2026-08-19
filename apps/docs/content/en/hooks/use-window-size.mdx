@@ -1,0 +1,46 @@
+---
+title: useWindowSize
+description: Track viewport width and height through a shared resize subscription.
+section: Browser & DOM
+order: 123
+---
+
+# useWindowSize
+
+## Overview
+
+`useWindowSize` returns current viewport dimensions and shares one `resize` listener among current subscribers.
+
+## Signature
+
+```ts
+function useWindowSize(): Readonly<{ width: number; height: number }>;
+```
+
+## Parameters
+
+This Hook takes no parameters.
+
+## Returns
+
+An immutable snapshot with numeric `width` and `height` in CSS pixels.
+
+## Behavior
+
+Resize notifications are skipped when both dimensions are unchanged. The shared listener and snapshot reset after the last subscriber leaves.
+
+## SSR / RSC
+
+The server snapshot is `{ width: 0, height: 0 }`. Avoid using it to select fundamentally different server markup. Call the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useThrottle` on a derived value only when downstream rendering is expensive; the source intentionally reports native resize updates.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-window-size/index.ts).

@@ -1,0 +1,43 @@
+---
+title: Getting started
+description: Client boundaries, direct imports, and the first Better Hooks component.
+section: Docs
+order: 3
+---
+
+# Getting started
+
+## Choose a Hook by lifecycle problem
+
+Start with the behavior you need rather than a framework adapter: state transitions, delayed work, a browser subscription, form input, storage, or a mount boundary. The [Hooks explorer](/hooks) groups all 22 public Hooks into those concerns.
+
+## Add the client boundary
+
+Every Better Hooks entry is a Client Component API. In an RSC framework, put the directive in the smallest component that calls the Hook:
+
+```tsx
+'use client';
+
+// Available after the preview package is published.
+import { useToggle } from 'better-hook/use-toggle';
+
+export function Disclosure() {
+  const [open, toggle] = useToggle(false);
+
+  return <button onClick={() => toggle()}>{open ? 'Hide' : 'Show'}</button>;
+}
+```
+
+The directive is not required in a client-only React application, but the Hook still runs during the React client lifecycle.
+
+## Prefer direct entries for examples
+
+Documentation examples use explicit entries such as `better-hook/use-toggle`. The root `better-hook` entry exports the same public Hooks, but a direct path communicates ownership and gives build tools the smallest obvious graph.
+
+## Keep render deterministic
+
+Pass deterministic initial values when markup is server rendered. Hooks that subscribe to browser state expose documented snapshots: for example, `useWindowSize` starts at `{ width: 0, height: 0 }`, and `useMediaQuery` accepts `defaultMatches`.
+
+## Handle cleanup through the Hook
+
+Do not duplicate timers or native listeners around a Hook. Update its inputs and let React run the Hook's cleanup when dependencies change or the component unmounts.

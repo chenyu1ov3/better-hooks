@@ -1,0 +1,26 @@
+---
+title: ADR 004 — Performance evidence
+description: How Better Hooks reports size and performance without unsupported benchmark claims.
+section: Architecture
+order: 23
+---
+
+# ADR 004 — Performance evidence
+
+## Status
+
+Accepted for the preview implementation.
+
+## Context
+
+Unqualified bundle sizes and competitor charts quickly become stale. A Hook can also be small in isolation while causing unnecessary subscriptions or client hydration.
+
+## Decision
+
+Size claims must come from the current built entry and identify the measurement. The website may report manifest facts such as zero runtime dependencies, explicit exports, and `sideEffects: false`. It does not invent competitor benchmarks, download counts, or coverage percentages.
+
+Runtime implementations share native subscriptions when ownership and cleanup remain clear. Documentation and examples hydrate only where interaction is required.
+
+## Consequences
+
+Performance sections may contain fewer numbers than marketing sites. That is intentional: evidence is refreshed by build tooling, and unverified figures remain absent rather than becoming placeholders that look authoritative.

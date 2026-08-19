@@ -1,0 +1,54 @@
+---
+title: useDebounceFn
+description: 对函数调用进行防抖，并提供取消与立即执行能力。
+section: 异步
+order: 112
+---
+
+# useDebounceFn
+
+## 概览
+
+`useDebounceFn` 会在一段时间没有新调用后，使用最新参数执行函数，并提供完整的任务生命周期控制。
+
+## 函数签名
+
+```ts
+function useDebounceFn<Args extends unknown[], Result>(
+  fn: (...args: Args) => Result,
+  options: DebounceOptions,
+): {
+  run: (...args: Args) => void;
+  cancel: () => void;
+  flush: () => Result | undefined;
+  pending: boolean;
+};
+```
+
+## 参数
+
+`fn` 始终使用最近一次已提交的版本。选项包含必填的 `delay`，以及可选的 `leading`、`trailing` 和有限 `maxWait`。
+
+## 返回值
+
+`run` 将参数加入等待队列，`cancel` 丢弃任务，`flush` 立即执行，`pending` 表示当前是否有等待中的调用。
+
+## 行为
+
+默认只在尾端执行。`flush` 会清理两个定时器并返回回调结果；组件卸载时会丢弃并清理任务，不再执行回调。
+
+## SSR / RSC
+
+渲染期间不会创建定时器；只有客户端调用 `run` 后才开始调度。该 Hook 必须在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+如果必须在页面跳转前完成本地保存，可以调用 `flush`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-debounce-fn/index.ts)。

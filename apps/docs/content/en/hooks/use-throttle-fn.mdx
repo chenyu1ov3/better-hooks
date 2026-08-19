@@ -1,0 +1,49 @@
+---
+title: useThrottleFn
+description: Throttle callback calls with leading and trailing controls.
+section: Async
+order: 113
+---
+
+# useThrottleFn
+
+## Overview
+
+`useThrottleFn` limits callback execution frequency while retaining the latest arguments and committed callback.
+
+## Signature
+
+```ts
+function useThrottleFn<Args extends unknown[], Result>(
+  fn: (...args: Args) => Result,
+  options: ThrottleOptions,
+): ThrottledFunction<Args, Result>;
+```
+
+## Parameters
+
+`delay` defines the throttle window. `leading` and `trailing` both default to `true`.
+
+## Returns
+
+The same `run`, `cancel`, `flush`, and `pending` control object as `useDebounceFn`.
+
+## Behavior
+
+Internally, `maxWait` equals `delay`, so a continuous stream cannot postpone execution indefinitely.
+
+## SSR / RSC
+
+No work starts during server render. Calls schedule timers only after client code invokes `run`.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Combine it with `useEventListener` when the source event should remain responsive but downstream work must be bounded.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-throttle-fn/index.ts).

@@ -1,0 +1,57 @@
+---
+title: useAsync
+description: 运行可取消的异步任务，避免过期结果更新组件状态。
+section: 异步
+order: 116
+---
+
+# useAsync
+
+## 概览
+
+`useAsync` 为每次任务执行管理 `AbortSignal`、状态、结果与错误，并阻止过期结果覆盖较新的状态。
+
+## 函数签名
+
+```ts
+type AsyncTask<T> = (signal: AbortSignal) => Promise<T> | T;
+function useAsync<T>(
+  task: AsyncTask<T>,
+  options?: { immediate?: boolean },
+): {
+  status: 'idle' | 'pending' | 'success' | 'error';
+  data: T | undefined;
+  error: unknown;
+  run: () => Promise<T>;
+  cancel: () => void;
+  reset: () => void;
+};
+```
+
+## 参数
+
+每次执行都会向 `task` 传入新的 `AbortSignal`。`immediate` 默认为 `false`；设为 `true` 时，任务会在组件提交后自动执行。
+
+## 返回值
+
+返回任务状态，以及引用稳定的 `run`、`cancel` 和 `reset`。`run` 返回任务本身的结果，并保留原始拒绝原因。
+
+## 行为
+
+开始新任务时会中止前一个 `AbortController`。序号检查会阻止旧结果更新状态。`cancel` 保留 `data` 并回到 `idle`；`reset` 还会清空 `data` 和 `error`。
+
+## SSR / RSC
+
+SSR 时状态从 `idle` 开始；即使启用 `immediate`，任务也只会在客户端 Effect 中启动。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以先用 `useDebounce` 稳定输入，再更新任务；关联面板关闭时则可调用 `cancel`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-async/index.ts)。

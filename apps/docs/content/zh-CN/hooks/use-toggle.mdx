@@ -1,0 +1,48 @@
+---
+title: useToggle
+description: 管理布尔状态，并提供稳定的切换与显式设置操作。
+section: 状态
+order: 100
+---
+
+# useToggle
+
+## 概览
+
+`useToggle` 管理一个布尔值，并返回引用稳定的操作函数。该函数可以反转状态、直接设值，或根据前值计算下一状态。
+
+## 函数签名
+
+```ts
+function useToggle(
+  initialValue?: boolean,
+): readonly [value: boolean, toggle: (next?: boolean | ((previous: boolean) => boolean)) => void];
+```
+
+## 参数
+
+`initialValue` 默认为 `false`。`toggle()` 会反转前值，也可以接收布尔值或函数式更新。
+
+## 返回值
+
+返回只读元组，包含当前布尔值和引用稳定的操作函数。
+
+## 行为
+
+操作函数使用 React 的函数式状态更新，因此连续调用时不会捕获过时的渲染值。
+
+## SSR / RSC
+
+SSR 时会使用确定的初始值。该 Hook 必须在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+需要 `setTrue`、`setFalse` 这样的具名操作时，请使用 `useBoolean`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-toggle/index.ts)。

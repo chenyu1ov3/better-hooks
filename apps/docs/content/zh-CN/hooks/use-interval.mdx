@@ -1,0 +1,46 @@
+---
+title: useInterval
+description: 以声明式定时任务周期执行最新回调。
+section: 异步
+order: 115
+---
+
+# useInterval
+
+## 概览
+
+`useInterval` 以声明方式管理周期定时器：传入间隔即可运行，传入 `null` 即可暂停。
+
+## 函数签名
+
+```ts
+function useInterval(callback: () => void, delay: number | null): void;
+```
+
+## 参数
+
+`callback` 始终使用最近一次已提交的版本，且不会因此重建定时器；`delay` 最小为零，`null` 表示暂停。
+
+## 返回值
+
+无返回值；通过改变 `delay` 控制定时任务。
+
+## 行为
+
+改变 `delay` 会替换原生定时器；依赖变化或组件卸载时都会执行清理。
+
+## SSR / RSC
+
+定时任务只会在客户端 Effect 中启动，SSR 期间不会运行。请在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以使用 `useToggle` 控制 `running`，或通过 `useOnline` 在离线时暂停轮询。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-interval/index.ts)。

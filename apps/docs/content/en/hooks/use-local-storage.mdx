@@ -1,0 +1,50 @@
+---
+title: useLocalStorage
+description: Synchronize typed React state with localStorage.
+section: Storage
+order: 140
+---
+
+# useLocalStorage
+
+## Overview
+
+`useLocalStorage` exposes local storage as a typed external store, including same-page subscribers, cross-document storage events, and recoverable errors.
+
+## Signature
+
+```ts
+function useLocalStorage<T>(
+  key: string,
+  initialValue: T | (() => T),
+  options?: { serialize?: (value: T) => string; deserialize?: (raw: string) => T },
+): { value: T; error: unknown; setValue: (next: SetStateAction<T>) => void; remove: () => void };
+```
+
+## Parameters
+
+`key` identifies the item. `initialValue` is captured once and may be lazy. Serialization defaults to JSON; custom serializer and deserializer must agree.
+
+## Returns
+
+The current `value`, the latest access or codec `error`, a functional `setValue`, and `remove`.
+
+## Behavior
+
+Failed reads keep the current value and report the error. Failed writes do not replace the current value. `remove` restores the captured initial value. Subscribers for a key share a store.
+
+## SSR / RSC
+
+The server snapshot uses `initialValue`; storage is read only when a browser is available. Use a deterministic initial value in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Display `error` when persistence matters. Keep security-sensitive or server-authoritative data out of browser storage.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-local-storage/index.ts).

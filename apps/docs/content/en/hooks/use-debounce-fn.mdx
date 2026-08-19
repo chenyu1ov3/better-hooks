@@ -1,0 +1,54 @@
+---
+title: useDebounceFn
+description: Debounce callback calls with cancellation and flush controls.
+section: Async
+order: 112
+---
+
+# useDebounceFn
+
+## Overview
+
+`useDebounceFn` schedules the latest arguments after a quiet period and exposes explicit lifecycle controls.
+
+## Signature
+
+```ts
+function useDebounceFn<Args extends unknown[], Result>(
+  fn: (...args: Args) => Result,
+  options: DebounceOptions,
+): {
+  run: (...args: Args) => void;
+  cancel: () => void;
+  flush: () => Result | undefined;
+  pending: boolean;
+};
+```
+
+## Parameters
+
+`fn` is read from the latest commit. Options use required `delay`, optional `leading`, `trailing`, and finite `maxWait`.
+
+## Returns
+
+`run` queues arguments, `cancel` drops them, `flush` invokes them immediately, and `pending` reports queued work.
+
+## Behavior
+
+Defaults are trailing-only. `flush` clears both timers and returns the callback result; unmount clears pending work without invoking it.
+
+## SSR / RSC
+
+Render creates no timer. Calling `run` is an interaction-time operation; use the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Call `flush` before navigation when a queued local save must finish synchronously.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-debounce-fn/index.ts).

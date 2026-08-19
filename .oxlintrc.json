@@ -1,0 +1,72 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "react",
+    "typescript",
+    "import",
+    "unicorn",
+    "vitest",
+    "jsx-a11y",
+    "react-perf",
+    "promise",
+    "node",
+    "oxc"
+  ],
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "es2022": true,
+    "node": true
+  },
+  "globals": {
+    "React": "readonly",
+    "JSX": "readonly"
+  },
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/coverage/**",
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/.next-dev/**",
+    "**/out/**",
+    "**/doc_build/**",
+    "**/.turbo/**",
+    "**/.cache/**",
+    "**/*.tsbuildinfo"
+  ],
+  "rules": {
+    "eslint/no-unused-vars": "error",
+    "typescript/no-explicit-any": "error",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "import/no-duplicates": "error",
+    "promise/param-names": "error"
+  },
+  "overrides": [
+    {
+      "files": ["apps/docs/next-env.d.ts"],
+      "rules": {
+        "typescript/triple-slash-reference": "off"
+      }
+    },
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx", "**/*.test-d.ts"],
+      "plugins": ["vitest", "typescript", "react"],
+      "rules": {
+        "vitest/expect-expect": "off",
+        "vitest/no-focused-tests": "error",
+        "vitest/require-mock-type-parameters": "off"
+      }
+    },
+    {
+      "files": ["**/*.tsx", "**/*.ts"],
+      "rules": {
+        "react/refs": "off",
+        "react/set-state-in-effect": "off",
+        "react/immutability": "off",
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/role-has-required-aria-props": "off"
+      }
+    }
+  ]
+}

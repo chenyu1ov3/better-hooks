@@ -1,0 +1,53 @@
+---
+title: useThrottle
+description: Limit value updates to at most once per time window.
+section: Async
+order: 111
+---
+
+# useThrottle
+
+## Overview
+
+`useThrottle` constrains a rapidly changing value to one publication per configured time window.
+
+## Signature
+
+```ts
+function useThrottle<T>(
+  value: T,
+  options: {
+    delay: number;
+    leading?: boolean;
+    trailing?: boolean;
+  },
+): T;
+```
+
+## Parameters
+
+`delay` defines the window. `leading` and `trailing` both default to `true`.
+
+## Returns
+
+The most recently published value, initialized with the first input.
+
+## Behavior
+
+It uses the debounce scheduler with `maxWait` equal to `delay`, guaranteeing progress while values keep changing.
+
+## SSR / RSC
+
+SSR returns the input value without scheduling work. Timers begin after client commit.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useWindowSize` or `useEventListener` as the source, then throttle rendering of expensive derived UI.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-throttle/index.ts).

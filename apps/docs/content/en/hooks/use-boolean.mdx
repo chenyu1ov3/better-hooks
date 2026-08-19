@@ -1,0 +1,52 @@
+---
+title: useBoolean
+description: Boolean state with named true, false, and toggle actions.
+section: State
+order: 101
+---
+
+# useBoolean
+
+## Overview
+
+`useBoolean` builds on `useToggle` and provides named actions for interfaces where intent matters more than tuple compactness.
+
+## Signature
+
+```ts
+function useBoolean(initialValue?: boolean): {
+  readonly value: boolean;
+  readonly boolean: boolean;
+  readonly setTrue: () => void;
+  readonly setFalse: () => void;
+  readonly toggle: (next?: ToggleUpdater) => void;
+};
+```
+
+## Parameters
+
+`initialValue` is optional and defaults to `false`.
+
+## Returns
+
+`value` and `boolean` are aliases. `setTrue`, `setFalse`, and `toggle` remain stable; the result object changes when the value changes.
+
+## Behavior
+
+Named actions update through `useToggle`, including support for explicit values and functional updates through `toggle`.
+
+## SSR / RSC
+
+It accesses no browser API and renders its initial state on the server. It is still a Client Component Hook.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Pass `setFalse` to escape-key or click-outside handling without creating an inline setter.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-boolean/index.ts).

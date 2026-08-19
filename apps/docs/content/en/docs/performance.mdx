@@ -1,0 +1,30 @@
+---
+title: Performance
+description: Verifiable package properties, subscription sharing, and performance boundaries.
+section: Concepts
+order: 6
+---
+
+# Performance
+
+## Verified package properties
+
+The current source contains 22 public Hooks, explicit package exports, no runtime dependencies, and a React peer dependency. The package is ESM-only and declares `sideEffects: false`.
+
+These are package properties, not a claim that every bundler or application produces the same output.
+
+## Import only the behavior you need
+
+After publication, each Hook will be available through a direct entry such as `better-hook/use-media-query`. Direct imports reduce ambiguity in application graphs; production size still depends on the consuming compiler, target, minifier, and surrounding code.
+
+## Shared subscriptions
+
+Where the browser source permits it, external-store Hooks share native work. Media-query subscribers share an entry per `Window` and query. Online status uses one listener pair per browser realm. Window size uses one resize listener for current subscribers.
+
+## Scheduling discipline
+
+Timer and listener setup occurs after commit. Cleanup runs on dependency changes and unmount. Stable callback refs avoid tearing down native listeners merely because a callback function received a new identity.
+
+## Measurements
+
+This site does not publish competitor comparisons or synthetic benchmark numbers. Bundle figures may be shown only when generated from the current build, with the entry, compression method, and version identified.

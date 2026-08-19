@@ -1,0 +1,46 @@
+---
+title: useOnline
+description: Track navigator connectivity with a shared external store.
+section: Browser & DOM
+order: 124
+---
+
+# useOnline
+
+## Overview
+
+`useOnline` observes browser `online` and `offline` events and exposes `navigator.onLine` as a React external-store snapshot.
+
+## Signature
+
+```ts
+function useOnline(): boolean;
+```
+
+## Parameters
+
+This Hook takes no parameters.
+
+## Returns
+
+`false` only when the browser reports `navigator.onLine === false`; otherwise `true`.
+
+## Behavior
+
+Subscribers in one browser realm share a single listener pair. The listeners and cached store are removed after the last subscriber unmounts.
+
+## SSR / RSC
+
+The server snapshot is `true`. Connectivity is a browser hint, not proof that a specific endpoint is reachable. Use the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use it to pause `useInterval` polling or explain an error; still handle request failures through `useAsync`.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-online/index.ts).

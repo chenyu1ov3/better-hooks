@@ -1,0 +1,26 @@
+---
+title: ADR 002 — API semantics
+description: Stable actions, committed callbacks, and explicit cancellation in public Hook APIs.
+section: Architecture
+order: 21
+---
+
+# ADR 002 — API semantics
+
+## Status
+
+Accepted for the preview implementation.
+
+## Context
+
+Small Hook APIs become hard to compose when actions change identity, callbacks become stale, or cancellation behavior is implicit.
+
+## Decision
+
+Actions returned by Better Hooks remain stable where their semantics allow it. Long-lived work calls the latest committed callback. Async and debounced work expose cancellation where callers need control, and stale asynchronous results cannot replace newer state.
+
+Controlled and uncontrolled state share one setter contract. Functional updates receive the latest value owned by that mode, and `onChange` is not called for `Object.is`-equal updates.
+
+## Consequences
+
+Implementation refs are updated at commit boundaries. APIs may expose a small state object rather than a bare callback when status or cancellation is part of the contract. Documentation describes leading, trailing, reset, and fallback behavior explicitly.

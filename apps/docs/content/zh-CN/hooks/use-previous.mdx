@@ -1,0 +1,47 @@
+---
+title: usePrevious
+description: 读取上一次成功提交的渲染值。
+section: 状态
+order: 103
+---
+
+# usePrevious
+
+## 概览
+
+`usePrevious` 提供上一次已提交的值，可用于前后比较、变化方向提示和依赖变化检测。
+
+## 函数签名
+
+```ts
+function usePrevious<T>(value: T): T | undefined;
+function usePrevious<T, U>(value: T, initialValue: U): T | U;
+```
+
+## 参数
+
+`value` 会在提交后写入。可选的 `initialValue` 会在第一次提交前返回。
+
+## 返回值
+
+返回上一次已提交的 `value`；首次渲染时返回 `initialValue`，未提供则返回 `undefined`。
+
+## 行为
+
+ref 会在 Effect 中更新，因此被并发渲染放弃的值不会成为“上一次”的值。
+
+## SSR / RSC
+
+服务端不会运行 Effect，因此只会返回初始回退值。请在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以与 `useDebounce` 组合，比较即时输入和上一次已提交的防抖结果。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-previous/index.ts)。

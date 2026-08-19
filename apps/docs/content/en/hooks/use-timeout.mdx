@@ -1,0 +1,49 @@
+---
+title: useTimeout
+description: Run the latest callback once after a declarative delay.
+section: Async
+order: 114
+---
+
+# useTimeout
+
+## Overview
+
+`useTimeout` owns a one-shot timer, tracks whether it is pending, and keeps callback changes separate from timer restarts.
+
+## Signature
+
+```ts
+function useTimeout(
+  callback: () => void,
+  delay: number | null,
+): { readonly cancel: () => void; readonly pending: boolean };
+```
+
+## Parameters
+
+`callback` is updated from the latest commit. `delay` is clamped to zero; `null` disables the timer.
+
+## Returns
+
+A stable `cancel` action and a `pending` flag.
+
+## Behavior
+
+Changing `delay` restarts the timer. Changing only `callback` does not. Completion and `cancel` set `pending` to false; unmount clears the timer.
+
+## SSR / RSC
+
+No timeout starts on the server. The initial `pending` value is `delay !== null`; client effects reconcile it.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useBoolean` for the visible state and expose `cancel` when the user can keep a notice open.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-timeout/index.ts).

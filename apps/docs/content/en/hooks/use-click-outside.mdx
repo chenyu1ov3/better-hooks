@@ -1,0 +1,50 @@
+---
+title: useClickOutside
+description: Handle pointer presses outside a referenced element.
+section: Browser & DOM
+order: 121
+---
+
+# useClickOutside
+
+## Overview
+
+`useClickOutside` listens for document-level `pointerdown` events and calls a handler only when the event target is outside the referenced element.
+
+## Signature
+
+```ts
+function useClickOutside<T extends HTMLElement>(
+  ref: { readonly current: T | null },
+  onOutside: (event: PointerEvent) => void,
+  enabled?: boolean,
+): void;
+```
+
+## Parameters
+
+`ref` identifies the inside region. `onOutside` follows the latest commit. `enabled` defaults to `true`.
+
+## Returns
+
+Nothing. The document listener is managed by the Hook.
+
+## Behavior
+
+Events with non-Node targets are ignored. A missing element is not treated as an outside hit. Disabling or unmounting removes the listener.
+
+## SSR / RSC
+
+When `document` is unavailable, the effect performs no work. Call the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useBoolean` for open state and pass its stable `setFalse` action as the handler.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-click-outside/index.ts).

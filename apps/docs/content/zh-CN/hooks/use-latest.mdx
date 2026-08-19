@@ -1,0 +1,46 @@
+---
+title: useLatest
+description: 使用稳定的 ref 保存最近一次已提交值。
+section: 状态
+order: 104
+---
+
+# useLatest
+
+## 概览
+
+`useLatest` 返回一个引用稳定的 ref，其 `current` 始终保存最近一次已提交的值。
+
+## 函数签名
+
+```ts
+function useLatest<T>(value: T): React.RefObject<T>;
+```
+
+## 参数
+
+`value` 可以是任意类型；值变化时，ref 本身的引用不会改变。
+
+## 返回值
+
+返回使用首次渲染值初始化且引用稳定的 `RefObject<T>`。
+
+## 行为
+
+ref 会在 Effect 中更新，而不是在渲染期间更新，因此长生命周期的外部回调不会观察到被放弃的并发渲染值。
+
+## SSR / RSC
+
+SSR 时 `current` 为本次渲染值，后续只会在客户端提交后更新。请仅在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+如果 `useEventListener` 等高层 Hook 已经负责管理最新回调，应直接使用对应的高层 Hook。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-latest/index.ts)。

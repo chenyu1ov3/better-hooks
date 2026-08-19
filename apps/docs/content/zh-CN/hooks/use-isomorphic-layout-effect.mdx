@@ -1,0 +1,46 @@
+---
+title: useIsomorphicLayoutEffect
+description: 浏览器中使用 Layout Effect，SSR 时回退到普通 Effect。
+section: 生命周期
+order: 151
+---
+
+# useIsomorphicLayoutEffect
+
+## 概览
+
+`useIsomorphicLayoutEffect` 在 `window` 存在时使用 `useLayoutEffect`，在其他环境中使用 `useEffect`。
+
+## 函数签名
+
+```ts
+const useIsomorphicLayoutEffect: typeof React.useEffect;
+```
+
+## 参数
+
+接收与 React Effect API 相同的回调和依赖数组。
+
+## 返回值
+
+返回值与 React `useEffect` 的类型保持一致。
+
+## 行为
+
+模块加载时会根据环境选择实现：浏览器中在 Layout Effect 阶段运行；浏览器外采用普通 Effect 语义，避免服务端警告。
+
+## SSR / RSC
+
+服务端分支使用 `useEffect`，不会在服务端渲染期间执行。该 API 仍然是 Client Component Hook。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+多数业务应优先使用已经管理已提交回调 ref 的高层 Hook；这项基础能力更适合对布局时序敏感的库内部逻辑。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-isomorphic-layout-effect/index.ts)。

@@ -1,0 +1,46 @@
+---
+title: useLatest
+description: Keep a stable ref to the latest committed value.
+section: State
+order: 104
+---
+
+# useLatest
+
+## Overview
+
+`useLatest` returns one ref object whose `current` value follows the most recent commit.
+
+## Signature
+
+```ts
+function useLatest<T>(value: T): React.RefObject<T>;
+```
+
+## Parameters
+
+`value` may have any type. Changing it does not change the returned ref identity.
+
+## Returns
+
+A stable `RefObject<T>` initialized with the first render value.
+
+## Behavior
+
+The ref updates in an effect rather than during render, so external callbacks cannot observe a value from an abandoned concurrent render.
+
+## SSR / RSC
+
+During SSR, `current` contains the render value. Later updates happen after client commits; call it only in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Prefer a Hook such as `useEventListener` when it already manages the latest callback internally.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-latest/index.ts).

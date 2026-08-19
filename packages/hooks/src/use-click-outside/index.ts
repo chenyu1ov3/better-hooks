@@ -1,0 +1,119 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { useIsomorphicLayoutEffect } from '../use-isomorphic-layout-effect/index.js';
+
+interface OutsideBinding {
+  readonly document: Document;
+  readonly root: ShadowRoot | undefined;
+  readonly listener: (event: PointerEvent) => void;
+  readonly rootListener: EventListener | undefined;
+}
+
+function eventOccurredInside(event: PointerEvent, element: HTMLElement): boolean {
+  const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+  if (path.includes(element)) return true;
+
+  const target = event.target;
+  const NodeConstructor = element.ownerDocument.defaultView?.Node;
+  const isNode = NodeConstructor
+    ? target instanceof NodeConstructor
+    : Boolean(target && typeof (target as Node).nodeType === 'number');
+  return isNode && element.contains(target as Node);
+}
+
+/**
+ * Calls `onOutside` for captured pointer presses outside the referenced element.
+ * The listener follows the element to its owner document and supports composed
+ * events crossing a shadow root.
+ * @public
+ */
+export function useClickOutside<T extends HTMLElement>(
+  ref: { readonly current: T | null },
+  onOutside: (event: PointerEvent) => void,
+  enabled = true,
+): void {
+  const callbackRef = useRef(onOutside);
+  const targetRef = useRef(ref);
+  const bindingRef = useRef<OutsideBinding | undefined>(undefined);
+  useIsomorphicLayoutEffect(() => {
+    callbackRef.current = onOutside;
+    targetRef.current = ref;
+  }, [onOutside, ref]);
+
+  useEffect(() => {
+    const element = enabled ? ref.current : null;
+    const targetDocument = element?.ownerDocument;
+    const nodeRoot = element?.getRootNode();
+    const targetRoot =
+      nodeRoot?.nodeType === 11 && 'host' in nodeRoot ? (nodeRoot as ShadowRoot) : undefined;
+    const current = bindingRef.current;
+    if (current?.document === targetDocument && current?.root === targetRoot) return;
+
+    if (current) {
+      current.document.removeEventListener('pointerdown', current.listener, true);
+      current.root?.removeEventListener('pointerdown', current.rootListener!, true);
+    }
+    bindingRef.current = undefined;
+    if (!targetDocument) return;
+
+    const shadowResults = new WeakMap<Event, boolean>();
+    const handlePointerDown = (event: PointerEvent) => {
+      const currentElement = targetRef.current.current;
+      if (
+        !currentElement ||
+        currentElement.ownerDocument !== targetDocument ||
+        eventOccurredInside(event, currentElement)
+      ) {
+        return;
+      }
+
+      const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+      if (targetRoot && path.includes(targetRoot.host)) {
+        // A closed shadow root hides its internal path from document listeners.
+        // Wait until the root listener records whether the real target was inside.
+        queueMicrotask(() => {
+          if (
+            bindingRef.current?.listener === handlePointerDown &&
+            shadowResults.get(event) !== true
+          ) {
+            callbackRef.current(event);
+          }
+        });
+      } else {
+        callbackRef.current(event);
+      }
+    };
+    const handleRootPointerDown: EventListener | undefined = targetRoot
+      ? (event) => {
+          const pointerEvent = event as PointerEvent;
+          const currentElement = targetRef.current.current;
+          const inside = Boolean(
+            currentElement && eventOccurredInside(pointerEvent, currentElement),
+          );
+          shadowResults.set(event, inside);
+          if (!event.composed && !inside) callbackRef.current(pointerEvent);
+        }
+      : undefined;
+    targetDocument.addEventListener('pointerdown', handlePointerDown, true);
+    targetRoot?.addEventListener('pointerdown', handleRootPointerDown!, true);
+    bindingRef.current = {
+      document: targetDocument,
+      root: targetRoot,
+      listener: handlePointerDown,
+      rootListener: handleRootPointerDown,
+    };
+  });
+
+  useEffect(
+    () => () => {
+      const binding = bindingRef.current;
+      if (binding) {
+        binding.document.removeEventListener('pointerdown', binding.listener, true);
+        binding.root?.removeEventListener('pointerdown', binding.rootListener!, true);
+      }
+      bindingRef.current = undefined;
+    },
+    [],
+  );
+}

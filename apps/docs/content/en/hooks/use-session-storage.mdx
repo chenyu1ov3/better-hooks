@@ -1,0 +1,50 @@
+---
+title: useSessionStorage
+description: Synchronize typed React state with sessionStorage.
+section: Storage
+order: 141
+---
+
+# useSessionStorage
+
+## Overview
+
+`useSessionStorage` provides the same typed external-store contract as `useLocalStorage`, scoped to the current browser tab session.
+
+## Signature
+
+```ts
+function useSessionStorage<T>(
+  key: string,
+  initialValue: T | (() => T),
+  options?: StorageOptions<T>,
+): UseStorageResult<T>;
+```
+
+## Parameters
+
+`key` selects the item, `initialValue` supplies the missing/server value, and optional codecs replace JSON serialization.
+
+## Returns
+
+`value`, `error`, `setValue`, and `remove`. The setter accepts a value or functional update.
+
+## Behavior
+
+Values survive reloads in the same tab but are not intended as cross-tab persistence. Access and codec failures are reflected in `error` without throwing from render.
+
+## SSR / RSC
+
+The server snapshot is the captured initial value. Browser storage is accessed only when available; call the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Combine with `useDebounceFn` when writes should wait for typing to settle.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-session-storage/index.ts).

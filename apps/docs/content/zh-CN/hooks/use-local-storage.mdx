@@ -1,0 +1,50 @@
+---
+title: useLocalStorage
+description: 在 localStorage 与类型安全的 React 状态之间保持同步。
+section: 存储
+order: 140
+---
+
+# useLocalStorage
+
+## 概览
+
+`useLocalStorage` 将本地存储连接为类型安全的外部状态源，支持同页订阅者与跨文档 `storage` 事件，并将错误保留在状态中。
+
+## 函数签名
+
+```ts
+function useLocalStorage<T>(
+  key: string,
+  initialValue: T | (() => T),
+  options?: { serialize?: (value: T) => string; deserialize?: (raw: string) => T },
+): { value: T; error: unknown; setValue: (next: SetStateAction<T>) => void; remove: () => void };
+```
+
+## 参数
+
+`key` 标识存储项；`initialValue` 只捕获一次，并支持惰性计算。默认使用 JSON；自定义序列化与反序列化函数必须相互匹配。
+
+## 返回值
+
+返回当前 `value`、最近一次访问或编解码产生的 `error`、支持函数式更新的 `setValue`，以及 `remove`。
+
+## 行为
+
+读取失败时会保留当前值并报告错误，写入失败也不会替换当前值。`remove` 会恢复首次捕获的初始值；同一存储项的订阅者共享外部状态源。
+
+## SSR / RSC
+
+服务端快照使用 `initialValue`，并且只在浏览器环境可用时读取存储。请在 Client Component 中传入确定的初始值。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+如果持久化结果对用户很重要，应显示 `error`；敏感数据或以服务端为准的数据不应放入浏览器存储。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-local-storage/index.ts)。

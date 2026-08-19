@@ -1,0 +1,49 @@
+---
+title: useToggle
+description: Boolean state with a stable toggle or explicit setter action.
+section: State
+order: 100
+---
+
+# useToggle
+
+## Overview
+
+`useToggle` owns a boolean and returns one stable action that can invert it, set it directly, or calculate it from the previous value.
+
+## Signature
+
+```ts
+function useToggle(
+  initialValue?: boolean,
+): readonly [value: boolean, toggle: (next?: boolean | ((previous: boolean) => boolean)) => void];
+```
+
+## Parameters
+
+- `initialValue` defaults to `false` and is read by React when state is initialized.
+- `toggle()` inverts the previous value. Pass a boolean or updater to choose the next value.
+
+## Returns
+
+A readonly tuple containing the current boolean and a referentially stable action.
+
+## Behavior
+
+The action uses a functional React state update, so repeated calls do not close over an old render value.
+
+## SSR / RSC
+
+The initial value is deterministic during SSR. Call the Hook only in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useBoolean` when named `setTrue` and `setFalse` actions make the call site clearer.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-toggle/index.ts).

@@ -1,0 +1,36 @@
+---
+title: SSR 与 RSC
+description: 了解 Better Hooks 的服务端快照、Client Component 边界与 hydration 规则。
+section: 核心概念
+order: 5
+---
+
+# SSR 与 RSC
+
+## Client Component 边界
+
+所有 Better Hooks 都会调用 React 客户端 Hook，因此必须在 Client Component 中运行。Server Component 可以渲染使用 Better Hooks 的子组件，但不能直接调用这些 Hook。
+
+## 导入安全
+
+包不会在导入时注册监听器、启动定时器、读取存储或访问 DOM。因此，这些模块可以安全地进入服务端构建；但这并不表示 Hook 可以在 Server Component 中调用。
+
+## 服务端快照
+
+面向浏览器的 Hook 使用确定的回退值：
+
+| Hook             | 服务端结果                           |
+| ---------------- | ------------------------------------ |
+| `useMediaQuery`  | `defaultMatches`，未提供时为 `false` |
+| `useWindowSize`  | `{ width: 0, height: 0 }`            |
+| `useOnline`      | `true`                               |
+| 存储 Hooks       | 调用方提供的初始值                   |
+| 监听与定时 Hooks | 服务端渲染期间不创建订阅或定时器     |
+
+## Hydration 一致性
+
+请选择能够渲染合理初始界面的服务端回退值。Hydration 完成后，React 会同步浏览器快照。浏览器测量结果未知时，应优先使用稳定的中性布局，不要据此切换整棵服务端节点树。
+
+## RSC-friendly 不等于可在服务端调用
+
+本项目所说的 RSC-friendly，指的是客户端边界清晰、导入过程安全、传给客户端叶子节点的 props 可序列化，并且服务端快照有明确文档；它不表示 Hook 能在 Server Component 中执行。

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://oxc.rs/schema/oxfmt.json",
+  "printWidth": 100,
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "all",
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/.next/**",
+    "**/.next-dev/**",
+    "**/out/**",
+    "**/doc_build/**",
+    "**/*.tsbuildinfo"
+  ]
+}

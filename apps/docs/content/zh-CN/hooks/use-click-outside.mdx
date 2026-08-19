@@ -1,0 +1,50 @@
+---
+title: useClickOutside
+description: 响应目标元素外部的指针按下事件。
+section: 浏览器与 DOM
+order: 121
+---
+
+# useClickOutside
+
+## 概览
+
+`useClickOutside` 监听 `document` 上的 `pointerdown` 事件，仅当事件发生在 ref 所指元素之外时才调用处理函数。
+
+## 函数签名
+
+```ts
+function useClickOutside<T extends HTMLElement>(
+  ref: { readonly current: T | null },
+  onOutside: (event: PointerEvent) => void,
+  enabled?: boolean,
+): void;
+```
+
+## 参数
+
+`ref` 指定内部区域；`onOutside` 始终使用最近一次已提交的回调；`enabled` 默认为 `true`。
+
+## 返回值
+
+无返回值；`document` 监听器的建立与清理由 Hook 管理。
+
+## 行为
+
+非 `Node` 类型的事件目标会被忽略。引用元素尚不存在时，事件不会被视为外部点击；禁用 Hook 或卸载组件都会移除监听器。
+
+## SSR / RSC
+
+`document` 不可用时，Effect 不会执行任何操作。请仅在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+用 `useBoolean` 管理打开状态，并把稳定的 `setFalse` 直接作为处理函数。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-click-outside/index.ts)。

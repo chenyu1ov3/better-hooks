@@ -1,0 +1,46 @@
+---
+title: useIsMounted
+description: Read whether a component has completed its mounted effect.
+section: Lifecycle
+order: 150
+---
+
+# useIsMounted
+
+## Overview
+
+`useIsMounted` returns a stable function that reports whether the component's mount effect is currently active.
+
+## Signature
+
+```ts
+function useIsMounted(): () => boolean;
+```
+
+## Parameters
+
+This Hook takes no parameters.
+
+## Returns
+
+A stable function returning `true` after the mount effect and `false` before it or after cleanup.
+
+## Behavior
+
+Strict Mode effect replay resets and restores the flag through matching cleanup. The result is lifecycle state, not render visibility.
+
+## SSR / RSC
+
+The function returns `false` during SSR and before the first client effect. Use in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Prefer cancellation such as `useAsync`'s abort signal for asynchronous tasks. Use this Hook only when an external callback cannot be cancelled.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-is-mounted/index.ts).

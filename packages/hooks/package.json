@@ -1,0 +1,162 @@
+{
+  "name": "better-hook",
+  "version": "0.1.0",
+  "description": "React 19-first, concurrent-safe hooks primitives with near-zero runtime dependencies.",
+  "homepage": "https://chenyu1ov3.github.io/better-hooks/",
+  "bugs": {
+    "url": "https://github.com/chenyu1ov3/better-hooks/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chenyu1ov3/better-hooks.git",
+    "directory": "packages/hooks"
+  },
+  "files": [
+    "dist",
+    "src/use-*/examples/*.md",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./use-toggle": {
+      "types": "./dist/use-toggle/index.d.ts",
+      "import": "./dist/use-toggle/index.js",
+      "default": "./dist/use-toggle/index.js"
+    },
+    "./use-boolean": {
+      "types": "./dist/use-boolean/index.d.ts",
+      "import": "./dist/use-boolean/index.js",
+      "default": "./dist/use-boolean/index.js"
+    },
+    "./use-previous": {
+      "types": "./dist/use-previous/index.d.ts",
+      "import": "./dist/use-previous/index.js",
+      "default": "./dist/use-previous/index.js"
+    },
+    "./use-latest": {
+      "types": "./dist/use-latest/index.d.ts",
+      "import": "./dist/use-latest/index.js",
+      "default": "./dist/use-latest/index.js"
+    },
+    "./use-controllable-state": {
+      "types": "./dist/use-controllable-state/index.d.ts",
+      "import": "./dist/use-controllable-state/index.js",
+      "default": "./dist/use-controllable-state/index.js"
+    },
+    "./use-is-mounted": {
+      "types": "./dist/use-is-mounted/index.d.ts",
+      "import": "./dist/use-is-mounted/index.js",
+      "default": "./dist/use-is-mounted/index.js"
+    },
+    "./use-isomorphic-layout-effect": {
+      "types": "./dist/use-isomorphic-layout-effect/index.d.ts",
+      "import": "./dist/use-isomorphic-layout-effect/index.js",
+      "default": "./dist/use-isomorphic-layout-effect/index.js"
+    },
+    "./use-debounce": {
+      "types": "./dist/use-debounce/index.d.ts",
+      "import": "./dist/use-debounce/index.js",
+      "default": "./dist/use-debounce/index.js"
+    },
+    "./use-throttle": {
+      "types": "./dist/use-throttle/index.d.ts",
+      "import": "./dist/use-throttle/index.js",
+      "default": "./dist/use-throttle/index.js"
+    },
+    "./use-debounce-fn": {
+      "types": "./dist/use-debounce-fn/index.d.ts",
+      "import": "./dist/use-debounce-fn/index.js",
+      "default": "./dist/use-debounce-fn/index.js"
+    },
+    "./use-throttle-fn": {
+      "types": "./dist/use-throttle-fn/index.d.ts",
+      "import": "./dist/use-throttle-fn/index.js",
+      "default": "./dist/use-throttle-fn/index.js"
+    },
+    "./use-timeout": {
+      "types": "./dist/use-timeout/index.d.ts",
+      "import": "./dist/use-timeout/index.js",
+      "default": "./dist/use-timeout/index.js"
+    },
+    "./use-interval": {
+      "types": "./dist/use-interval/index.d.ts",
+      "import": "./dist/use-interval/index.js",
+      "default": "./dist/use-interval/index.js"
+    },
+    "./use-async": {
+      "types": "./dist/use-async/index.d.ts",
+      "import": "./dist/use-async/index.js",
+      "default": "./dist/use-async/index.js"
+    },
+    "./use-event-listener": {
+      "types": "./dist/use-event-listener/index.d.ts",
+      "import": "./dist/use-event-listener/index.js",
+      "default": "./dist/use-event-listener/index.js"
+    },
+    "./use-click-outside": {
+      "types": "./dist/use-click-outside/index.d.ts",
+      "import": "./dist/use-click-outside/index.js",
+      "default": "./dist/use-click-outside/index.js"
+    },
+    "./use-media-query": {
+      "types": "./dist/use-media-query/index.d.ts",
+      "import": "./dist/use-media-query/index.js",
+      "default": "./dist/use-media-query/index.js"
+    },
+    "./use-window-size": {
+      "types": "./dist/use-window-size/index.d.ts",
+      "import": "./dist/use-window-size/index.js",
+      "default": "./dist/use-window-size/index.js"
+    },
+    "./use-online": {
+      "types": "./dist/use-online/index.d.ts",
+      "import": "./dist/use-online/index.js",
+      "default": "./dist/use-online/index.js"
+    },
+    "./use-input": {
+      "types": "./dist/use-input/index.d.ts",
+      "import": "./dist/use-input/index.js",
+      "default": "./dist/use-input/index.js"
+    },
+    "./use-local-storage": {
+      "types": "./dist/use-local-storage/index.d.ts",
+      "import": "./dist/use-local-storage/index.js",
+      "default": "./dist/use-local-storage/index.js"
+    },
+    "./use-session-storage": {
+      "types": "./dist/use-session-storage/index.d.ts",
+      "import": "./dist/use-session-storage/index.js",
+      "default": "./dist/use-session-storage/index.js"
+    },
+    "./use-storage": {
+      "types": "./dist/use-storage/index.d.ts",
+      "import": "./dist/use-storage/index.js",
+      "default": "./dist/use-storage/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown && tsc --project tsconfig.build.json",
+    "clean": "node -e \"import('node:fs').then(({rmSync}) => rmSync('dist', { recursive: true, force: true }))\"",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0 <20.0.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

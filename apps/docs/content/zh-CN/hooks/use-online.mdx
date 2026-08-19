@@ -1,0 +1,46 @@
+---
+title: useOnline
+description: 通过共享的外部状态源跟踪 navigator 联网状态。
+section: 浏览器与 DOM
+order: 124
+---
+
+# useOnline
+
+## 概览
+
+`useOnline` 监听浏览器的 `online` 与 `offline` 事件，并将 `navigator.onLine` 暴露为 React 外部状态源快照。
+
+## 函数签名
+
+```ts
+function useOnline(): boolean;
+```
+
+## 参数
+
+无参数。
+
+## 返回值
+
+只有浏览器报告 `navigator.onLine === false` 时才返回 `false`，其他情况均为 `true`。
+
+## 行为
+
+同一浏览器上下文中的订阅者共用一对监听器；最后一个订阅者卸载后，会移除监听器和缓存的外部状态源。
+
+## SSR / RSC
+
+服务端快照为 `true`。联网状态只是浏览器提供的提示，不能证明特定接口确实可达。请在 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以在离线时暂停 `useInterval` 轮询或辅助解释错误，但请求本身仍需通过 `useAsync` 处理失败情况。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-online/index.ts)。

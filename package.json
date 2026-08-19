@@ -1,0 +1,63 @@
+{
+  "name": "better-hook-monorepo",
+  "private": true,
+  "homepage": "https://chenyu1ov3.github.io/better-hooks/",
+  "bugs": {
+    "url": "https://github.com/chenyu1ov3/better-hooks/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chenyu1ov3/better-hooks.git"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --filter ./packages/hooks build",
+    "clean": "pnpm -r clean",
+    "dev": "pnpm --filter ./packages/hooks dev",
+    "typecheck": "pnpm --filter ./packages/hooks typecheck && pnpm --filter ./apps/docs typecheck",
+    "lint": "oxlint . --tsconfig tsconfig.json --deny-warnings",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "test": "vitest run",
+    "test:types": "vitest run --typecheck.only --project=types",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm --filter @better-hooks/docs test:e2e",
+    "docs:dev": "pnpm --filter better-hook build && pnpm --parallel --filter better-hook --filter @better-hooks/docs run dev",
+    "docs:build": "pnpm --filter @better-hooks/docs... build",
+    "check:package": "pnpm build && node scripts/check-package.mjs",
+    "check:examples": "node scripts/check-hook-examples.mjs",
+    "check:docs-locales": "node scripts/check-doc-locales.mjs",
+    "check": "pnpm format:check && pnpm lint && pnpm check:package && pnpm typecheck && pnpm test:coverage && pnpm check:examples && pnpm check:docs-locales && pnpm --filter @better-hooks/docs build",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@changesets/cli": "^2.29.6",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitest/coverage-v8": "^3.2.4",
+    "jsdom": "^26.1.0",
+    "oxfmt": "^0.64.0",
+    "oxlint": "^1.79.0",
+    "publint": "^0.3.12",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "remark-parse": "^11.0.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^5.9.2",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@10.15.0"
+}

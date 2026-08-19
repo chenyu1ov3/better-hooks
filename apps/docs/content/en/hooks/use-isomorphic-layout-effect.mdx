@@ -1,0 +1,46 @@
+---
+title: useIsomorphicLayoutEffect
+description: Use a layout effect in the browser and a passive effect during SSR.
+section: Lifecycle
+order: 151
+---
+
+# useIsomorphicLayoutEffect
+
+## Overview
+
+`useIsomorphicLayoutEffect` is `useLayoutEffect` when `window` exists and `useEffect` otherwise.
+
+## Signature
+
+```ts
+const useIsomorphicLayoutEffect: typeof React.useEffect;
+```
+
+## Parameters
+
+It accepts the same effect callback and dependency list as React's effect APIs.
+
+## Returns
+
+The effect registration result, matching React's `useEffect` type.
+
+## Behavior
+
+Environment selection happens when the module is evaluated. In the browser, the effect runs in the layout-effect phase; outside it, passive effect semantics avoid a server warning.
+
+## SSR / RSC
+
+The server branch is `useEffect`, which does not run during server rendering. The API remains a Client Component Hook.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Most consumers should use a higher-level Hook that already manages committed callback refs. Choose this primitive only for layout-sensitive library internals.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-isomorphic-layout-effect/index.ts).

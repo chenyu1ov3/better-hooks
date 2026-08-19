@@ -1,0 +1,49 @@
+---
+title: useTimeout
+description: 经过声明式延迟后执行一次最新回调。
+section: 异步
+order: 114
+---
+
+# useTimeout
+
+## 概览
+
+`useTimeout` 管理一次性定时器、提供等待状态，并将回调更新与定时器重启分开处理。
+
+## 函数签名
+
+```ts
+function useTimeout(
+  callback: () => void,
+  delay: number | null,
+): { readonly cancel: () => void; readonly pending: boolean };
+```
+
+## 参数
+
+`callback` 始终使用最近一次已提交的版本；`delay` 最小为零，传入 `null` 可以禁用定时器。
+
+## 返回值
+
+返回引用稳定的 `cancel` 操作和 `pending` 状态。
+
+## 行为
+
+改变 `delay` 会重启定时器，只改变 `callback` 则不会。任务完成或取消后，`pending` 都会变为 `false`；组件卸载时会清理定时器。
+
+## SSR / RSC
+
+服务端不会启动定时器。`pending` 的初始值为 `delay !== null`，客户端 Effect 会完成状态同步。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以用 `useBoolean` 管理显示状态；如果允许用户保留通知，则可以向界面暴露 `cancel`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-timeout/index.ts)。
