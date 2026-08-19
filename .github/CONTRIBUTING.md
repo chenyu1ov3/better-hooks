@@ -41,3 +41,13 @@ pnpm changeset
 
 Use patch Changesets for compatible fixes, minor Changesets for backward-compatible
 features, and major Changesets for breaking public API changes.
+
+## Release and deployment
+
+Every push to `main` runs the quality, compatibility, and documentation E2E
+jobs, then deploys the static documentation to GitHub Pages. A pending Changeset
+also creates or updates the `Version Packages` pull request.
+
+Merging that pull request publishes `better-hook` through the release job. The
+repository must have an Actions secret named `NPM_TOKEN` with publish access
+before merging it; documentation deployment does not depend on that secret.
