@@ -15,7 +15,7 @@ pass serializable values to components that use these Hooks, and may import the
 package's public types with `import type`.
 
 Direct Hook entries are the preferred choice for the smallest initial module graph.
-The package is ESM-only and supports Node.js 22+ tooling and React
+The package is ESM-only and supports Node.js 22.18+ tooling and React
 `>=19.0.0 <20.0.0`.
 
 ## Hook examples

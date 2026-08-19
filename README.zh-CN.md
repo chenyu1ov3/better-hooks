@@ -45,7 +45,7 @@ API 说明和在线示例请查看 [Hook 参考文档](https://chenyu1ov3.github
 
 ## 本地开发
 
-环境要求：Node.js 22.12 或更高版本，以及 pnpm 10.15.0。
+环境要求：Node.js 22.18 或更高版本，以及 pnpm 10.15.0。
 
 ```sh
 pnpm install --frozen-lockfile

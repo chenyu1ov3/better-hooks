@@ -2,7 +2,7 @@
 
 ## Setup
 
-Install Node.js 22.12 or newer and pnpm 10.15.0, then install the locked
+Install Node.js 22.18 or newer and pnpm 10.15.0, then install the locked
 workspace dependencies:
 
 ```sh

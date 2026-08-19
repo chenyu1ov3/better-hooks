@@ -46,7 +46,7 @@ See the [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/) for A
 
 ## Development
 
-Requirements: Node.js 22.12 or newer and pnpm 10.15.0.
+Requirements: Node.js 22.18 or newer and pnpm 10.15.0.
 
 ```sh
 pnpm install --frozen-lockfile
