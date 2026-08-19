@@ -43,7 +43,7 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitest/coverage-v8": "^3.2.4",
-    "jsdom": "^26.1.0",
+    "jsdom": "^30.0.1",
     "oxfmt": "^0.64.0",
     "oxlint": "^1.79.0",
     "publint": "^0.3.12",
