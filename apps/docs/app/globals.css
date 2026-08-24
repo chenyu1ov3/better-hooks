@@ -143,6 +143,12 @@ svg {
 
 .site-frame {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-frame > main {
+  flex: 1;
 }
 
 .site-header {
@@ -1434,6 +1440,10 @@ pre {
   display: flex;
   align-items: center;
   gap: 18px;
+}
+
+.changelog-actions .text-link {
+  margin-top: 0;
 }
 
 .documentation-main {

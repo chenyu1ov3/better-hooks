@@ -23,15 +23,6 @@
 > Better Hooks is in preview. The `better-hook` package has not been published
 > to npm yet; verified installation instructions will arrive with the first release.
 
-## Guarantees
-
-- React 19 and strict TypeScript
-- ESM-only, explicit exports, and `sideEffects: false`
-- No runtime dependencies beyond the React peer dependency
-- SSR-safe imports with explicit Client Component boundaries
-- Focused direct-entry imports for every Hook
-- Bilingual documentation and runnable examples
-
 ## Included Hooks
 
 | Area             | Hooks                                                                                       |
@@ -43,20 +34,6 @@
 | Storage          | `useStorage`, `useLocalStorage`, `useSessionStorage`                                        |
 
 See the [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/) for API details and live examples.
-
-## Development
-
-Requirements: Node.js 22.18 or newer and pnpm 10.15.0.
-
-```sh
-pnpm install --frozen-lockfile
-pnpm check
-pnpm test:e2e
-```
-
-Run `pnpm docs:dev` to work on the documentation site. The publishable package
-lives in `packages/hooks`, while the Next.js documentation site lives in
-`apps/docs`.
 
 ## Links
 
