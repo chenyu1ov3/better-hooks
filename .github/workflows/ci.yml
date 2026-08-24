@@ -51,10 +51,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Typecheck workspaces
-        run: pnpm typecheck
       - name: Build and validate package artifact
         run: pnpm check:package
+      - name: Typecheck workspaces
+        run: pnpm typecheck
       - name: Run tests on Node 24
         if: matrix.node-version == '24'
         run: pnpm test
