@@ -310,6 +310,50 @@ test.describe('core interactions', () => {
     await expect(playground.locator('.live-code-panel-heading')).toHaveText('useAsync preview');
   });
 
+  test('Playground loads Hook modules only when selected', async ({ page }) => {
+    const requestedHookChunks = new Set<string>();
+    page.on('request', (request) => {
+      const filename = new URL(request.url()).pathname.split('/').at(-1);
+      if (filename?.startsWith('better-hook-')) {
+        requestedHookChunks.add(filename.replace(/\.[^.]+\.js$/, ''));
+      }
+    });
+
+    await openPage(page, 'playground');
+    const playground = page.locator('.playground-workbench');
+    const preview = playground.locator('.live-code-preview__canvas');
+    await expect(preview.getByText('Search', { exact: true })).toBeVisible();
+    expect([...requestedHookChunks]).toEqual(['better-hook-use-debounce']);
+
+    await playground.getByRole('combobox', { name: 'Example' }).selectOption('use-async');
+    await expect(preview.getByText('Ready', { exact: true })).toBeVisible();
+    expect([...requestedHookChunks]).toEqual(['better-hook-use-debounce', 'better-hook-use-async']);
+  });
+
+  test('Playground reports a Hook chunk failure without discarding the editor', async ({
+    page,
+  }) => {
+    await openPage(page, 'playground');
+    const playground = page.locator('.playground-workbench');
+    const selector = playground.getByRole('combobox', { name: 'Example' });
+    await expect(playground.locator('.live-code-preview__canvas')).toContainText('Search');
+
+    await page.route('**/better-hook-use-async.*.js', (route) => route.abort());
+    await selector.selectOption('use-async');
+    await expect(playground.getByRole('alert')).toContainText(
+      'Unable to load module "better-hook/use-async"',
+    );
+    await expect(
+      playground.getByRole('textbox', { name: 'Editable TSX', exact: true }),
+    ).toContainText("from 'better-hook/use-async'");
+
+    await page.unroute('**/better-hook-use-async.*.js');
+    await selector.selectOption('use-debounce');
+    await selector.selectOption('use-async');
+    await expect(playground.locator('.live-code-preview__canvas')).toContainText('Ready');
+    await expect(playground.getByRole('alert')).toHaveCount(0);
+  });
+
   test('Hook example edits its preview, reports errors, copies, and resets', async ({ page }) => {
     await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
     await openPage(page, 'hooks/use-debounce');
