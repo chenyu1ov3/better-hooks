@@ -1,6 +1,6 @@
 {
   "name": "better-hook",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React 19-first, concurrent-safe hooks primitives with near-zero runtime dependencies.",
   "homepage": "https://chenyu1ov3.github.io/better-hooks/",
   "bugs": {
