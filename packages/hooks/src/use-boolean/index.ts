@@ -17,7 +17,7 @@ export interface UseBooleanActions {
 export interface UseBooleanResult extends UseBooleanActions {
   /** The current boolean value. */
   readonly value: boolean;
-  /** Alias for value for callers that prefer ahooks-style naming. */
+  /** Alias for value for callers that prefer an explicit boolean name. */
   readonly boolean: boolean;
 }
 

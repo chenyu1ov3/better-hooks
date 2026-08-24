@@ -39,7 +39,7 @@ export interface UseKeyPressOptions {
   readonly exactMatch?: boolean;
   /** Whether native listeners use capture. */
   readonly capture?: boolean;
-  /** ahooks-compatible alias for `capture`. */
+  /** Alias for `capture` when matching an existing event-listener option shape. */
   readonly useCapture?: boolean;
   /** Disables the subscription while false. */
   readonly enabled?: boolean;
@@ -259,9 +259,9 @@ function matchesFilter(
   if (typeof filter === 'number') return eventCode(event) === filter ? filter : false;
   if (typeof filter === 'string') return matchesString(event, filter, exactMatch) ? filter : false;
   if (Array.isArray(filter)) {
-    // Arrays are alternatives, matching ahooks' behavior. Keep the compact
-    // modifier-array spelling as a fallback so `['ctrl', 's']` remains useful
-    // without stealing matches from arrays that happen to contain `meta`.
+    // Arrays are alternatives. Keep the compact modifier-array spelling as a
+    // fallback so `['ctrl', 's']` remains useful without stealing matches from
+    // arrays that happen to contain `meta`.
     for (const item of filter) {
       const matched = matchesFilter(event, item, exactMatch);
       if (matched !== false) return matched;
