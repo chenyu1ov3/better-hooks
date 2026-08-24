@@ -45,6 +45,16 @@
       "import": "./dist/use-previous/index.js",
       "default": "./dist/use-previous/index.js"
     },
+    "./use-reset-state": {
+      "types": "./dist/use-reset-state/index.d.ts",
+      "import": "./dist/use-reset-state/index.js",
+      "default": "./dist/use-reset-state/index.js"
+    },
+    "./use-safe-state": {
+      "types": "./dist/use-safe-state/index.d.ts",
+      "import": "./dist/use-safe-state/index.js",
+      "default": "./dist/use-safe-state/index.js"
+    },
     "./use-latest": {
       "types": "./dist/use-latest/index.d.ts",
       "import": "./dist/use-latest/index.js",
@@ -59,6 +69,11 @@
       "types": "./dist/use-is-mounted/index.d.ts",
       "import": "./dist/use-is-mounted/index.js",
       "default": "./dist/use-is-mounted/index.js"
+    },
+    "./use-unmounted-ref": {
+      "types": "./dist/use-unmounted-ref/index.d.ts",
+      "import": "./dist/use-unmounted-ref/index.js",
+      "default": "./dist/use-unmounted-ref/index.js"
     },
     "./use-isomorphic-layout-effect": {
       "types": "./dist/use-isomorphic-layout-effect/index.d.ts",
@@ -79,6 +94,11 @@
       "types": "./dist/use-debounce-fn/index.d.ts",
       "import": "./dist/use-debounce-fn/index.js",
       "default": "./dist/use-debounce-fn/index.js"
+    },
+    "./use-document-visibility": {
+      "types": "./dist/use-document-visibility/index.d.ts",
+      "import": "./dist/use-document-visibility/index.js",
+      "default": "./dist/use-document-visibility/index.js"
     },
     "./use-throttle-fn": {
       "types": "./dist/use-throttle-fn/index.d.ts",
@@ -104,6 +124,16 @@
       "types": "./dist/use-event-listener/index.d.ts",
       "import": "./dist/use-event-listener/index.js",
       "default": "./dist/use-event-listener/index.js"
+    },
+    "./use-hover": {
+      "types": "./dist/use-hover/index.d.ts",
+      "import": "./dist/use-hover/index.js",
+      "default": "./dist/use-hover/index.js"
+    },
+    "./use-key-press": {
+      "types": "./dist/use-key-press/index.d.ts",
+      "import": "./dist/use-key-press/index.js",
+      "default": "./dist/use-key-press/index.js"
     },
     "./use-click-outside": {
       "types": "./dist/use-click-outside/index.d.ts",
@@ -134,6 +164,16 @@
       "types": "./dist/use-local-storage/index.d.ts",
       "import": "./dist/use-local-storage/index.js",
       "default": "./dist/use-local-storage/index.js"
+    },
+    "./use-lock-fn": {
+      "types": "./dist/use-lock-fn/index.d.ts",
+      "import": "./dist/use-lock-fn/index.js",
+      "default": "./dist/use-lock-fn/index.js"
+    },
+    "./use-memoized-fn": {
+      "types": "./dist/use-memoized-fn/index.d.ts",
+      "import": "./dist/use-memoized-fn/index.js",
+      "default": "./dist/use-memoized-fn/index.js"
     },
     "./use-session-storage": {
       "types": "./dist/use-session-storage/index.d.ts",

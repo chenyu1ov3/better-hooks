@@ -8,21 +8,29 @@ import {
   useControllableState,
   useDebounce,
   useDebounceFn,
+  useDocumentVisibility,
   useEventListener,
+  useHover,
   useInput,
   useInterval,
   useIsMounted,
   useIsomorphicLayoutEffect,
+  useKeyPress,
   useLatest,
   useLocalStorage,
+  useLockFn,
+  useMemoizedFn,
   useMediaQuery,
   useOnline,
   usePrevious,
+  useResetState,
+  useSafeState,
   useSessionStorage,
   useThrottle,
   useThrottleFn,
   useTimeout,
   useToggle,
+  useUnmountedRef,
   useWindowSize,
 } from '../index.js';
 
@@ -33,6 +41,10 @@ function ServerHarness(): JSX.Element {
   const previous = usePrevious('current', 'initial');
   const latest = useLatest('latest');
   const [controlled] = useControllableState({ defaultValue: 'state' });
+  const memoized = useMemoizedFn(() => 'memoized');
+  const [safe] = useSafeState('safe');
+  const [resettable] = useResetState('resettable');
+  const unmountedRef = useUnmountedRef();
   const mounted = useIsMounted();
   const request = useAsync(async () => 'data');
   const debounced = useDebounce('debounced', { delay: 10 });
@@ -46,6 +58,10 @@ function ServerHarness(): JSX.Element {
   const media = useMediaQuery('(min-width: 1px)', { defaultMatches: true });
   const size = useWindowSize();
   const online = useOnline();
+  const visibility = useDocumentVisibility();
+  useKeyPress('Enter', () => undefined);
+  const hovering = useHover(null);
+  useLockFn(async () => 'locked');
 
   useIsomorphicLayoutEffect(() => undefined, []);
   useInterval(() => undefined, null);
@@ -59,6 +75,10 @@ function ServerHarness(): JSX.Element {
       data-controlled={controlled}
       data-height={size.height}
       data-input={input.value}
+      data-visibility={visibility}
+      data-hovering={String(hovering)}
+      data-unmounted={String(unmountedRef.current)}
+      data-new-state={`${memoized()}:${safe}:${resettable}`}
       data-latest={latest.current}
       data-local={local.value}
       data-media={String(media)}
@@ -86,6 +106,10 @@ describe('server rendering', () => {
     expect(html).toContain('data-width="0"');
     expect(html).toContain('data-height="0"');
     expect(html).toContain('data-mounted="false"');
+    expect(html).toContain('data-visibility="visible"');
+    expect(html).toContain('data-hovering="false"');
+    expect(html).toContain('data-unmounted="false"');
+    expect(html).toContain('data-new-state="memoized:safe:resettable"');
     expect(error).not.toHaveBeenCalled();
   });
 });

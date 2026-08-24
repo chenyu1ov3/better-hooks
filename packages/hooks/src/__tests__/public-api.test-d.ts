@@ -6,22 +6,30 @@ import * as clickOutsideEntry from 'better-hook/use-click-outside';
 import * as controllableEntry from 'better-hook/use-controllable-state';
 import * as debounceEntry from 'better-hook/use-debounce';
 import * as debounceFnEntry from 'better-hook/use-debounce-fn';
+import * as documentVisibilityEntry from 'better-hook/use-document-visibility';
 import * as eventListenerEntry from 'better-hook/use-event-listener';
+import * as hoverEntry from 'better-hook/use-hover';
 import * as inputEntry from 'better-hook/use-input';
 import * as intervalEntry from 'better-hook/use-interval';
 import * as isMountedEntry from 'better-hook/use-is-mounted';
 import * as isomorphicEntry from 'better-hook/use-isomorphic-layout-effect';
+import * as keyPressEntry from 'better-hook/use-key-press';
 import * as latestEntry from 'better-hook/use-latest';
 import * as localStorageEntry from 'better-hook/use-local-storage';
+import * as lockFnEntry from 'better-hook/use-lock-fn';
+import * as memoizedFnEntry from 'better-hook/use-memoized-fn';
 import * as mediaQueryEntry from 'better-hook/use-media-query';
 import * as onlineEntry from 'better-hook/use-online';
 import * as previousEntry from 'better-hook/use-previous';
+import * as resetStateEntry from 'better-hook/use-reset-state';
+import * as safeStateEntry from 'better-hook/use-safe-state';
 import * as sessionStorageEntry from 'better-hook/use-session-storage';
 import * as storageEntry from 'better-hook/use-storage';
 import * as throttleEntry from 'better-hook/use-throttle';
 import * as throttleFnEntry from 'better-hook/use-throttle-fn';
 import * as timeoutEntry from 'better-hook/use-timeout';
 import * as toggleEntry from 'better-hook/use-toggle';
+import * as unmountedRefEntry from 'better-hook/use-unmounted-ref';
 import * as windowSizeEntry from 'better-hook/use-window-size';
 
 test('direct entries match the root API', () => {
@@ -33,18 +41,27 @@ test('direct entries match the root API', () => {
   >();
   expectTypeOf(debounceEntry.useDebounce).toEqualTypeOf<typeof root.useDebounce>();
   expectTypeOf(debounceFnEntry.useDebounceFn).toEqualTypeOf<typeof root.useDebounceFn>();
+  expectTypeOf(documentVisibilityEntry.useDocumentVisibility).toEqualTypeOf<
+    typeof root.useDocumentVisibility
+  >();
   expectTypeOf(eventListenerEntry.useEventListener).toEqualTypeOf<typeof root.useEventListener>();
+  expectTypeOf(hoverEntry.useHover).toEqualTypeOf<typeof root.useHover>();
   expectTypeOf(inputEntry.useInput).toEqualTypeOf<typeof root.useInput>();
   expectTypeOf(intervalEntry.useInterval).toEqualTypeOf<typeof root.useInterval>();
   expectTypeOf(isMountedEntry.useIsMounted).toEqualTypeOf<typeof root.useIsMounted>();
   expectTypeOf(isomorphicEntry.useIsomorphicLayoutEffect).toEqualTypeOf<
     typeof root.useIsomorphicLayoutEffect
   >();
+  expectTypeOf(keyPressEntry.useKeyPress).toEqualTypeOf<typeof root.useKeyPress>();
   expectTypeOf(latestEntry.useLatest).toEqualTypeOf<typeof root.useLatest>();
   expectTypeOf(localStorageEntry.useLocalStorage).toEqualTypeOf<typeof root.useLocalStorage>();
+  expectTypeOf(lockFnEntry.useLockFn).toEqualTypeOf<typeof root.useLockFn>();
+  expectTypeOf(memoizedFnEntry.useMemoizedFn).toEqualTypeOf<typeof root.useMemoizedFn>();
   expectTypeOf(mediaQueryEntry.useMediaQuery).toEqualTypeOf<typeof root.useMediaQuery>();
   expectTypeOf(onlineEntry.useOnline).toEqualTypeOf<typeof root.useOnline>();
   expectTypeOf(previousEntry.usePrevious).toEqualTypeOf<typeof root.usePrevious>();
+  expectTypeOf(resetStateEntry.useResetState).toEqualTypeOf<typeof root.useResetState>();
+  expectTypeOf(safeStateEntry.useSafeState).toEqualTypeOf<typeof root.useSafeState>();
   expectTypeOf(sessionStorageEntry.useSessionStorage).toEqualTypeOf<
     typeof root.useSessionStorage
   >();
@@ -54,6 +71,7 @@ test('direct entries match the root API', () => {
   expectTypeOf(throttleFnEntry.useThrottleFn).toEqualTypeOf<typeof root.useThrottleFn>();
   expectTypeOf(timeoutEntry.useTimeout).toEqualTypeOf<typeof root.useTimeout>();
   expectTypeOf(toggleEntry.useToggle).toEqualTypeOf<typeof root.useToggle>();
+  expectTypeOf(unmountedRefEntry.useUnmountedRef).toEqualTypeOf<typeof root.useUnmountedRef>();
   expectTypeOf(windowSizeEntry.useWindowSize).toEqualTypeOf<typeof root.useWindowSize>();
 });
 
@@ -89,6 +107,39 @@ test('generic Hooks preserve useful inference', () => {
   expectTypeOf(stored.setValue)
     .parameter(0)
     .toEqualTypeOf<number | ((previous: number) => number)>();
+
+  const memoized = root.useMemoizedFn((value: number, suffix: string) => `${value}:${suffix}`);
+  expectTypeOf(memoized).parameters.toEqualTypeOf<[value: number, suffix: string]>();
+  expectTypeOf(memoized).returns.toBeString();
+
+  const [safeState, setSafeState] = root.useSafeState({ ready: false });
+  expectTypeOf(safeState).toEqualTypeOf<{ ready: boolean }>();
+  expectTypeOf(setSafeState)
+    .parameter(0)
+    .toEqualTypeOf<{ ready: boolean } | ((previous: { ready: boolean }) => { ready: boolean })>();
+
+  const [resetState, setResetState, resetStateValue] = root.useResetState(0);
+  expectTypeOf(resetState).toBeNumber();
+  expectTypeOf(setResetState).parameter(0).toEqualTypeOf<number | ((previous: number) => number)>();
+  expectTypeOf(resetStateValue).returns.toBeVoid();
+
+  const unmountedRef = root.useUnmountedRef();
+  expectTypeOf(unmountedRef.current).toBeBoolean();
+
+  const visibility = root.useDocumentVisibility({ enabled: true, capture: true });
+  expectTypeOf(visibility).toEqualTypeOf<root.VisibilityState>();
+  const hovering = root.useHover({ enabled: true });
+  expectTypeOf(hovering).toBeBoolean();
+
+  const keyPressHandler = (event: KeyboardEvent, key: root.KeyType): void => {
+    expectTypeOf(event).toEqualTypeOf<KeyboardEvent>();
+    expectTypeOf(key).toEqualTypeOf<root.KeyType>();
+  };
+  root.useKeyPress(['ctrl', 's'], keyPressHandler, { exactMatch: true });
+
+  const locked = root.useLockFn(async (value: number) => value.toString());
+  expectTypeOf(locked).parameters.toEqualTypeOf<[value: number]>();
+  expectTypeOf(locked).returns.toEqualTypeOf<Promise<string | undefined>>();
 });
 
 test('event overloads infer native events', () => {
@@ -98,6 +149,24 @@ test('event overloads infer native events', () => {
   root.useEventListener(document, 'pointerdown', (event) => {
     expectTypeOf(event).toEqualTypeOf<PointerEvent>();
   });
+});
+
+test('error observers accept unknown errors across callback hooks', () => {
+  const onError: root.HookErrorHandler = (error) => {
+    expectTypeOf(error).toBeUnknown();
+  };
+
+  root.useAsync(async () => undefined, { onError });
+  root.useTimeout(() => undefined, null, { onError });
+  root.useInterval(() => undefined, null, { onError });
+  root.useDebounceFn(() => undefined, { delay: 10, onError });
+  root.useThrottleFn(() => undefined, { delay: 10, onError });
+  root.useEventListener('click', () => undefined, { onError });
+  root.useClickOutside({ current: null }, () => undefined, { onError });
+  root.useMediaQuery('(min-width: 1px)', { onError });
+  root.useKeyPress('Enter', () => undefined, { onError });
+  root.useHover({ onError });
+  root.useLockFn(() => undefined, { onError });
 });
 
 test('invalid calls are rejected', () => {
