@@ -28,7 +28,7 @@
     "check:package": "pnpm build && node scripts/check-package.mjs",
     "check:examples": "node scripts/check-hook-examples.mjs",
     "check:docs-locales": "node scripts/check-doc-locales.mjs",
-    "check": "pnpm format:check && pnpm lint && pnpm check:package && pnpm typecheck && pnpm test:coverage && pnpm check:examples && pnpm check:docs-locales && pnpm --filter @better-hooks/docs build",
+    "check": "pnpm format:check && pnpm lint && pnpm check:package && pnpm typecheck && pnpm test:coverage && pnpm test:types && pnpm check:examples && pnpm check:docs-locales && pnpm --filter @better-hooks/docs build",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish"
