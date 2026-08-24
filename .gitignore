@@ -14,3 +14,4 @@ out/
 .pnpm-store/
 packages/hooks/etc/
 packages/hooks/temp/
+AGENTS.md
