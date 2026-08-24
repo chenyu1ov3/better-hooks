@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect } from '../use-isomorphic-layout-effect/index.js';
+import { notifyHookError, type HookErrorHandler } from '../utils/errors.js';
 
 /** Status of the latest active or completed async run. @public */
 export type AsyncStatus = 'idle' | 'pending' | 'success' | 'error';
@@ -20,6 +21,8 @@ export interface AsyncState<T> {
 export interface UseAsyncOptions {
   /** Starts the task in an effect after commit when true. */
   readonly immediate?: boolean;
+  /** Observes the latest run's task error before the returned promise rejects. */
+  readonly onError?: HookErrorHandler;
 }
 
 /** State and stable actions returned by {@link useAsync}. @public */
@@ -51,6 +54,7 @@ function createAbortError(): Error {
  */
 export function useAsync<T>(task: AsyncTask<T>, options: UseAsyncOptions = {}): UseAsyncResult<T> {
   const taskRef = useRef(task);
+  const onErrorRef = useRef(options.onError);
   const mountedRef = useRef(false);
   const sequenceRef = useRef(0);
   const controllerRef = useRef<AbortController | undefined>(undefined);
@@ -63,6 +67,9 @@ export function useAsync<T>(task: AsyncTask<T>, options: UseAsyncOptions = {}): 
   useIsomorphicLayoutEffect(() => {
     taskRef.current = task;
   }, [task]);
+  useIsomorphicLayoutEffect(() => {
+    onErrorRef.current = options.onError;
+  }, [options.onError]);
   useIsomorphicLayoutEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -113,6 +120,7 @@ export function useAsync<T>(task: AsyncTask<T>, options: UseAsyncOptions = {}): 
       .catch((error) => {
         if (mountedRef.current && sequence === sequenceRef.current && !controller.signal.aborted) {
           setState((previous) => ({ ...previous, status: 'error', error }));
+          notifyHookError(error, onErrorRef.current);
         }
         throw error;
       })

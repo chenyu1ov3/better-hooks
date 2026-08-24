@@ -50,4 +50,32 @@ describe('useWindowSize', () => {
     add.mockRestore();
     remove.mockRestore();
   });
+
+  it('normalizes invalid dimensions and recovers from viewport getter errors', () => {
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      get: () => -1,
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      get: () => Number.NaN,
+    });
+    const invalid = renderHook(() => useWindowSize());
+    expect(invalid.result.current).toEqual({ width: 0, height: 0 });
+    invalid.unmount();
+
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      get: () => {
+        throw new Error('viewport unavailable');
+      },
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      get: () => 720,
+    });
+    const inaccessible = renderHook(() => useWindowSize());
+    expect(inaccessible.result.current).toEqual({ width: 0, height: 0 });
+    inaccessible.unmount();
+  });
 });

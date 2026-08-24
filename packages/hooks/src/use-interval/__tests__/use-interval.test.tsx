@@ -84,4 +84,19 @@ describe('useInterval', () => {
     unmount();
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it('reports a callback error and stops the interval before rethrowing', () => {
+    const error = new Error('observed');
+    const onError = vi.fn();
+    const callback = vi.fn(() => {
+      throw error;
+    });
+    renderHook(() => useInterval(callback, 10, { onError }));
+
+    expect(() => act(() => vi.advanceTimersByTime(10))).toThrow(error);
+    expect(onError).toHaveBeenCalledWith(error);
+    expect(vi.getTimerCount()).toBe(0);
+    act(() => vi.advanceTimersByTime(30));
+    expect(callback).toHaveBeenCalledOnce();
+  });
 });

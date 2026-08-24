@@ -1,11 +1,14 @@
 'use client';
 
 import { useCallback, useSyncExternalStore } from 'react';
+import { notifyHookError, type HookErrorHandler } from '../utils/errors.js';
 
 /** Controls the deterministic value used when matchMedia is unavailable. @public */
 export interface MediaQueryOptions {
   /** The value returned during SSR or when matchMedia is unavailable. */
   readonly defaultMatches?: boolean;
+  /** Observes browser API failures after the client subscription is attempted. */
+  readonly onError?: HookErrorHandler;
 }
 
 interface QueryEntry {
@@ -59,13 +62,24 @@ function getQueryEntry(targetWindow: Window, query: string): QueryEntry {
   return entry;
 }
 
-function subscribeToQuery(query: string, listener: () => void): () => void {
+function subscribeToQuery(
+  query: string,
+  listener: () => void,
+  onError: HookErrorHandler | undefined,
+): () => void {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
     return () => undefined;
   }
 
-  const entries = getEntries(window);
-  const entry = getQueryEntry(window, query);
+  let entries: Map<string, QueryEntry>;
+  let entry: QueryEntry;
+  try {
+    entries = getEntries(window);
+    entry = getQueryEntry(window, query);
+  } catch (error) {
+    notifyHookError(error, onError);
+    return () => undefined;
+  }
   if (entry.listeners.size === 0 && !entry.listening) {
     entry.listening = addMediaListener(entry.list, entry.notify);
   }
@@ -90,13 +104,17 @@ function subscribeToQuery(query: string, listener: () => void): () => void {
  */
 export function useMediaQuery(query: string, options: MediaQueryOptions = {}): boolean {
   const subscribe = useCallback(
-    (onChange: () => void) => subscribeToQuery(query, onChange),
-    [query],
+    (onChange: () => void) => subscribeToQuery(query, onChange, options.onError),
+    [options.onError, query],
   );
   const getSnapshot = useCallback(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function')
       return options.defaultMatches ?? false;
-    return getQueryEntry(window, query).list.matches;
+    try {
+      return getQueryEntry(window, query).list.matches;
+    } catch {
+      return options.defaultMatches ?? false;
+    }
   }, [options.defaultMatches, query]);
   const getServerSnapshot = useCallback(
     () => options.defaultMatches ?? false,

@@ -103,4 +103,27 @@ describe('useEventListener', () => {
     controller.abort();
     hook.unmount();
   });
+
+  it('observes listener errors while leaving the subscription attached', () => {
+    const target = new EventTarget();
+    const error = new Error('listener failed');
+    const onError = vi.fn();
+    const add = vi.spyOn(target, 'addEventListener');
+    const hook = renderHook(() =>
+      useEventListener(
+        target,
+        'custom',
+        () => {
+          throw error;
+        },
+        { onError },
+      ),
+    );
+    const listener = add.mock.calls[0]?.[1] as EventListener;
+
+    expect(() => listener(new Event('custom'))).toThrow(error);
+    expect(onError).toHaveBeenCalledWith(error);
+    expect(add).toHaveBeenCalledTimes(1);
+    hook.unmount();
+  });
 });

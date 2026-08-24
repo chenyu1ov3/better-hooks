@@ -2,12 +2,21 @@
 
 import { useEffect, useRef } from 'react';
 import { useIsomorphicLayoutEffect } from '../use-isomorphic-layout-effect/index.js';
+import { notifyHookError, type HookErrorHandler } from '../utils/errors.js';
 
 interface OutsideBinding {
   readonly document: Document;
   readonly root: ShadowRoot | undefined;
   readonly listener: (event: PointerEvent) => void;
   readonly rootListener: EventListener | undefined;
+}
+
+/** Options for {@link useClickOutside}. @public */
+export interface UseClickOutsideOptions {
+  /** Whether the outside listener is active. */
+  readonly enabled?: boolean;
+  /** Observes callback failures before they are rethrown. */
+  readonly onError?: HookErrorHandler;
 }
 
 function eventOccurredInside(event: PointerEvent, element: HTMLElement): boolean {
@@ -31,15 +40,22 @@ function eventOccurredInside(event: PointerEvent, element: HTMLElement): boolean
 export function useClickOutside<T extends HTMLElement>(
   ref: { readonly current: T | null },
   onOutside: (event: PointerEvent) => void,
-  enabled = true,
+  enabledOrOptions: boolean | UseClickOutsideOptions = true,
 ): void {
+  const enabled =
+    typeof enabledOrOptions === 'boolean' ? enabledOrOptions : (enabledOrOptions.enabled ?? true);
+  const onError = typeof enabledOrOptions === 'boolean' ? undefined : enabledOrOptions.onError;
   const callbackRef = useRef(onOutside);
+  const onErrorRef = useRef(onError);
   const targetRef = useRef(ref);
   const bindingRef = useRef<OutsideBinding | undefined>(undefined);
   useIsomorphicLayoutEffect(() => {
     callbackRef.current = onOutside;
     targetRef.current = ref;
   }, [onOutside, ref]);
+  useIsomorphicLayoutEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   useEffect(() => {
     const element = enabled ? ref.current : null;
@@ -58,6 +74,14 @@ export function useClickOutside<T extends HTMLElement>(
     if (!targetDocument) return;
 
     const shadowResults = new WeakMap<Event, boolean>();
+    const invokeOutside = (event: PointerEvent) => {
+      try {
+        callbackRef.current(event);
+      } catch (error) {
+        notifyHookError(error, onErrorRef.current);
+        throw error;
+      }
+    };
     const handlePointerDown = (event: PointerEvent) => {
       const currentElement = targetRef.current.current;
       if (
@@ -77,11 +101,11 @@ export function useClickOutside<T extends HTMLElement>(
             bindingRef.current?.listener === handlePointerDown &&
             shadowResults.get(event) !== true
           ) {
-            callbackRef.current(event);
+            invokeOutside(event);
           }
         });
       } else {
-        callbackRef.current(event);
+        invokeOutside(event);
       }
     };
     const handleRootPointerDown: EventListener | undefined = targetRoot
@@ -92,11 +116,36 @@ export function useClickOutside<T extends HTMLElement>(
             currentElement && eventOccurredInside(pointerEvent, currentElement),
           );
           shadowResults.set(event, inside);
-          if (!event.composed && !inside) callbackRef.current(pointerEvent);
+          if (!event.composed && !inside) invokeOutside(pointerEvent);
         }
       : undefined;
-    targetDocument.addEventListener('pointerdown', handlePointerDown, true);
-    targetRoot?.addEventListener('pointerdown', handleRootPointerDown!, true);
+    let documentAdded = false;
+    let rootAdded = false;
+    try {
+      targetDocument.addEventListener('pointerdown', handlePointerDown, true);
+      documentAdded = true;
+      if (targetRoot) {
+        targetRoot.addEventListener('pointerdown', handleRootPointerDown!, true);
+        rootAdded = true;
+      }
+    } catch (error) {
+      if (rootAdded) {
+        try {
+          targetRoot?.removeEventListener('pointerdown', handleRootPointerDown!, true);
+        } catch {
+          // Preserve the registration error while still attempting document cleanup.
+        }
+      }
+      if (documentAdded) {
+        try {
+          targetDocument.removeEventListener('pointerdown', handlePointerDown, true);
+        } catch {
+          // Cleanup is best effort for hostile custom EventTarget implementations.
+        }
+      }
+      notifyHookError(error, onErrorRef.current);
+      throw error;
+    }
     bindingRef.current = {
       document: targetDocument,
       root: targetRoot,

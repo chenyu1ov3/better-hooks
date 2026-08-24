@@ -194,6 +194,25 @@ describe('useThrottleFn', () => {
     expect(callback).toHaveBeenCalledTimes(2);
   });
 
+  it('reports callback errors and resets the throttle window', () => {
+    const error = new Error('observed');
+    const onError = vi.fn();
+    const callback = vi
+      .fn<() => string>()
+      .mockImplementationOnce(() => {
+        throw error;
+      })
+      .mockReturnValue('ok');
+    const { result } = renderHook(() => useThrottleFn(callback, { delay: 10, onError }));
+
+    expect(() => act(() => result.current.run())).toThrow(error);
+    expect(onError).toHaveBeenCalledWith(error);
+    expect(result.current.pending).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+    act(() => result.current.run());
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
   it('makes retained controls inert after unmount', () => {
     const callback = vi.fn((value: string) => value);
     const { result, unmount } = renderHook(() => useThrottleFn(callback, { delay: 10 }));

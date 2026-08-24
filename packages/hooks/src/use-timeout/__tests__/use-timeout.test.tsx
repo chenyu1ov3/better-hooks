@@ -114,6 +114,25 @@ describe('useTimeout', () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
+  it('reports callback errors and still preserves the throw/cleanup contract', () => {
+    const error = new Error('observed');
+    const onError = vi.fn();
+    const { result } = renderHook(() =>
+      useTimeout(
+        () => {
+          throw error;
+        },
+        10,
+        { onError },
+      ),
+    );
+
+    expect(() => act(() => vi.advanceTimersByTime(10))).toThrow(error);
+    expect(onError).toHaveBeenCalledWith(error);
+    expect(result.current.pending).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it('keeps a single timer in Strict Mode and cleans up on unmount', () => {
     const callback = vi.fn();
     const { unmount } = renderHook(() => useTimeout(callback, 100), {

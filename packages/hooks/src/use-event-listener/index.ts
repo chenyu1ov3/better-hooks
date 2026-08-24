@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useIsomorphicLayoutEffect } from '../use-isomorphic-layout-effect/index.js';
+import { notifyHookError, type HookErrorHandler } from '../utils/errors.js';
 
 /** A ref-like object whose current value is an event target. @public */
 export type EventListenerRefTarget = { readonly current: EventTarget | null };
@@ -9,6 +10,14 @@ export type EventListenerRefTarget = { readonly current: EventTarget | null };
 export type EventListenerTarget = EventTarget | null | undefined | EventListenerRefTarget;
 /** The callback accepted by the untyped event-listener overloads. @public */
 export type EventListenerCallback = (event: Event) => void;
+
+/** Native listener options plus an optional error observer. @public */
+export interface UseEventListenerOptions extends AddEventListenerOptions {
+  /** Observes callback failures before they are rethrown. */
+  readonly onError?: HookErrorHandler;
+}
+
+type EventListenerOptions = boolean | UseEventListenerOptions;
 
 function isEventTarget(value: object): value is EventTarget {
   return (
@@ -53,33 +62,33 @@ function removeBinding(binding: ListenerBinding): void {
 export function useEventListener<K extends keyof WindowEventMap>(
   type: K,
   listener: (event: WindowEventMap[K]) => void,
-  options?: AddEventListenerOptions | boolean,
+  options?: EventListenerOptions,
 ): void;
 /** @public */
 export function useEventListener<K extends keyof GlobalEventHandlersEventMap>(
   target: EventListenerTarget,
   type: K,
   listener: (event: GlobalEventHandlersEventMap[K]) => void,
-  options?: AddEventListenerOptions | boolean,
+  options?: EventListenerOptions,
 ): void;
 /** @public */
 export function useEventListener(
   type: string,
   listener: EventListenerCallback,
-  options?: AddEventListenerOptions | boolean,
+  options?: EventListenerOptions,
 ): void;
 /** @public */
 export function useEventListener(
   target: EventListenerTarget,
   type: string,
   listener: EventListenerCallback,
-  options?: AddEventListenerOptions | boolean,
+  options?: EventListenerOptions,
 ): void;
 export function useEventListener(
   targetOrType: EventListenerTarget | string,
   typeOrListener: string | EventListenerCallback,
-  listenerOrOptions?: EventListenerCallback | AddEventListenerOptions | boolean,
-  options?: AddEventListenerOptions | boolean,
+  listenerOrOptions?: EventListenerCallback | EventListenerOptions,
+  options?: EventListenerOptions,
 ): void {
   const hasExplicitTarget = typeof targetOrType !== 'string';
   const target = hasExplicitTarget
@@ -93,7 +102,7 @@ export function useEventListener(
   ) as EventListenerCallback;
   const eventOptions = hasExplicitTarget
     ? options
-    : (listenerOrOptions as AddEventListenerOptions | boolean | undefined);
+    : (listenerOrOptions as EventListenerOptions | undefined);
   const capture =
     typeof eventOptions === 'boolean' ? eventOptions : (eventOptions?.capture ?? false);
   const optionsKind =
@@ -105,11 +114,16 @@ export function useEventListener(
   const passive = typeof eventOptions === 'boolean' ? undefined : eventOptions?.passive;
   const once = typeof eventOptions === 'boolean' ? undefined : eventOptions?.once;
   const signal = typeof eventOptions === 'boolean' ? undefined : eventOptions?.signal;
+  const onError = typeof eventOptions === 'boolean' ? undefined : eventOptions?.onError;
   const listenerRef = useRef(listener);
+  const onErrorRef = useRef(onError);
   const bindingRef = useRef<ListenerBinding | undefined>(undefined);
   useIsomorphicLayoutEffect(() => {
     listenerRef.current = listener;
   }, [listener]);
+  useIsomorphicLayoutEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   // Reconcile after every commit so a stable ref object can move between
   // targets without forcing callers to manufacture a new ref identity.
@@ -132,7 +146,14 @@ export function useEventListener(
     bindingRef.current = undefined;
     if (!resolved) return;
 
-    const stableListener: EventListenerCallback = (event) => listenerRef.current(event);
+    const stableListener: EventListenerCallback = (event) => {
+      try {
+        listenerRef.current(event);
+      } catch (error) {
+        notifyHookError(error, onErrorRef.current);
+        throw error;
+      }
+    };
     const listenerOptions =
       optionsKind === 'boolean'
         ? capture

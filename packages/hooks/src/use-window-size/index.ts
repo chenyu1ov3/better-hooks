@@ -22,7 +22,16 @@ function getServerSnapshot(): WindowSize {
 }
 
 function readSize(targetWindow: Window): WindowSize {
-  return { width: targetWindow.innerWidth, height: targetWindow.innerHeight };
+  try {
+    const width = targetWindow.innerWidth;
+    const height = targetWindow.innerHeight;
+    return {
+      width: Number.isFinite(width) && width >= 0 ? width : 0,
+      height: Number.isFinite(height) && height >= 0 ? height : 0,
+    };
+  } catch {
+    return serverSnapshot;
+  }
 }
 
 function updateSnapshot(store: WindowSizeStore, targetWindow: Window): boolean {

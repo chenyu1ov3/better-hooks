@@ -328,4 +328,49 @@ describe('useAsync', () => {
     expect(result.current.status).toBe('idle');
     expect(result.current.data).toBeUndefined();
   });
+
+  it('observes the latest task error without changing the rejected promise', async () => {
+    const error = new Error('observed');
+    const onError = vi.fn();
+    const { result } = renderHook(() =>
+      useAsync(
+        () => {
+          throw error;
+        },
+        { onError },
+      ),
+    );
+
+    await act(async () => {
+      await expect(result.current.run()).rejects.toBe(error);
+    });
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith(error);
+    expect(result.current.error).toBe(error);
+  });
+
+  it('does not report an expected cancellation as a task error', async () => {
+    const onError = vi.fn();
+    const { result } = renderHook(() =>
+      useAsync(
+        (signal) =>
+          new Promise<string>((_resolve, reject) => {
+            signal.addEventListener('abort', () =>
+              reject(new DOMException('aborted', 'AbortError')),
+            );
+          }),
+        { onError },
+      ),
+    );
+
+    let pending!: Promise<string>;
+    await act(async () => {
+      pending = result.current.run();
+      void pending.catch(() => undefined);
+      await Promise.resolve();
+      result.current.cancel();
+    });
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' });
+    expect(onError).not.toHaveBeenCalled();
+  });
 });

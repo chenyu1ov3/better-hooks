@@ -123,4 +123,22 @@ describe('useMediaQuery', () => {
     expect(result.current).toBe(true);
     expect(() => unmount()).not.toThrow();
   });
+
+  it('falls back and reports when matchMedia itself throws', () => {
+    const error = new Error('invalid media query');
+    const onError = vi.fn();
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn(() => {
+        throw error;
+      }),
+    });
+
+    const { result, unmount } = renderHook(() =>
+      useMediaQuery('(invalid)', { defaultMatches: true, onError }),
+    );
+    expect(result.current).toBe(true);
+    expect(onError).toHaveBeenCalledWith(error);
+    unmount();
+  });
 });

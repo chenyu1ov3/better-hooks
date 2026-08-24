@@ -207,6 +207,28 @@ describe('useDebounceFn', () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
+  it('reports callback errors and allows a later cycle to recover', () => {
+    const error = new Error('observed');
+    const onError = vi.fn();
+    const callback = vi
+      .fn<() => string>()
+      .mockImplementationOnce(() => {
+        throw error;
+      })
+      .mockReturnValue('ok');
+    const { result } = renderHook(() => useDebounceFn(callback, { delay: 10, onError }));
+
+    act(() => result.current.run());
+    expect(() => act(() => vi.advanceTimersByTime(10))).toThrow(error);
+    expect(onError).toHaveBeenCalledWith(error);
+    expect(result.current.pending).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+
+    act(() => result.current.run());
+    act(() => vi.advanceTimersByTime(10));
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
   it('makes retained controls inert after unmount', () => {
     const callback = vi.fn();
     const { result, unmount } = renderHook(() => useDebounceFn(callback, { delay: 10 }));

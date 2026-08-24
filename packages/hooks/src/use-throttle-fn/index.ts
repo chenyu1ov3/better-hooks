@@ -5,9 +5,16 @@ import { normalizeDelay } from '../utils/timing.js';
 import type { DebouncedFunction } from '../use-debounce-fn/index.js';
 import type { ThrottleOptions } from '../use-throttle/index.js';
 import { useIsomorphicLayoutEffect } from '../use-isomorphic-layout-effect/index.js';
+import { notifyHookError, type HookErrorHandler } from '../utils/errors.js';
 
 /** Controls a throttled function invocation. @public */
 export type ThrottledFunction<Args extends unknown[], Result> = DebouncedFunction<Args, Result>;
+
+/** Options for {@link useThrottleFn}. @public */
+export interface ThrottleFnOptions extends ThrottleOptions {
+  /** Observes callback failures before they are rethrown. */
+  readonly onError?: HookErrorHandler;
+}
 
 interface ThrottleState<Args extends unknown[], Result> {
   timer?: ReturnType<typeof setInterval>;
@@ -21,12 +28,13 @@ interface ThrottleState<Args extends unknown[], Result> {
 /** Throttles calls to the latest function. @public */
 export function useThrottleFn<Args extends unknown[], Result>(
   fn: (...args: Args) => Result,
-  options: ThrottleOptions,
+  options: ThrottleFnOptions,
 ): ThrottledFunction<Args, Result> {
   const delay = normalizeDelay(options.delay);
   const leading = options.leading ?? true;
   const trailing = options.trailing ?? true;
   const fnRef = useRef(fn);
+  const onErrorRef = useRef(options.onError);
   const timingRef = useRef({ delay, leading, trailing });
   const state = useRef<ThrottleState<Args, Result>>({
     open: false,
@@ -57,6 +65,19 @@ export function useThrottleFn<Args extends unknown[], Result>(
     [state],
   );
 
+  const invoke = useCallback(
+    (args: Args) => {
+      try {
+        return call(args);
+      } catch (error) {
+        cancel();
+        notifyHookError(error, onErrorRef.current);
+        throw error;
+      }
+    },
+    [call, cancel],
+  );
+
   const tick = useCallback(() => {
     const args = state.args;
     if (args === undefined) {
@@ -64,13 +85,8 @@ export function useThrottleFn<Args extends unknown[], Result>(
       return state.value;
     }
     drop();
-    try {
-      return call(args);
-    } catch (error) {
-      cancel();
-      throw error;
-    }
-  }, [call, cancel, drop, state]);
+    return invoke(args);
+  }, [cancel, drop, invoke, state]);
 
   const flush = useCallback(() => {
     const args = state.args;
@@ -81,13 +97,8 @@ export function useThrottleFn<Args extends unknown[], Result>(
     if (state.timer !== undefined) clearInterval(state.timer);
     state.timer = setInterval(tick, timingRef.current.delay);
     drop();
-    try {
-      return call(args);
-    } catch (error) {
-      cancel();
-      throw error;
-    }
-  }, [call, cancel, drop, state, tick]);
+    return invoke(args);
+  }, [cancel, drop, invoke, state, tick]);
 
   const run = useCallback(
     (...args: Args) => {
@@ -97,12 +108,7 @@ export function useThrottleFn<Args extends unknown[], Result>(
         state.open = true;
         state.timer = setInterval(tick, current.delay);
         if (current.leading) {
-          try {
-            call(args);
-          } catch (error) {
-            cancel();
-            throw error;
-          }
+          invoke(args);
           return;
         }
       }
@@ -114,7 +120,7 @@ export function useThrottleFn<Args extends unknown[], Result>(
         drop();
       }
     },
-    [call, cancel, drop, state, tick],
+    [drop, invoke, state, tick],
   );
 
   useIsomorphicLayoutEffect(() => {
@@ -128,6 +134,10 @@ export function useThrottleFn<Args extends unknown[], Result>(
   useIsomorphicLayoutEffect(() => {
     fnRef.current = fn;
   }, [fn]);
+
+  useIsomorphicLayoutEffect(() => {
+    onErrorRef.current = options.onError;
+  }, [options.onError]);
 
   useIsomorphicLayoutEffect(() => {
     const old = timingRef.current;

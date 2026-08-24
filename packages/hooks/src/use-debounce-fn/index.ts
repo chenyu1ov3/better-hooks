@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 import { normalizeDelay } from '../utils/timing.js';
 import type { DebounceOptions } from '../use-debounce/index.js';
 import { useIsomorphicLayoutEffect } from '../use-isomorphic-layout-effect/index.js';
+import { notifyHookError, type HookErrorHandler } from '../utils/errors.js';
 
 /** Controls a debounced function invocation. @public */
 export interface DebouncedFunction<Args extends unknown[], Result> {
@@ -20,6 +21,12 @@ interface TimingOptions {
   readonly maxWait: number | undefined;
 }
 
+/** Options for {@link useDebounceFn}. @public */
+export interface DebounceFnOptions extends DebounceOptions {
+  /** Observes callback failures before they are rethrown. */
+  readonly onError?: HookErrorHandler;
+}
+
 interface SchedulerState<Args extends unknown[], Result> {
   wait?: ReturnType<typeof setTimeout>;
   max?: ReturnType<typeof setTimeout>;
@@ -33,7 +40,7 @@ interface SchedulerState<Args extends unknown[], Result> {
 /** Debounces calls to the latest function. @public */
 export function useDebounceFn<Args extends unknown[], Result>(
   fn: (...args: Args) => Result,
-  options: DebounceOptions,
+  options: DebounceFnOptions,
 ): DebouncedFunction<Args, Result> {
   const timing: TimingOptions = {
     delay: normalizeDelay(options.delay),
@@ -42,6 +49,7 @@ export function useDebounceFn<Args extends unknown[], Result>(
     maxWait: options.maxWait === undefined ? undefined : normalizeDelay(options.maxWait),
   };
   const fnRef = useRef(fn);
+  const onErrorRef = useRef(options.onError);
   const timingRef = useRef(timing);
   const state = useRef<SchedulerState<Args, Result>>({
     open: false,
@@ -72,14 +80,29 @@ export function useDebounceFn<Args extends unknown[], Result>(
     [state],
   );
 
+  const invoke = useCallback(
+    (args: Args) => {
+      try {
+        return call(args);
+      } catch (error) {
+        clear();
+        state.open = false;
+        drop();
+        notifyHookError(error, onErrorRef.current);
+        throw error;
+      }
+    },
+    [call, clear, drop, state],
+  );
+
   const flush = useCallback(() => {
     clear();
     state.open = false;
     const args = state.args;
     if (args === undefined) return state.value;
     drop();
-    return call(args);
-  }, [call, clear, drop, state]);
+    return invoke(args);
+  }, [clear, drop, invoke, state]);
 
   const start = useCallback(() => {
     const current = timingRef.current;
@@ -101,12 +124,7 @@ export function useDebounceFn<Args extends unknown[], Result>(
         state.open = true;
         start();
         if (current.leading) {
-          try {
-            call(args);
-          } catch (error) {
-            cancel();
-            throw error;
-          }
+          invoke(args);
           return;
         }
       } else {
@@ -121,7 +139,7 @@ export function useDebounceFn<Args extends unknown[], Result>(
         drop();
       }
     },
-    [call, cancel, drop, flush, start, state],
+    [drop, flush, invoke, start, state],
   );
 
   useIsomorphicLayoutEffect(() => {
@@ -135,6 +153,10 @@ export function useDebounceFn<Args extends unknown[], Result>(
   useIsomorphicLayoutEffect(() => {
     fnRef.current = fn;
   }, [fn]);
+
+  useIsomorphicLayoutEffect(() => {
+    onErrorRef.current = options.onError;
+  }, [options.onError]);
 
   useIsomorphicLayoutEffect(() => {
     const old = timingRef.current;

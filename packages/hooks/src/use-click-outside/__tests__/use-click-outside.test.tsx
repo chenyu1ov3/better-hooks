@@ -152,4 +152,78 @@ describe('useClickOutside', () => {
     panel.remove();
     outside.remove();
   });
+
+  it('observes outside callback errors while keeping the binding cleanable', () => {
+    const panel = document.createElement('div');
+    const outside = document.createElement('button');
+    document.body.append(panel, outside);
+    const error = new Error('outside failed');
+    const onError = vi.fn();
+    const add = vi.spyOn(document, 'addEventListener');
+    const hook = renderHook(() =>
+      useClickOutside(
+        { current: panel },
+        () => {
+          throw error;
+        },
+        { onError },
+      ),
+    );
+    const listener = add.mock.calls.find(([type]) => type === 'pointerdown')?.[1] as EventListener;
+
+    expect(() => listener(new Event('pointerdown'))).toThrow(error);
+    expect(onError).toHaveBeenCalledWith(error);
+    hook.unmount();
+    add.mockRestore();
+    panel.remove();
+    outside.remove();
+  });
+
+  it('cleans the document listener when shadow-root registration fails', () => {
+    const host = document.createElement('div');
+    const shadow = host.attachShadow({ mode: 'open' });
+    const panel = document.createElement('div');
+    shadow.append(panel);
+    document.body.append(host);
+    const failure = new Error('shadow registration failed');
+    const onError = vi.fn();
+    const rootAdd = vi.spyOn(shadow, 'addEventListener').mockImplementation(() => {
+      throw failure;
+    });
+    const documentRemove = vi.spyOn(document, 'removeEventListener');
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    expect(() =>
+      renderHook(() => useClickOutside({ current: panel }, vi.fn(), { onError })),
+    ).toThrow(failure);
+    expect(rootAdd).toHaveBeenCalledWith('pointerdown', expect.any(Function), true);
+    expect(onError).toHaveBeenCalledWith(failure);
+    expect(
+      documentRemove.mock.calls.some(
+        ([type, , capture]) => type === 'pointerdown' && capture === true,
+      ),
+    ).toBe(true);
+
+    consoleError.mockRestore();
+    documentRemove.mockRestore();
+    rootAdd.mockRestore();
+    host.remove();
+  });
+
+  it('supports pointer events without composedPath', () => {
+    const panel = document.createElement('div');
+    const outside = document.createElement('button');
+    document.body.append(panel, outside);
+    const callback = vi.fn();
+    const add = vi.spyOn(document, 'addEventListener');
+    const { unmount } = renderHook(() => useClickOutside({ current: panel }, callback));
+    const listener = add.mock.calls.find(([type]) => type === 'pointerdown')?.[1] as EventListener;
+
+    listener({ target: outside, composedPath: undefined } as unknown as PointerEvent);
+    expect(callback).toHaveBeenCalledOnce();
+    unmount();
+    add.mockRestore();
+    panel.remove();
+    outside.remove();
+  });
 });
