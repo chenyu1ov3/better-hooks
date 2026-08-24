@@ -1,5 +1,5 @@
 {
-  "name": "better-hook",
+  "name": "better-hooks",
   "version": "0.2.0",
   "description": "React 19-first, concurrent-safe hooks primitives with near-zero runtime dependencies.",
   "homepage": "https://chenyu1ov3.github.io/better-hooks/",
@@ -14,7 +14,6 @@
   },
   "files": [
     "dist",
-    "src/use-*/examples/*.md",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"

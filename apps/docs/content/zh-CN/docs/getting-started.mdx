@@ -19,7 +19,7 @@ Better Hooks 的所有入口都是 Client Component API。在使用 RSC 的框�
 'use client';
 
 // 预览包发布后可用。
-import { useToggle } from 'better-hook/use-toggle';
+import { useToggle } from 'better-hooks/use-toggle';
 
 export function Disclosure() {
   const [open, toggle] = useToggle(false);
@@ -32,7 +32,7 @@ export function Disclosure() {
 
 ## 示例优先使用直接入口
 
-文档示例使用 `better-hook/use-toggle` 这样的显式入口。根入口 `better-hook` 同样导出所有公开 Hook，但直接路径更能体现模块归属，也能让构建工具获得更小、更明确的依赖图。
+文档示例使用 `better-hooks/use-toggle` 这样的显式入口。根入口 `better-hooks` 同样导出所有公开 Hook，但直接路径更能体现模块归属，也能让构建工具获得更小、更明确的依赖图。
 
 ## 保持渲染结果确定
 

@@ -7,8 +7,8 @@
     "composite": true,
     "paths": {
       "*": ["./*"],
-      "better-hook": ["./src/index.ts"],
-      "better-hook/*": ["./src/*/index.ts"]
+      "better-hooks": ["./src/index.ts"],
+      "better-hooks/*": ["./src/*/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],

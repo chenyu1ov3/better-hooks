@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useOnline } from 'better-hook/use-online';
+import { useOnline } from 'better-hooks/use-online';
 
 export function ConnectionStatus() {
   const online = useOnline();

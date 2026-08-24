@@ -9,7 +9,7 @@ order: 142
 
 ## 概览
 
-`better-hook/use-storage` 是存储模块的聚合入口。它从共享实现模块中导出两个浏览器存储 Hook 及其 TypeScript 契约，但不提供名为 `useStorage` 的独立 Hook。
+`better-hooks/use-storage` 是存储模块的聚合入口。它从共享实现模块中导出两个浏览器存储 Hook 及其 TypeScript 契约，但不提供名为 `useStorage` 的独立 Hook。
 
 ## 导出
 
@@ -20,7 +20,7 @@ export {
   type StorageOptions,
   type StorageState,
   type UseStorageResult,
-} from 'better-hook/use-storage';
+} from 'better-hooks/use-storage';
 ```
 
 模块只需要一个 Hook 时，请使用独立的 [useLocalStorage](/zh/hooks/use-local-storage) 或 [useSessionStorage](/zh/hooks/use-session-storage) 入口；同一模块需要同时使用两者时，可以选择这个聚合入口。

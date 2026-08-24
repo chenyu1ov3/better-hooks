@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useThrottle } from 'better-hook/use-throttle';
+import { useThrottle } from 'better-hooks/use-throttle';
 
 export function ThrottledRange() {
   const [value, setValue] = useState(0);

@@ -11,4 +11,4 @@ disclosure timeline with the reporter.
 
 ## Supported versions
 
-Security fixes are applied to the latest released version of `better-hook`.
+Security fixes are applied to the latest released version of `better-hooks`.

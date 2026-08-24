@@ -16,7 +16,7 @@ export type LocalizedText = Readonly<Record<Locale, string>>;
 type ApiEntryBase = {
   readonly slug: `use-${string}`;
   readonly name: string;
-  readonly importPath: `better-hook/use-${string}`;
+  readonly importPath: `better-hooks/use-${string}`;
   readonly importStatement: string;
   readonly signature: string;
   readonly category: HookCategory;
@@ -78,7 +78,7 @@ export const hooks = [
   defineHook({
     slug: 'use-toggle',
     name: 'useToggle',
-    importPath: 'better-hook/use-toggle',
+    importPath: 'better-hooks/use-toggle',
     signature:
       'useToggle(initialValue?: boolean): readonly [boolean, (next?: ToggleUpdater) => void]',
     category: 'state',
@@ -94,7 +94,7 @@ export const hooks = [
   defineHook({
     slug: 'use-boolean',
     name: 'useBoolean',
-    importPath: 'better-hook/use-boolean',
+    importPath: 'better-hooks/use-boolean',
     signature: 'useBoolean(initialValue?: boolean): UseBooleanResult',
     category: 'state',
     description: {
@@ -109,7 +109,7 @@ export const hooks = [
   defineHook({
     slug: 'use-controllable-state',
     name: 'useControllableState',
-    importPath: 'better-hook/use-controllable-state',
+    importPath: 'better-hooks/use-controllable-state',
     signature:
       'useControllableState<T>(options?: UseControllableStateOptions<T>): readonly [T | undefined, SetValue<T>]',
     category: 'state',
@@ -125,7 +125,7 @@ export const hooks = [
   defineHook({
     slug: 'use-previous',
     name: 'usePrevious',
-    importPath: 'better-hook/use-previous',
+    importPath: 'better-hooks/use-previous',
     signature: 'usePrevious<T, U = undefined>(value: T, initialValue?: U): T | U | undefined',
     category: 'state',
     description: {
@@ -140,7 +140,7 @@ export const hooks = [
   defineHook({
     slug: 'use-latest',
     name: 'useLatest',
-    importPath: 'better-hook/use-latest',
+    importPath: 'better-hooks/use-latest',
     signature: 'useLatest<T>(value: T): RefObject<T>',
     category: 'state',
     description: {
@@ -155,7 +155,7 @@ export const hooks = [
   defineHook({
     slug: 'use-memoized-fn',
     name: 'useMemoizedFn',
-    importPath: 'better-hook/use-memoized-fn',
+    importPath: 'better-hooks/use-memoized-fn',
     signature: 'useMemoizedFn<T extends (...args: never[]) => unknown>(fn: T): T',
     category: 'state',
     description: {
@@ -170,7 +170,7 @@ export const hooks = [
   defineHook({
     slug: 'use-safe-state',
     name: 'useSafeState',
-    importPath: 'better-hook/use-safe-state',
+    importPath: 'better-hooks/use-safe-state',
     signature: 'useSafeState<S>(initialState: S | (() => S)): UseSafeStateResult<S>',
     category: 'state',
     description: {
@@ -185,7 +185,7 @@ export const hooks = [
   defineHook({
     slug: 'use-reset-state',
     name: 'useResetState',
-    importPath: 'better-hook/use-reset-state',
+    importPath: 'better-hooks/use-reset-state',
     signature: 'useResetState<S>(initialState: S | (() => S)): UseResetStateResult<S>',
     category: 'state',
     description: {
@@ -200,7 +200,7 @@ export const hooks = [
   defineHook({
     slug: 'use-debounce',
     name: 'useDebounce',
-    importPath: 'better-hook/use-debounce',
+    importPath: 'better-hooks/use-debounce',
     signature: 'useDebounce<T>(value: T, options: DebounceOptions): T',
     category: 'async',
     description: {
@@ -215,7 +215,7 @@ export const hooks = [
   defineHook({
     slug: 'use-throttle',
     name: 'useThrottle',
-    importPath: 'better-hook/use-throttle',
+    importPath: 'better-hooks/use-throttle',
     signature: 'useThrottle<T>(value: T, options: ThrottleOptions): T',
     category: 'async',
     description: {
@@ -230,7 +230,7 @@ export const hooks = [
   defineHook({
     slug: 'use-debounce-fn',
     name: 'useDebounceFn',
-    importPath: 'better-hook/use-debounce-fn',
+    importPath: 'better-hooks/use-debounce-fn',
     signature:
       'useDebounceFn<Args, Result>(fn: (...args: Args) => Result, options: DebounceFnOptions): DebouncedFunction<Args, Result>',
     category: 'async',
@@ -246,7 +246,7 @@ export const hooks = [
   defineHook({
     slug: 'use-throttle-fn',
     name: 'useThrottleFn',
-    importPath: 'better-hook/use-throttle-fn',
+    importPath: 'better-hooks/use-throttle-fn',
     signature:
       'useThrottleFn<Args, Result>(fn: (...args: Args) => Result, options: ThrottleFnOptions): ThrottledFunction<Args, Result>',
     category: 'async',
@@ -262,7 +262,7 @@ export const hooks = [
   defineHook({
     slug: 'use-timeout',
     name: 'useTimeout',
-    importPath: 'better-hook/use-timeout',
+    importPath: 'better-hooks/use-timeout',
     signature:
       'useTimeout(callback: () => void, delay: number | null, options?: UseTimeoutOptions): { cancel: () => void; pending: boolean }',
     category: 'async',
@@ -278,7 +278,7 @@ export const hooks = [
   defineHook({
     slug: 'use-interval',
     name: 'useInterval',
-    importPath: 'better-hook/use-interval',
+    importPath: 'better-hooks/use-interval',
     signature:
       'useInterval(callback: () => void, delay: number | null, options?: UseIntervalOptions): void',
     category: 'async',
@@ -294,7 +294,7 @@ export const hooks = [
   defineHook({
     slug: 'use-async',
     name: 'useAsync',
-    importPath: 'better-hook/use-async',
+    importPath: 'better-hooks/use-async',
     signature: 'useAsync<T>(task: AsyncTask<T>, options?: UseAsyncOptions): UseAsyncResult<T>',
     category: 'async',
     description: {
@@ -309,7 +309,7 @@ export const hooks = [
   defineHook({
     slug: 'use-lock-fn',
     name: 'useLockFn',
-    importPath: 'better-hook/use-lock-fn',
+    importPath: 'better-hooks/use-lock-fn',
     signature:
       'useLockFn<Args extends readonly unknown[], Result>(fn: (...args: Args) => Result | PromiseLike<Result>, options?: UseLockFnOptions): LockFn<Args, Awaited<Result>>',
     category: 'async',
@@ -325,7 +325,7 @@ export const hooks = [
   defineHook({
     slug: 'use-event-listener',
     name: 'useEventListener',
-    importPath: 'better-hook/use-event-listener',
+    importPath: 'better-hooks/use-event-listener',
     signature:
       'useEventListener(target?, type, listener, options?: UseEventListenerOptions | boolean): void',
     category: 'browser-dom',
@@ -341,7 +341,7 @@ export const hooks = [
   defineHook({
     slug: 'use-click-outside',
     name: 'useClickOutside',
-    importPath: 'better-hook/use-click-outside',
+    importPath: 'better-hooks/use-click-outside',
     signature:
       'useClickOutside<T extends HTMLElement>(ref: RefTarget<T>, onOutside: (event: PointerEvent) => void, enabledOrOptions?: boolean | UseClickOutsideOptions): void',
     category: 'browser-dom',
@@ -357,7 +357,7 @@ export const hooks = [
   defineHook({
     slug: 'use-media-query',
     name: 'useMediaQuery',
-    importPath: 'better-hook/use-media-query',
+    importPath: 'better-hooks/use-media-query',
     signature: 'useMediaQuery(query: string, options?: MediaQueryOptions): boolean',
     category: 'browser-dom',
     description: {
@@ -372,7 +372,7 @@ export const hooks = [
   defineHook({
     slug: 'use-window-size',
     name: 'useWindowSize',
-    importPath: 'better-hook/use-window-size',
+    importPath: 'better-hooks/use-window-size',
     signature: 'useWindowSize(): Readonly<{ width: number; height: number }>',
     category: 'browser-dom',
     description: {
@@ -387,7 +387,7 @@ export const hooks = [
   defineHook({
     slug: 'use-online',
     name: 'useOnline',
-    importPath: 'better-hook/use-online',
+    importPath: 'better-hooks/use-online',
     signature: 'useOnline(): boolean',
     category: 'browser-dom',
     description: {
@@ -402,7 +402,7 @@ export const hooks = [
   defineHook({
     slug: 'use-document-visibility',
     name: 'useDocumentVisibility',
-    importPath: 'better-hook/use-document-visibility',
+    importPath: 'better-hooks/use-document-visibility',
     signature: 'useDocumentVisibility(options?: UseDocumentVisibilityOptions): VisibilityState',
     category: 'browser-dom',
     description: {
@@ -417,7 +417,7 @@ export const hooks = [
   defineHook({
     slug: 'use-key-press',
     name: 'useKeyPress',
-    importPath: 'better-hook/use-key-press',
+    importPath: 'better-hooks/use-key-press',
     signature:
       'useKeyPress(keyFilter: KeyFilter, handler: KeyPressHandler, options?: UseKeyPressOptions): void',
     category: 'browser-dom',
@@ -433,7 +433,7 @@ export const hooks = [
   defineHook({
     slug: 'use-hover',
     name: 'useHover',
-    importPath: 'better-hook/use-hover',
+    importPath: 'better-hooks/use-hover',
     signature: 'useHover(target?: HoverTarget, options?: UseHoverOptions): boolean',
     category: 'browser-dom',
     description: {
@@ -448,7 +448,7 @@ export const hooks = [
   defineHook({
     slug: 'use-input',
     name: 'useInput',
-    importPath: 'better-hook/use-input',
+    importPath: 'better-hooks/use-input',
     signature: 'useInput(options?: UseInputOptions): UseInputResult',
     category: 'forms',
     description: {
@@ -463,7 +463,7 @@ export const hooks = [
   defineHook({
     slug: 'use-local-storage',
     name: 'useLocalStorage',
-    importPath: 'better-hook/use-local-storage',
+    importPath: 'better-hooks/use-local-storage',
     signature:
       'useLocalStorage<T>(key: string, initialValue: T | (() => T), options?: StorageOptions<T>): UseStorageResult<T>',
     category: 'storage',
@@ -479,7 +479,7 @@ export const hooks = [
   defineHook({
     slug: 'use-session-storage',
     name: 'useSessionStorage',
-    importPath: 'better-hook/use-session-storage',
+    importPath: 'better-hooks/use-session-storage',
     signature:
       'useSessionStorage<T>(key: string, initialValue: T | (() => T), options?: StorageOptions<T>): UseStorageResult<T>',
     category: 'storage',
@@ -495,7 +495,7 @@ export const hooks = [
   defineHook({
     slug: 'use-is-mounted',
     name: 'useIsMounted',
-    importPath: 'better-hook/use-is-mounted',
+    importPath: 'better-hooks/use-is-mounted',
     signature: 'useIsMounted(): () => boolean',
     category: 'lifecycle',
     description: {
@@ -510,7 +510,7 @@ export const hooks = [
   defineHook({
     slug: 'use-isomorphic-layout-effect',
     name: 'useIsomorphicLayoutEffect',
-    importPath: 'better-hook/use-isomorphic-layout-effect',
+    importPath: 'better-hooks/use-isomorphic-layout-effect',
     signature: 'useIsomorphicLayoutEffect: typeof React.useEffect',
     category: 'lifecycle',
     description: {
@@ -525,7 +525,7 @@ export const hooks = [
   defineHook({
     slug: 'use-unmounted-ref',
     name: 'useUnmountedRef',
-    importPath: 'better-hook/use-unmounted-ref',
+    importPath: 'better-hooks/use-unmounted-ref',
     signature: 'useUnmountedRef(): RefObject<boolean>',
     category: 'lifecycle',
     description: {
@@ -543,8 +543,9 @@ export const aggregateEntries = [
   defineAggregate({
     slug: 'use-storage',
     name: 'use-storage',
-    importPath: 'better-hook/use-storage',
-    importStatement: "import { useLocalStorage, useSessionStorage } from 'better-hook/use-storage'",
+    importPath: 'better-hooks/use-storage',
+    importStatement:
+      "import { useLocalStorage, useSessionStorage } from 'better-hooks/use-storage'",
     signature:
       'exports useLocalStorage, useSessionStorage, StorageOptions, StorageState, UseStorageResult',
     category: 'storage',

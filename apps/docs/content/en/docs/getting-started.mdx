@@ -19,7 +19,7 @@ Every Better Hooks entry is a Client Component API. In an RSC framework, put the
 'use client';
 
 // Available after the preview package is published.
-import { useToggle } from 'better-hook/use-toggle';
+import { useToggle } from 'better-hooks/use-toggle';
 
 export function Disclosure() {
   const [open, toggle] = useToggle(false);
@@ -32,7 +32,7 @@ The directive is not required in a client-only React application, but the Hook s
 
 ## Prefer direct entries for examples
 
-Documentation examples use explicit entries such as `better-hook/use-toggle`. The root `better-hook` entry exports the same public Hooks, but a direct path communicates ownership and gives build tools the smallest obvious graph.
+Documentation examples use explicit entries such as `better-hooks/use-toggle`. The root `better-hooks` entry exports the same public Hooks, but a direct path communicates ownership and gives build tools the smallest obvious graph.
 
 ## Keep render deterministic
 

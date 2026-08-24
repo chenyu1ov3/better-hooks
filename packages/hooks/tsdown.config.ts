@@ -9,7 +9,10 @@ export default defineConfig({
   platform: 'neutral',
   target: 'es2022',
   dts: false,
-  sourcemap: true,
+  // Source maps embed the TypeScript source in published artifacts. Consumers
+  // get the runtime and declaration files without needing maps to execute or
+  // typecheck the package.
+  sourcemap: false,
   clean: true,
   unbundle: true,
   treeshake: true,

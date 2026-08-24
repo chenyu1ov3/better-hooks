@@ -9,7 +9,7 @@ order: 142
 
 ## Overview
 
-`better-hook/use-storage` is the aggregate storage entry. It exports both browser-storage Hooks and their shared TypeScript contracts from the module that contains their common implementation. It does not export a separate `useStorage` Hook.
+`better-hooks/use-storage` is the aggregate storage entry. It exports both browser-storage Hooks and their shared TypeScript contracts from the module that contains their common implementation. It does not export a separate `useStorage` Hook.
 
 ## Exports
 
@@ -20,7 +20,7 @@ export {
   type StorageOptions,
   type StorageState,
   type UseStorageResult,
-} from 'better-hook/use-storage';
+} from 'better-hooks/use-storage';
 ```
 
 Use the dedicated [useLocalStorage](/hooks/use-local-storage) and [useSessionStorage](/hooks/use-session-storage) entries when a module needs only one Hook. The aggregate entry is useful when both belong to the same feature.

@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useDebounce } from 'better-hook/use-debounce';
+import { useDebounce } from 'better-hooks/use-debounce';
 
 export function SearchPreview() {
   const [query, setQuery] = useState('');

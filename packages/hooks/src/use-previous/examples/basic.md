@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { usePrevious } from 'better-hook/use-previous';
+import { usePrevious } from 'better-hooks/use-previous';
 
 export function CountHistory() {
   const [count, setCount] = useState(0);

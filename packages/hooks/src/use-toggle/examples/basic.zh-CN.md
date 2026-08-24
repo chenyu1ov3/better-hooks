@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useToggle } from 'better-hook/use-toggle';
+import { useToggle } from 'better-hooks/use-toggle';
 
 export function Disclosure() {
   const [open, toggle] = useToggle(false);

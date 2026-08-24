@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible problem with better-hook.
+description: Report a reproducible problem with better-hooks.
 title: '[Bug]: '
 labels: [bug]
 body:
@@ -20,6 +20,6 @@ body:
     id: versions
     attributes:
       label: Versions
-      placeholder: better-hook, React, Node.js, and package manager versions
+      placeholder: better-hooks, React, Node.js, and package manager versions
     validations:
       required: true

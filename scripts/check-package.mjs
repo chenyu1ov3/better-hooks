@@ -13,12 +13,16 @@ const packageDirectory = path.resolve(process.argv[2] ?? 'packages/hooks');
 const manifestPath = path.join(packageDirectory, 'package.json');
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
 const packageExports = manifest.exports;
+const failures = [];
+
+if (manifest.name !== 'better-hooks') {
+  failures.push(`package name must be better-hooks, received ${JSON.stringify(manifest.name)}`);
+}
 
 if (!packageExports || typeof packageExports !== 'object' || Array.isArray(packageExports)) {
   throw new TypeError(`${path.relative(process.cwd(), manifestPath)} must define package exports.`);
 }
 
-const failures = [];
 let importCount = 0;
 let clientEntryCount = 0;
 
@@ -124,12 +128,22 @@ exitOnFailures(`Direct entries exceed a size budget (default gzip limit: ${gzipL
 console.log(`Validated size budgets for ${rows.length} direct entries.`);
 
 const tempDirectory = await mkdtemp(path.join(os.tmpdir(), 'better-hooks-pack-'));
-const tarball = path.join(tempDirectory, 'better-hook.tgz');
+const tarball = path.join(tempDirectory, 'better-hooks.tgz');
 
 try {
   console.log('Packing the published artifact...');
   runPnpm(['pack', '--out', tarball], { cwd: packageDirectory });
   await access(tarball, constants.R_OK);
+  const entries = listPackEntries(packageDirectory);
+  const forbiddenEntries = entries.filter(
+    (entry) => entry.startsWith('package/src/') || entry.endsWith('.map'),
+  );
+  if (forbiddenEntries.length > 0) {
+    failures.push(
+      `Published artifact contains forbidden source or map files: ${forbiddenEntries.join(', ')}`,
+    );
+  }
+  exitOnFailures('Published artifact content checks failed');
 
   console.log('Running publint against the packed artifact...');
   runPnpm(['exec', 'publint', tarball]);
@@ -217,6 +231,30 @@ function runPnpm(args, options = {}) {
   }
 
   execFileSync('pnpm', args, { stdio: 'inherit', ...options });
+}
+
+function listPackEntries(directory) {
+  try {
+    const npmArgs = ['pack', '--dry-run', '--json', '--ignore-scripts'];
+    const executable = process.platform === 'win32' ? (process.env.ComSpec ?? 'cmd.exe') : 'npm';
+    const args = process.platform === 'win32' ? ['/d', '/s', '/c', 'npm.cmd', ...npmArgs] : npmArgs;
+    const output = execFileSync(executable, args, {
+      cwd: directory,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'inherit'],
+    });
+    const records = JSON.parse(output);
+    return records.flatMap((record) =>
+      Array.isArray(record.files)
+        ? record.files
+            .filter((file) => file && typeof file.path === 'string')
+            .map((file) => `package/${file.path}`)
+        : [],
+    );
+  } catch (error) {
+    failures.push(`Unable to inspect the package file list: ${formatError(error)}`);
+    return [];
+  }
 }
 
 function exitOnFailures(heading) {

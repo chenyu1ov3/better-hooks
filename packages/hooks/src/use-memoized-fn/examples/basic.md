@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useMemoizedFn } from 'better-hook/use-memoized-fn';
+import { useMemoizedFn } from 'better-hooks/use-memoized-fn';
 
 export function MemoizedGreeting() {
   const [name, setName] = useState('Ada');

@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useSessionStorage } from 'better-hook/use-session-storage';
+import { useSessionStorage } from 'better-hooks/use-session-storage';
 
 export function DraftField() {
   const draft = useSessionStorage('draft:v1', '');

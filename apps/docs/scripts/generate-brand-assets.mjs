@@ -91,7 +91,7 @@ try {
             <p class="description">Predictable cleanup. Explicit runtime boundaries.</p>
           </section>
           <div class="mark">${largeMark}</div>
-          <footer class="footer"><span>better-hook</span><span>github.com/chenyu1ov3/better-hooks</span></footer>
+          <footer class="footer"><span>better-hooks</span><span>github.com/chenyu1ov3/better-hooks</span></footer>
         </main>
       </body>
     </html>`);

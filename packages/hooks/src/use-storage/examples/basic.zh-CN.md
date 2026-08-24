@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useLocalStorage, useSessionStorage } from 'better-hook/use-storage';
+import { useLocalStorage, useSessionStorage } from 'better-hooks/use-storage';
 
 export function StorageSummary() {
   const visits = useLocalStorage('visits:v1', 0);

@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTimeout } from 'better-hook/use-timeout';
+import { useTimeout } from 'better-hooks/use-timeout';
 
 export function ExpiringNotice() {
   const [visible, setVisible] = useState(true);

@@ -8,7 +8,7 @@ the first action is pending resolve to `undefined`; failures remain rejected.
 ```tsx
 'use client';
 
-import { useLockFn } from 'better-hook/use-lock-fn';
+import { useLockFn } from 'better-hooks/use-lock-fn';
 
 export function SaveButton() {
   const save = useLockFn(async () => {

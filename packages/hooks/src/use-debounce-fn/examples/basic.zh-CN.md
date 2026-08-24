@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useDebounceFn } from 'better-hook/use-debounce-fn';
+import { useDebounceFn } from 'better-hooks/use-debounce-fn';
 
 export function DraftSaver() {
   const [saved, setSaved] = useState('');

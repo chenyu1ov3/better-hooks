@@ -8,7 +8,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useClickOutside } from 'better-hook/use-click-outside';
+import { useClickOutside } from 'better-hooks/use-click-outside';
 
 export function DismissiblePanel() {
   const panelRef = useRef<HTMLDivElement>(null);

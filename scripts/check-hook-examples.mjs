@@ -16,6 +16,7 @@ const entries = Object.keys(manifest.exports ?? {})
   .sort();
 const failures = [];
 const extracted = [];
+const exampleBaseUrl = 'https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src';
 const readmeTree = unified()
   .use(remarkParse)
   .parse(await readFile(path.join(packageDirectory, 'README.md'), 'utf8'));
@@ -26,7 +27,7 @@ visit(readmeTree, (node) => {
 
 for (const entry of entries) {
   for (const filename of ['basic.md', 'basic.zh-CN.md']) {
-    const url = `src/${entry}/examples/${filename}`;
+    const url = `${exampleBaseUrl}/${entry}/examples/${filename}`;
     if (!readmeLinks.has(url)) failures.push(`README.md: missing example link ${url}`);
   }
 }
@@ -121,7 +122,7 @@ for (const entry of entries) {
         failures.push(`${entry}/${filename}: tsx example must include 'use client'`);
       }
       const imports = sourceFile.statements.filter(ts.isImportDeclaration);
-      const directEntry = `better-hook/${entry}`;
+      const directEntry = `better-hooks/${entry}`;
       const hasDirectImport = imports.some(
         (statement) =>
           ts.isStringLiteral(statement.moduleSpecifier) &&

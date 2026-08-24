@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useThrottleFn } from 'better-hook/use-throttle-fn';
+import { useThrottleFn } from 'better-hooks/use-throttle-fn';
 
 export function PointerPosition() {
   const [x, setX] = useState(0);

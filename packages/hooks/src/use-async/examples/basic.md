@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useAsync } from 'better-hook/use-async';
+import { useAsync } from 'better-hooks/use-async';
 
 function loadProfile(signal: AbortSignal) {
   return new Promise<{ name: string }>((resolve, reject) => {

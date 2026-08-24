@@ -8,7 +8,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useIsomorphicLayoutEffect } from 'better-hook/use-isomorphic-layout-effect';
+import { useIsomorphicLayoutEffect } from 'better-hooks/use-isomorphic-layout-effect';
 
 export function MeasuredLabel() {
   const labelRef = useRef<HTMLSpanElement>(null);

@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useControllableState } from 'better-hook/use-controllable-state';
+import { useControllableState } from 'better-hooks/use-controllable-state';
 
 export function UncontrolledCounter() {
   const [count, setCount] = useControllableState({

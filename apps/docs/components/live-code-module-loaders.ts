@@ -2,79 +2,85 @@ type LiveCodeModule = object;
 type LiveCodeModuleLoader = () => Promise<LiveCodeModule>;
 
 const moduleLoaders = {
-  'better-hook': () => import(/* webpackChunkName: "better-hook-all" */ 'better-hook'),
-  'better-hook/use-async': () =>
-    import(/* webpackChunkName: "better-hook-use-async" */ 'better-hook/use-async'),
-  'better-hook/use-boolean': () =>
-    import(/* webpackChunkName: "better-hook-use-boolean" */ 'better-hook/use-boolean'),
-  'better-hook/use-click-outside': () =>
-    import(/* webpackChunkName: "better-hook-use-click-outside" */ 'better-hook/use-click-outside'),
-  'better-hook/use-controllable-state': () =>
+  'better-hooks': () => import(/* webpackChunkName: "better-hooks-all" */ 'better-hooks'),
+  'better-hooks/use-async': () =>
+    import(/* webpackChunkName: "better-hooks-use-async" */ 'better-hooks/use-async'),
+  'better-hooks/use-boolean': () =>
+    import(/* webpackChunkName: "better-hooks-use-boolean" */ 'better-hooks/use-boolean'),
+  'better-hooks/use-click-outside': () =>
     import(
-      /* webpackChunkName: "better-hook-use-controllable-state" */ 'better-hook/use-controllable-state'
+      /* webpackChunkName: "better-hooks-use-click-outside" */ 'better-hooks/use-click-outside'
     ),
-  'better-hook/use-debounce': () =>
-    import(/* webpackChunkName: "better-hook-use-debounce" */ 'better-hook/use-debounce'),
-  'better-hook/use-debounce-fn': () =>
-    import(/* webpackChunkName: "better-hook-use-debounce-fn" */ 'better-hook/use-debounce-fn'),
-  'better-hook/use-document-visibility': () =>
+  'better-hooks/use-controllable-state': () =>
     import(
-      /* webpackChunkName: "better-hook-use-document-visibility" */ 'better-hook/use-document-visibility'
+      /* webpackChunkName: "better-hooks-use-controllable-state" */ 'better-hooks/use-controllable-state'
     ),
-  'better-hook/use-event-listener': () =>
+  'better-hooks/use-debounce': () =>
+    import(/* webpackChunkName: "better-hooks-use-debounce" */ 'better-hooks/use-debounce'),
+  'better-hooks/use-debounce-fn': () =>
+    import(/* webpackChunkName: "better-hooks-use-debounce-fn" */ 'better-hooks/use-debounce-fn'),
+  'better-hooks/use-document-visibility': () =>
     import(
-      /* webpackChunkName: "better-hook-use-event-listener" */ 'better-hook/use-event-listener'
+      /* webpackChunkName: "better-hooks-use-document-visibility" */ 'better-hooks/use-document-visibility'
     ),
-  'better-hook/use-hover': () =>
-    import(/* webpackChunkName: "better-hook-use-hover" */ 'better-hook/use-hover'),
-  'better-hook/use-input': () =>
-    import(/* webpackChunkName: "better-hook-use-input" */ 'better-hook/use-input'),
-  'better-hook/use-interval': () =>
-    import(/* webpackChunkName: "better-hook-use-interval" */ 'better-hook/use-interval'),
-  'better-hook/use-is-mounted': () =>
-    import(/* webpackChunkName: "better-hook-use-is-mounted" */ 'better-hook/use-is-mounted'),
-  'better-hook/use-isomorphic-layout-effect': () =>
+  'better-hooks/use-event-listener': () =>
     import(
-      /* webpackChunkName: "better-hook-use-isomorphic-layout-effect" */ 'better-hook/use-isomorphic-layout-effect'
+      /* webpackChunkName: "better-hooks-use-event-listener" */ 'better-hooks/use-event-listener'
     ),
-  'better-hook/use-key-press': () =>
-    import(/* webpackChunkName: "better-hook-use-key-press" */ 'better-hook/use-key-press'),
-  'better-hook/use-latest': () =>
-    import(/* webpackChunkName: "better-hook-use-latest" */ 'better-hook/use-latest'),
-  'better-hook/use-local-storage': () =>
-    import(/* webpackChunkName: "better-hook-use-local-storage" */ 'better-hook/use-local-storage'),
-  'better-hook/use-lock-fn': () =>
-    import(/* webpackChunkName: "better-hook-use-lock-fn" */ 'better-hook/use-lock-fn'),
-  'better-hook/use-media-query': () =>
-    import(/* webpackChunkName: "better-hook-use-media-query" */ 'better-hook/use-media-query'),
-  'better-hook/use-memoized-fn': () =>
-    import(/* webpackChunkName: "better-hook-use-memoized-fn" */ 'better-hook/use-memoized-fn'),
-  'better-hook/use-online': () =>
-    import(/* webpackChunkName: "better-hook-use-online" */ 'better-hook/use-online'),
-  'better-hook/use-previous': () =>
-    import(/* webpackChunkName: "better-hook-use-previous" */ 'better-hook/use-previous'),
-  'better-hook/use-reset-state': () =>
-    import(/* webpackChunkName: "better-hook-use-reset-state" */ 'better-hook/use-reset-state'),
-  'better-hook/use-safe-state': () =>
-    import(/* webpackChunkName: "better-hook-use-safe-state" */ 'better-hook/use-safe-state'),
-  'better-hook/use-session-storage': () =>
+  'better-hooks/use-hover': () =>
+    import(/* webpackChunkName: "better-hooks-use-hover" */ 'better-hooks/use-hover'),
+  'better-hooks/use-input': () =>
+    import(/* webpackChunkName: "better-hooks-use-input" */ 'better-hooks/use-input'),
+  'better-hooks/use-interval': () =>
+    import(/* webpackChunkName: "better-hooks-use-interval" */ 'better-hooks/use-interval'),
+  'better-hooks/use-is-mounted': () =>
+    import(/* webpackChunkName: "better-hooks-use-is-mounted" */ 'better-hooks/use-is-mounted'),
+  'better-hooks/use-isomorphic-layout-effect': () =>
     import(
-      /* webpackChunkName: "better-hook-use-session-storage" */ 'better-hook/use-session-storage'
+      /* webpackChunkName: "better-hooks-use-isomorphic-layout-effect" */ 'better-hooks/use-isomorphic-layout-effect'
     ),
-  'better-hook/use-storage': () =>
-    import(/* webpackChunkName: "better-hook-use-storage" */ 'better-hook/use-storage'),
-  'better-hook/use-throttle': () =>
-    import(/* webpackChunkName: "better-hook-use-throttle" */ 'better-hook/use-throttle'),
-  'better-hook/use-throttle-fn': () =>
-    import(/* webpackChunkName: "better-hook-use-throttle-fn" */ 'better-hook/use-throttle-fn'),
-  'better-hook/use-timeout': () =>
-    import(/* webpackChunkName: "better-hook-use-timeout" */ 'better-hook/use-timeout'),
-  'better-hook/use-toggle': () =>
-    import(/* webpackChunkName: "better-hook-use-toggle" */ 'better-hook/use-toggle'),
-  'better-hook/use-unmounted-ref': () =>
-    import(/* webpackChunkName: "better-hook-use-unmounted-ref" */ 'better-hook/use-unmounted-ref'),
-  'better-hook/use-window-size': () =>
-    import(/* webpackChunkName: "better-hook-use-window-size" */ 'better-hook/use-window-size'),
+  'better-hooks/use-key-press': () =>
+    import(/* webpackChunkName: "better-hooks-use-key-press" */ 'better-hooks/use-key-press'),
+  'better-hooks/use-latest': () =>
+    import(/* webpackChunkName: "better-hooks-use-latest" */ 'better-hooks/use-latest'),
+  'better-hooks/use-local-storage': () =>
+    import(
+      /* webpackChunkName: "better-hooks-use-local-storage" */ 'better-hooks/use-local-storage'
+    ),
+  'better-hooks/use-lock-fn': () =>
+    import(/* webpackChunkName: "better-hooks-use-lock-fn" */ 'better-hooks/use-lock-fn'),
+  'better-hooks/use-media-query': () =>
+    import(/* webpackChunkName: "better-hooks-use-media-query" */ 'better-hooks/use-media-query'),
+  'better-hooks/use-memoized-fn': () =>
+    import(/* webpackChunkName: "better-hooks-use-memoized-fn" */ 'better-hooks/use-memoized-fn'),
+  'better-hooks/use-online': () =>
+    import(/* webpackChunkName: "better-hooks-use-online" */ 'better-hooks/use-online'),
+  'better-hooks/use-previous': () =>
+    import(/* webpackChunkName: "better-hooks-use-previous" */ 'better-hooks/use-previous'),
+  'better-hooks/use-reset-state': () =>
+    import(/* webpackChunkName: "better-hooks-use-reset-state" */ 'better-hooks/use-reset-state'),
+  'better-hooks/use-safe-state': () =>
+    import(/* webpackChunkName: "better-hooks-use-safe-state" */ 'better-hooks/use-safe-state'),
+  'better-hooks/use-session-storage': () =>
+    import(
+      /* webpackChunkName: "better-hooks-use-session-storage" */ 'better-hooks/use-session-storage'
+    ),
+  'better-hooks/use-storage': () =>
+    import(/* webpackChunkName: "better-hooks-use-storage" */ 'better-hooks/use-storage'),
+  'better-hooks/use-throttle': () =>
+    import(/* webpackChunkName: "better-hooks-use-throttle" */ 'better-hooks/use-throttle'),
+  'better-hooks/use-throttle-fn': () =>
+    import(/* webpackChunkName: "better-hooks-use-throttle-fn" */ 'better-hooks/use-throttle-fn'),
+  'better-hooks/use-timeout': () =>
+    import(/* webpackChunkName: "better-hooks-use-timeout" */ 'better-hooks/use-timeout'),
+  'better-hooks/use-toggle': () =>
+    import(/* webpackChunkName: "better-hooks-use-toggle" */ 'better-hooks/use-toggle'),
+  'better-hooks/use-unmounted-ref': () =>
+    import(
+      /* webpackChunkName: "better-hooks-use-unmounted-ref" */ 'better-hooks/use-unmounted-ref'
+    ),
+  'better-hooks/use-window-size': () =>
+    import(/* webpackChunkName: "better-hooks-use-window-size" */ 'better-hooks/use-window-size'),
 } satisfies Record<string, LiveCodeModuleLoader>;
 
 export type LazyLiveCodeModuleSpecifier = keyof typeof moduleLoaders;

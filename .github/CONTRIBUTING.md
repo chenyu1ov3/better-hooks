@@ -29,7 +29,7 @@ pnpm test:e2e
 
 Keep each Hook, its tests, and examples together under its Hook directory. Use
 Oxlint and Oxfmt for static analysis and formatting; do not introduce ESLint or
-Prettier configuration. Keep the published `better-hook` package ESM-only with
+Prettier configuration. Keep the published `better-hooks` package ESM-only with
 explicit exports and no import-time browser or React side effects.
 
 Public package changes must include a Changeset unless they are
@@ -48,6 +48,6 @@ Every push to `main` runs the quality, compatibility, and documentation E2E
 jobs, then deploys the static documentation to GitHub Pages. A pending Changeset
 also creates or updates the `Version Packages` pull request.
 
-Merging that pull request publishes `better-hook` through the release job. The
+Merging that pull request publishes `better-hooks` through the release job. The
 repository must have an Actions secret named `NPM_TOKEN` with publish access
 before merging it; documentation deployment does not depend on that secret.

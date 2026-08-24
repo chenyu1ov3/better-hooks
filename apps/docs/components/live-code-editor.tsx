@@ -38,7 +38,7 @@ const errorCopy = {
     importClause: (clause: string) => `Unsupported import clause: ${clause}`,
     importSyntax: 'Unsupported import syntax. Use static ES module imports.',
     module: (specifier: string) =>
-      `Unsupported import "${specifier}". Use react, better-hook, or a public better-hook subpath.`,
+      `Unsupported import "${specifier}". Use react, better-hooks, or a public better-hooks subpath.`,
   },
   'zh-CN': {
     componentCase: '导出的组件名必须以大写字母开头。',
@@ -48,7 +48,7 @@ const errorCopy = {
     importClause: (clause: string) => `暂不支持这种导入写法：${clause}`,
     importSyntax: '暂不支持这种 import 写法，请使用静态 ES 模块导入。',
     module: (specifier: string) =>
-      `不支持导入“${specifier}”。这里只能使用 react、better-hook 或其公开子路径。`,
+      `不支持导入“${specifier}”。这里只能使用 react、better-hooks 或其公开子路径。`,
   },
 } as const;
 

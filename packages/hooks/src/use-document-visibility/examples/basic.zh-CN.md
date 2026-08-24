@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useDocumentVisibility } from 'better-hook/use-document-visibility';
+import { useDocumentVisibility } from 'better-hooks/use-document-visibility';
 
 export function VisibilityStatus() {
   const visibility = useDocumentVisibility();

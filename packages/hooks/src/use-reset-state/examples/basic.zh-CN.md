@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useResetState } from 'better-hook/use-reset-state';
+import { useResetState } from 'better-hooks/use-reset-state';
 
 export function ResettableCounter() {
   const [count, setCount, resetCount] = useResetState(0);

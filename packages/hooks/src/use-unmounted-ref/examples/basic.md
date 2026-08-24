@@ -8,7 +8,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useUnmountedRef } from 'better-hook/use-unmounted-ref';
+import { useUnmountedRef } from 'better-hooks/use-unmounted-ref';
 
 export function AsyncStatus() {
   const [ready, setReady] = useState(false);

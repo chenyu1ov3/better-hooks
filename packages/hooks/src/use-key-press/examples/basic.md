@@ -8,7 +8,7 @@ key codes, alternative arrays, predicates, and modifier combinations.
 ```tsx
 'use client';
 
-import { useKeyPress } from 'better-hook/use-key-press';
+import { useKeyPress } from 'better-hooks/use-key-press';
 
 export function Shortcuts() {
   useKeyPress('ctrl.s', (event) => {

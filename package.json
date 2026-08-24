@@ -1,5 +1,5 @@
 {
-  "name": "better-hook-monorepo",
+  "name": "better-hooks",
   "private": true,
   "homepage": "https://chenyu1ov3.github.io/better-hooks/",
   "bugs": {
@@ -23,7 +23,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "pnpm --filter @better-hooks/docs test:e2e",
-    "docs:dev": "pnpm --filter better-hook build && pnpm --parallel --filter better-hook --filter @better-hooks/docs run dev",
+    "docs:dev": "pnpm --filter better-hooks build && pnpm --parallel --filter better-hooks --filter @better-hooks/docs run dev",
     "docs:build": "pnpm --filter @better-hooks/docs... build",
     "check:package": "pnpm build && node scripts/check-package.mjs",
     "check:examples": "node scripts/check-hook-examples.mjs",

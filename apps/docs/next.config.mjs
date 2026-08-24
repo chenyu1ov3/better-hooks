@@ -13,7 +13,7 @@ const nextConfig = {
   assetPrefix: basePath ? `${basePath}/` : undefined,
   images: { unoptimized: true },
   poweredByHeader: false,
-  transpilePackages: ['better-hook'],
+  transpilePackages: ['better-hooks'],
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
@@ -21,7 +21,7 @@ const nextConfig = {
     if (dev) {
       config.resolve.alias = {
         ...config.resolve.alias,
-        'better-hook': hooksSourceDirectory,
+        'better-hooks': hooksSourceDirectory,
       };
       config.resolve.extensionAlias = {
         ...config.resolve.extensionAlias,

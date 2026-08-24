@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useBoolean } from 'better-hook/use-boolean';
+import { useBoolean } from 'better-hooks/use-boolean';
 
 export function DetailsToggle() {
   const details = useBoolean();

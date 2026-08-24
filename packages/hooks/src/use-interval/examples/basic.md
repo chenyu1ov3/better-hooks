@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useInterval } from 'better-hook/use-interval';
+import { useInterval } from 'better-hooks/use-interval';
 
 export function CounterClock() {
   const [count, setCount] = useState(0);

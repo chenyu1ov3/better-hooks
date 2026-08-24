@@ -9,7 +9,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { useHover } from 'better-hook/use-hover';
+import { useHover } from 'better-hooks/use-hover';
 
 export function HoverCard() {
   const ref = useRef<HTMLDivElement>(null);

@@ -17,10 +17,10 @@
 </p>
 
 > [!IMPORTANT]
-> Better Hooks 目前处于预览阶段，`better-hook@0.2.0` 已发布到 npm。
+> Better Hooks 目前处于预览阶段，`better-hooks@0.2.0` 已发布到 npm。
 
 ```sh
-pnpm add better-hook
+pnpm add better-hooks
 ```
 
 ## 包含的 Hooks

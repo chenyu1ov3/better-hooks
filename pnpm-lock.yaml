@@ -87,7 +87,7 @@ importers:
       '@mdx-js/react':
         specifier: ^3.1.0
         version: 3.1.1(@types/react@19.2.18)(react@19.2.8)
-      better-hook:
+      better-hooks:
         specifier: workspace:*
         version: link:../../packages/hooks
       github-slugger:

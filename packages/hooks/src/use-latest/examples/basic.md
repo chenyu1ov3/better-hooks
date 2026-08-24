@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useLatest } from 'better-hook/use-latest';
+import { useLatest } from 'better-hooks/use-latest';
 
 export function LatestCounter() {
   const [count, setCount] = useState(0);

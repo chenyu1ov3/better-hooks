@@ -6,4 +6,4 @@
 
 - Updated dependencies [2272ed9]
 - Updated dependencies [2abc6ec]
-  - better-hook@0.2.0
+  - better-hooks@0.2.0

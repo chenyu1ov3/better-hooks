@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useSafeState } from 'better-hook/use-safe-state';
+import { useSafeState } from 'better-hooks/use-safe-state';
 
 export function SafeCounter() {
   const [count, setCount] = useSafeState(0);

@@ -8,7 +8,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useEventListener } from 'better-hook/use-event-listener';
+import { useEventListener } from 'better-hooks/use-event-listener';
 
 export function ViewportWidth() {
   const [width, setWidth] = useState(0);

@@ -17,10 +17,10 @@
 </p>
 
 > [!IMPORTANT]
-> Better Hooks is in preview, and `better-hook@0.2.0` is available on npm.
+> Better Hooks is in preview, and `better-hooks@0.2.0` is available on npm.
 
 ```sh
-pnpm add better-hook
+pnpm add better-hooks
 ```
 
 ## Included Hooks

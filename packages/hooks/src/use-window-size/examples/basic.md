@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useWindowSize } from 'better-hook/use-window-size';
+import { useWindowSize } from 'better-hooks/use-window-size';
 
 export function ViewportDimensions() {
   const { width, height } = useWindowSize();

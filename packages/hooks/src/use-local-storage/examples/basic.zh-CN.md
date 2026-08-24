@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useLocalStorage } from 'better-hook/use-local-storage';
+import { useLocalStorage } from 'better-hooks/use-local-storage';
 
 export function ThemePreference() {
   const theme = useLocalStorage('theme:v1', 'system');

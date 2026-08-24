@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useMediaQuery } from 'better-hook/use-media-query';
+import { useMediaQuery } from 'better-hooks/use-media-query';
 
 export function ResponsiveMode() {
   const compact = useMediaQuery('(max-width: 48rem)', { defaultMatches: false });

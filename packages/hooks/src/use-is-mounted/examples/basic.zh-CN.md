@@ -8,7 +8,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useIsMounted } from 'better-hook/use-is-mounted';
+import { useIsMounted } from 'better-hooks/use-is-mounted';
 
 export function DelayedStatus() {
   const isMounted = useIsMounted();

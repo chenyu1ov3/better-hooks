@@ -314,7 +314,7 @@ test.describe('core interactions', () => {
     const requestedHookChunks = new Set<string>();
     page.on('request', (request) => {
       const filename = new URL(request.url()).pathname.split('/').at(-1);
-      if (filename?.startsWith('better-hook-')) {
+      if (filename?.startsWith('better-hooks-')) {
         requestedHookChunks.add(filename.replace(/\.[^.]+\.js$/, ''));
       }
     });
@@ -323,11 +323,14 @@ test.describe('core interactions', () => {
     const playground = page.locator('.playground-workbench');
     const preview = playground.locator('.live-code-preview__canvas');
     await expect(preview.getByText('Search', { exact: true })).toBeVisible();
-    expect([...requestedHookChunks]).toEqual(['better-hook-use-debounce']);
+    expect([...requestedHookChunks]).toEqual(['better-hooks-use-debounce']);
 
     await playground.getByRole('combobox', { name: 'Example' }).selectOption('use-async');
     await expect(preview.getByText('Ready', { exact: true })).toBeVisible();
-    expect([...requestedHookChunks]).toEqual(['better-hook-use-debounce', 'better-hook-use-async']);
+    expect([...requestedHookChunks]).toEqual([
+      'better-hooks-use-debounce',
+      'better-hooks-use-async',
+    ]);
   });
 
   test('Playground reports a Hook chunk failure without discarding the editor', async ({
@@ -338,16 +341,16 @@ test.describe('core interactions', () => {
     const selector = playground.getByRole('combobox', { name: 'Example' });
     await expect(playground.locator('.live-code-preview__canvas')).toContainText('Search');
 
-    await page.route('**/better-hook-use-async.*.js', (route) => route.abort());
+    await page.route('**/better-hooks-use-async.*.js', (route) => route.abort());
     await selector.selectOption('use-async');
     await expect(playground.getByRole('alert')).toContainText(
-      'Unable to load module "better-hook/use-async"',
+      'Unable to load module "better-hooks/use-async"',
     );
     await expect(
       playground.getByRole('textbox', { name: 'Editable TSX', exact: true }),
-    ).toContainText("from 'better-hook/use-async'");
+    ).toContainText("from 'better-hooks/use-async'");
 
-    await page.unroute('**/better-hook-use-async.*.js');
+    await page.unroute('**/better-hooks-use-async.*.js');
     await selector.selectOption('use-debounce');
     await selector.selectOption('use-async');
     await expect(playground.locator('.live-code-preview__canvas')).toContainText('Ready');
@@ -366,7 +369,7 @@ test.describe('core interactions', () => {
     const editor = workbench.getByRole('textbox', { name: 'Editable TSX', exact: true });
     const reset = workbench.getByRole('button', { name: 'Reset example' });
     await expect(editor).toHaveAttribute('contenteditable', /^(?:true|plaintext-only)$/);
-    await expect(editor).toContainText("from 'better-hook/use-debounce'");
+    await expect(editor).toContainText("from 'better-hooks/use-debounce'");
 
     await editor.fill(`export function SearchPreview() {
   return <output>Edited preview</output>;
@@ -391,7 +394,7 @@ export function BrokenExample() {
 
     await reset.click();
     await expect(workbench.getByRole('alert')).toHaveCount(0);
-    await expect(editor).toContainText("from 'better-hook/use-debounce'");
+    await expect(editor).toContainText("from 'better-hooks/use-debounce'");
     await expect(preview.getByText('Search', { exact: true })).toBeVisible();
     await expect(reset).toBeDisabled();
   });
@@ -417,7 +420,7 @@ export function BrokenExample() {
       await expect(playground.locator('.live-code-panel-heading')).toHaveText(`${label} preview`);
       await expect(
         playground.getByRole('textbox', { name: 'Editable TSX', exact: true }),
-      ).toContainText(`better-hook/${value}`);
+      ).toContainText(`better-hooks/${value}`);
       const expectedText = defaultExampleText[value as keyof typeof defaultExampleText];
       if (expectedText !== null) {
         await expect(playground.locator('.live-code-preview__canvas')).toContainText(expectedText);

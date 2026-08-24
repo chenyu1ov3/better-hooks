@@ -7,7 +7,7 @@
 ```tsx
 'use client';
 
-import { useInput } from 'better-hook/use-input';
+import { useInput } from 'better-hooks/use-input';
 
 export function NameField() {
   const name = useInput({ initialValue: 'Ada' });
