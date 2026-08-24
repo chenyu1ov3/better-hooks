@@ -13,10 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/chenyu1ov3/better-hooks/actions/workflows/ci.yml"><img src="https://github.com/chenyu1ov3/better-hooks/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0f766e" alt="MIT license" /></a>
-  <img src="https://img.shields.io/badge/React-19-087ea4" alt="React 19" />
-  <img src="https://img.shields.io/badge/TypeScript-strict-3178c6" alt="Strict TypeScript" />
 </p>
 
 > [!IMPORTANT]
@@ -25,13 +22,14 @@
 
 ## Included Hooks
 
-| Area             | Hooks                                                                                       |
-| ---------------- | ------------------------------------------------------------------------------------------- |
-| State            | `useBoolean`, `useToggle`, `useInput`, `useControllableState`, `usePrevious`, `useLatest`   |
-| Scheduling       | `useDebounce`, `useDebounceFn`, `useThrottle`, `useThrottleFn`, `useTimeout`, `useInterval` |
-| Async and events | `useAsync`, `useEventListener`, `useClickOutside`                                           |
-| Browser state    | `useMediaQuery`, `useWindowSize`, `useOnline`, `useIsMounted`, `useIsomorphicLayoutEffect`  |
-| Storage          | `useStorage`, `useLocalStorage`, `useSessionStorage`                                        |
+| Area             | Hooks                                                                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| State            | `useBoolean`, `useToggle`, `useInput`, `useControllableState`, `usePrevious`, `useLatest`, `useSafeState`, `useResetState`, `useMemoizedFn` |
+| Scheduling       | `useDebounce`, `useDebounceFn`, `useThrottle`, `useThrottleFn`, `useTimeout`, `useInterval`                                                 |
+| Async and events | `useAsync`, `useLockFn`, `useEventListener`, `useClickOutside`                                                                              |
+| Browser state    | `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover`                                           |
+| Lifecycle        | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                              |
+| Storage          | `useStorage`, `useLocalStorage`, `useSessionStorage`                                                                                        |
 
 See the [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/) for API details and live examples.
 

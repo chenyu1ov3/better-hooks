@@ -16,13 +16,13 @@ order: 113
 ```ts
 function useThrottleFn<Args extends unknown[], Result>(
   fn: (...args: Args) => Result,
-  options: ThrottleOptions,
+  options: ThrottleFnOptions,
 ): ThrottledFunction<Args, Result>;
 ```
 
 ## 参数
 
-`delay` 用于定义节流窗口；`leading` 与 `trailing` 均默认为 `true`。
+`delay` 用于定义节流窗口；`leading` 与 `trailing` 均默认为 `true`；`onError` 用于观察回调异常。
 
 ## 返回值
 
@@ -30,7 +30,7 @@ function useThrottleFn<Args extends unknown[], Result>(
 
 ## 行为
 
-内部的 `maxWait` 等于 `delay`，因此连续事件流不会让执行时间无限后移。
+内部的 `maxWait` 等于 `delay`，因此连续事件流不会让执行时间无限后移。回调失败后会重置节流窗口，在调用可选的 `onError` 后重新抛出原始错误。
 
 ## SSR / RSC
 

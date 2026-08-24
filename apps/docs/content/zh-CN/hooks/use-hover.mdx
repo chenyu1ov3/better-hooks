@@ -1,0 +1,47 @@
+---
+title: useHover
+description: 跟踪目标的悬停状态，并跟随 ref 目标变化。
+section: 浏览器与 DOM
+order: 127
+---
+
+# useHover
+
+## 概览
+
+`useHover` 跟踪 EventTarget 从 `mouseenter` 到 `mouseleave` 的区间，并返回当前布尔状态。
+
+## 函数签名
+
+```ts
+function useHover(target?: HoverTarget, options?: UseHoverOptions): boolean;
+function useHover(options?: UseHoverOptions): boolean;
+```
+
+## 参数
+
+可以传入直接 target、ref 或惰性 target。`enabled` 暂停观察，`capture` 控制原生注册方式，`onEnter`、`onLeave` 和 `onChange` 观察状态变化。回调错误可通过 `onError` 观察。
+
+## 返回值
+
+在匹配的进入和离开事件之间返回 `true`，其他时间返回 `false`。
+
+## 行为
+
+ref 的 `current` 变化时监听器会跟随新目标。目标变化会重置状态并移除旧目标监听器。调用 `onError` 后，回调错误仍会重新抛出。
+
+## SSR / RSC
+
+服务端返回 `false`，原生监听器只在客户端提交后添加。请在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以用布尔值驱动 tooltip 或预览；当状态变更处理函数需要稳定引用时，可配合 `useMemoizedFn`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-hover/index.ts)。

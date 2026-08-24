@@ -1,0 +1,46 @@
+---
+title: useResetState
+description: Add a stable reset action that restores the first resolved state value.
+section: State
+order: 107
+---
+
+# useResetState
+
+## Overview
+
+`useResetState` combines safe React state with a reset action that restores the initial value captured by the first render.
+
+## Signature
+
+```ts
+function useResetState<S>(initialState: S | (() => S)): UseResetStateResult<S>;
+```
+
+## Parameters
+
+`initialState` may be a value or lazy initializer. The first resolved value is retained as the reset snapshot.
+
+## Returns
+
+A readonly tuple of `[state, setState, resetState]`. Both actions are stable references.
+
+## Behavior
+
+`setState` follows `useSafeState` and ignores calls after unmount. `resetState` restores the first snapshot even if a later render receives a different initializer or prop-derived value.
+
+## SSR / RSC
+
+The initial snapshot is captured without browser access, so SSR output is deterministic. Actions are intended for a Client Component after hydration.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use it for editable forms, filters, or dialogs that need a one-click return to their opening state.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-reset-state/index.ts).

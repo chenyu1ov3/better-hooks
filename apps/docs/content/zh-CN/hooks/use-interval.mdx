@@ -14,12 +14,16 @@ order: 115
 ## 函数签名
 
 ```ts
-function useInterval(callback: () => void, delay: number | null): void;
+function useInterval(
+  callback: () => void,
+  delay: number | null,
+  options?: { onError?: (error: unknown) => void },
+): void;
 ```
 
 ## 参数
 
-`callback` 始终使用最近一次已提交的版本，且不会因此重建定时器；`delay` 最小为零，`null` 表示暂停。
+`callback` 始终使用最近一次已提交的版本，且不会因此重建定时器；`delay` 最小为零，`null` 表示暂停。`onError` 用于观察回调异常。
 
 ## 返回值
 
@@ -27,7 +31,7 @@ function useInterval(callback: () => void, delay: number | null): void;
 
 ## 行为
 
-改变 `delay` 会替换原生定时器；依赖变化或组件卸载时都会执行清理。
+改变 `delay` 会替换原生定时器；依赖变化或组件卸载时都会执行清理。回调抛错时，会先停止 interval，再调用 `onError` 并重新抛出原始错误。
 
 ## SSR / RSC
 

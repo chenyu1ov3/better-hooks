@@ -1,0 +1,47 @@
+---
+title: useHover
+description: Track hover state for a target and follow ref target changes.
+section: Browser & DOM
+order: 127
+---
+
+# useHover
+
+## Overview
+
+`useHover` tracks the interval between `mouseenter` and `mouseleave` for an EventTarget and returns the current boolean state.
+
+## Signature
+
+```ts
+function useHover(target?: HoverTarget, options?: UseHoverOptions): boolean;
+function useHover(options?: UseHoverOptions): boolean;
+```
+
+## Parameters
+
+Pass a direct target, ref, or lazy target. `enabled` pauses observation, `capture` controls native registration, and `onEnter`, `onLeave`, and `onChange` observe transitions. Callback failures can be observed with `onError`.
+
+## Returns
+
+`true` between matching enter and leave events, otherwise `false`.
+
+## Behavior
+
+Listeners follow a ref when its `current` target changes. A target change resets the state and removes listeners from the previous target. Callback errors are rethrown after `onError` is called.
+
+## SSR / RSC
+
+The server value is `false`, and native listeners are attached only after a client commit. Use the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use the boolean to drive tooltips or previews, and use `useMemoizedFn` when transition handlers need a stable identity outside the Hook.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-hover/index.ts).

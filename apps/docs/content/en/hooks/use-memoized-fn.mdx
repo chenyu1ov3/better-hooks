@@ -1,0 +1,46 @@
+---
+title: useMemoizedFn
+description: Keep a stable callback identity while invoking the latest committed implementation.
+section: State
+order: 105
+---
+
+# useMemoizedFn
+
+## Overview
+
+`useMemoizedFn` returns one function reference for the lifetime of the component while forwarding calls to the latest callback that has committed.
+
+## Signature
+
+```ts
+function useMemoizedFn<T extends (...args: never[]) => unknown>(fn: T): T;
+```
+
+## Parameters
+
+`fn` is the callback to invoke. Its arguments, return value, and `this` context are preserved.
+
+## Returns
+
+A stable function with the same parameter and return types as `fn`.
+
+## Behavior
+
+The wrapper identity does not change when `fn` changes. The implementation is published from a layout effect, so an abandoned concurrent render cannot replace the callback observed by an event or timer.
+
+## SSR / RSC
+
+The wrapper can be created during SSR and does not invoke `fn` while rendering. Use the Hook from a Client Component when the callback interacts with browser APIs.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use it when an imperative subscription needs a stable listener but must still read current props or state.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-memoized-fn/index.ts).

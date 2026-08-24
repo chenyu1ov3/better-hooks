@@ -1,0 +1,50 @@
+---
+title: useDocumentVisibility
+description: 通过共享的外部状态订阅跟踪文档可见性。
+section: 浏览器与 DOM
+order: 125
+---
+
+# useDocumentVisibility
+
+## 概览
+
+`useDocumentVisibility` 读取文档的 `visibilityState`，并为观察同一文档和 capture 模式的组件共享一个原生监听器。
+
+## 函数签名
+
+```ts
+function useDocumentVisibility(options?: UseDocumentVisibilityOptions): VisibilityState;
+function useDocumentVisibility(
+  target: DocumentVisibilityTarget,
+  options?: Omit<UseDocumentVisibilityOptions, 'target' | 'ref'>,
+): VisibilityState;
+```
+
+## 参数
+
+使用 `target` 或 `ref` 观察其他文档，使用 `enabled` 暂停更新，使用 `capture` 选择原生 capture 注册方式。默认目标是当前 `document`。
+
+## 返回值
+
+返回 `'visible'`、`'hidden'` 或 `'prerender'`。目标被禁用或不可用时返回 `'visible'`。
+
+## 行为
+
+订阅会被共享，最后一个消费者卸载后才移除。读取和监听器注册都经过保护，部分 mock 的 document 也会回退到确定性的 visible 快照。
+
+## SSR / RSC
+
+服务端快照始终是 `'visible'`，SSR 期间不会访问 document。观察浏览器可见性时请在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+当值变为 `'hidden'` 时暂停轮询或延迟高成本工作；若任务需要在后台停止，可以配合 `useAsync` 的取消操作。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-document-visibility/index.ts)。

@@ -17,19 +17,19 @@ order: 120
 function useEventListener<K extends keyof WindowEventMap>(
   type: K,
   listener: (event: WindowEventMap[K]) => void,
-  options?: AddEventListenerOptions | boolean,
+  options?: UseEventListenerOptions | boolean,
 ): void;
 function useEventListener(
   target: EventListenerTarget,
   type: string,
   listener: (event: Event) => void,
-  options?: AddEventListenerOptions | boolean,
+  options?: UseEventListenerOptions | boolean,
 ): void;
 ```
 
 ## 参数
 
-省略 `target` 时使用 `window`；也可以传入 `EventTarget`、空目标或 `{ current }` ref。支持原生的 `capture`、`passive`、`once` 和 `signal` 选项。
+省略 `target` 时使用 `window`；也可以传入 `EventTarget`、空目标或 `{ current }` ref。支持原生的 `capture`、`passive`、`once` 和 `signal` 选项；`onError` 用于观察监听器异常。
 
 ## 返回值
 
@@ -37,7 +37,7 @@ function useEventListener(
 
 ## 行为
 
-回调 ref 会在组件提交时更新。目标、事件类型或有效选项变化时，Hook 会替换原生监听器，并使用相同的 `capture` 值移除旧监听器。
+回调 ref 会在组件提交时更新。目标、事件类型或有效选项变化时，Hook 会替换原生监听器，并使用相同的 `capture` 值移除旧监听器。监听器抛错时会先调用 `onError`，再重新抛出原始错误；订阅仍然可以被清理。
 
 ## SSR / RSC
 

@@ -13,10 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/chenyu1ov3/better-hooks/actions/workflows/ci.yml"><img src="https://github.com/chenyu1ov3/better-hooks/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI 状态" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0f766e" alt="MIT 许可证" /></a>
-  <img src="https://img.shields.io/badge/React-19-087ea4" alt="React 19" />
-  <img src="https://img.shields.io/badge/TypeScript-strict-3178c6" alt="严格 TypeScript" />
 </p>
 
 > [!IMPORTANT]
@@ -24,13 +21,14 @@
 
 ## 包含的 Hooks
 
-| 分类       | Hooks                                                                                       |
-| ---------- | ------------------------------------------------------------------------------------------- |
-| 状态       | `useBoolean`, `useToggle`, `useInput`, `useControllableState`, `usePrevious`, `useLatest`   |
-| 调度       | `useDebounce`, `useDebounceFn`, `useThrottle`, `useThrottleFn`, `useTimeout`, `useInterval` |
-| 异步与事件 | `useAsync`, `useEventListener`, `useClickOutside`                                           |
-| 浏览器状态 | `useMediaQuery`, `useWindowSize`, `useOnline`, `useIsMounted`, `useIsomorphicLayoutEffect`  |
-| 存储       | `useStorage`, `useLocalStorage`, `useSessionStorage`                                        |
+| 分类       | Hooks                                                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 状态       | `useBoolean`, `useToggle`, `useInput`, `useControllableState`, `usePrevious`, `useLatest`, `useSafeState`, `useResetState`, `useMemoizedFn` |
+| 调度       | `useDebounce`, `useDebounceFn`, `useThrottle`, `useThrottleFn`, `useTimeout`, `useInterval`                                                 |
+| 异步与事件 | `useAsync`, `useLockFn`, `useEventListener`, `useClickOutside`                                                                              |
+| 浏览器状态 | `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover`                                           |
+| 生命周期   | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                              |
+| 存储       | `useStorage`, `useLocalStorage`, `useSessionStorage`                                                                                        |
 
 API 说明和在线示例请查看 [Hook 参考文档](https://chenyu1ov3.github.io/better-hooks/zh/hooks/)。
 

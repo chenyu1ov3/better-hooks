@@ -1,0 +1,50 @@
+---
+title: useDocumentVisibility
+description: Track document visibility with a shared external-store subscription.
+section: Browser & DOM
+order: 125
+---
+
+# useDocumentVisibility
+
+## Overview
+
+`useDocumentVisibility` reads a document's `visibilityState` and shares one native listener for consumers observing the same document and capture mode.
+
+## Signature
+
+```ts
+function useDocumentVisibility(options?: UseDocumentVisibilityOptions): VisibilityState;
+function useDocumentVisibility(
+  target: DocumentVisibilityTarget,
+  options?: Omit<UseDocumentVisibilityOptions, 'target' | 'ref'>,
+): VisibilityState;
+```
+
+## Parameters
+
+Use `target` or `ref` to observe another document, `enabled` to pause updates, and `capture` to choose native capture registration. The default target is the ambient `document`.
+
+## Returns
+
+`'visible'`, `'hidden'`, or `'prerender'`. Disabled or unavailable targets return `'visible'`.
+
+## Behavior
+
+Subscriptions are shared and removed when the last consumer leaves. Reads and listener registration are guarded so partially mocked documents fall back to the deterministic visible snapshot.
+
+## SSR / RSC
+
+The server snapshot is always `'visible'`; no document is touched during SSR. Use the Hook in a Client Component when observing browser visibility.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Pause polling or defer expensive work when the value becomes `'hidden'`; pair it with `useAsync` cancellation when a task should stop in the background.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-document-visibility/index.ts).

@@ -14,12 +14,15 @@ order: 122
 ## Signature
 
 ```ts
-function useMediaQuery(query: string, options?: { readonly defaultMatches?: boolean }): boolean;
+function useMediaQuery(
+  query: string,
+  options?: { readonly defaultMatches?: boolean; readonly onError?: (error: unknown) => void },
+): boolean;
 ```
 
 ## Parameters
 
-`query` is a CSS media query. `defaultMatches` is the server and unsupported-browser fallback, defaulting to `false`.
+`query` is a CSS media query. `defaultMatches` is the server and unsupported-browser fallback, defaulting to `false`. `onError` observes `matchMedia` and subscription failures.
 
 ## Returns
 
@@ -27,7 +30,7 @@ Whether the query currently matches.
 
 ## Behavior
 
-Subscribers share a cached `MediaQueryList`; the native listener is removed when the last subscriber leaves. Legacy `addListener` is used only when modern methods are absent.
+Subscribers share a cached `MediaQueryList`; the native listener is removed when the last subscriber leaves. Legacy `addListener` is used only when modern methods are absent. If `matchMedia` throws, the Hook reports the failure and returns `defaultMatches` instead of breaking the render.
 
 ## SSR / RSC
 

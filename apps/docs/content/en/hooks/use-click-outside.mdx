@@ -17,13 +17,13 @@ order: 121
 function useClickOutside<T extends HTMLElement>(
   ref: { readonly current: T | null },
   onOutside: (event: PointerEvent) => void,
-  enabled?: boolean,
+  enabledOrOptions?: boolean | { enabled?: boolean; onError?: (error: unknown) => void },
 ): void;
 ```
 
 ## Parameters
 
-`ref` identifies the inside region. `onOutside` follows the latest commit. `enabled` defaults to `true`.
+`ref` identifies the inside region. `onOutside` follows the latest commit. A boolean enables the listener directly; the object form supports `enabled` and an `onError` observer. `enabled` defaults to `true`.
 
 ## Returns
 
@@ -31,7 +31,7 @@ Nothing. The document listener is managed by the Hook.
 
 ## Behavior
 
-Events with non-Node targets are ignored. A missing element is not treated as an outside hit. Disabling or unmounting removes the listener.
+Events with non-Node targets are ignored. A missing element is not treated as an outside hit. Disabling or unmounting removes the listener. If `onOutside` throws, `onError` runs before the original error is rethrown.
 
 ## SSR / RSC
 

@@ -16,13 +16,13 @@ order: 113
 ```ts
 function useThrottleFn<Args extends unknown[], Result>(
   fn: (...args: Args) => Result,
-  options: ThrottleOptions,
+  options: ThrottleFnOptions,
 ): ThrottledFunction<Args, Result>;
 ```
 
 ## Parameters
 
-`delay` defines the throttle window. `leading` and `trailing` both default to `true`.
+`delay` defines the throttle window. `leading` and `trailing` both default to `true`; `onError` observes callback failures.
 
 ## Returns
 
@@ -30,7 +30,7 @@ The same `run`, `cancel`, `flush`, and `pending` control object as `useDebounceF
 
 ## Behavior
 
-Internally, `maxWait` equals `delay`, so a continuous stream cannot postpone execution indefinitely.
+Internally, `maxWait` equals `delay`, so a continuous stream cannot postpone execution indefinitely. A callback failure resets the throttle window and is rethrown after the optional `onError` observer runs.
 
 ## SSR / RSC
 

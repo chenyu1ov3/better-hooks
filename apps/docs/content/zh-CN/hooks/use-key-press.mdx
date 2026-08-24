@@ -1,0 +1,50 @@
+---
+title: useKeyPress
+description: 为匹配的按键、键码、谓词和组合键执行处理函数。
+section: 浏览器与 DOM
+order: 126
+---
+
+# useKeyPress
+
+## 概览
+
+`useKeyPress` 订阅键盘事件，支持现代 key 名称、旧式数字键码、候选数组、谓词以及 `ctrl.s` 等组合键。
+
+## 函数签名
+
+```ts
+function useKeyPress(
+  keyFilter: KeyFilter,
+  handler: KeyPressHandler,
+  options?: UseKeyPressOptions,
+): void;
+```
+
+## 参数
+
+默认监听 `keydown`。可通过 `events` 监听 `keyup` 或 `keypress`，通过 `target`/`ref` 限定 EventTarget，通过 `exactMatch` 严格匹配修饰键，并用 `enabled` 暂停。`onError` 可观察谓词或处理函数错误。
+
+## 返回值
+
+无返回值。原生订阅会跟随 target、事件和 enabled 选项，并在清理时移除。
+
+## 行为
+
+键过滤器可以是字符串、数字、候选数组或谓词。匹配回调的错误会先通过 `onError` 报告，然后继续抛出，不会被吞掉。
+
+## SSR / RSC
+
+当 `window` 或配置的 target 不可用时不会添加监听器。请在 Client Component 中使用此 Hook。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+键盘触发 mutation 时可以配合 `useLockFn`，模态框和命令面板快捷键可以配合 `useBoolean`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-key-press/index.ts)。

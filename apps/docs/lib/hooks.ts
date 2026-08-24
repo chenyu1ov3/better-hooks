@@ -153,6 +153,51 @@ export const hooks = [
     },
   }),
   defineHook({
+    slug: 'use-memoized-fn',
+    name: 'useMemoizedFn',
+    importPath: 'better-hook/use-memoized-fn',
+    signature: 'useMemoizedFn<T extends (...args: never[]) => unknown>(fn: T): T',
+    category: 'state',
+    description: {
+      en: 'Keeps a stable callback identity while invoking the latest committed implementation.',
+      'zh-CN': '保持回调引用稳定，同时调用最近一次提交的实现。',
+    },
+    ssrBehavior: {
+      en: 'Creates a stable wrapper without invoking the callback during server rendering.',
+      'zh-CN': '服务端渲染时只创建稳定包装函数，不会执行回调。',
+    },
+  }),
+  defineHook({
+    slug: 'use-safe-state',
+    name: 'useSafeState',
+    importPath: 'better-hook/use-safe-state',
+    signature: 'useSafeState<S>(initialState: S | (() => S)): UseSafeStateResult<S>',
+    category: 'state',
+    description: {
+      en: 'Provides state whose setter ignores updates after the component unmounts.',
+      'zh-CN': '提供在组件卸载后会忽略更新的 React 状态。',
+    },
+    ssrBehavior: {
+      en: 'Uses deterministic React state on the server; the setter becomes active after commit.',
+      'zh-CN': '服务端使用确定性的 React 状态，提交完成后 setter 才会生效。',
+    },
+  }),
+  defineHook({
+    slug: 'use-reset-state',
+    name: 'useResetState',
+    importPath: 'better-hook/use-reset-state',
+    signature: 'useResetState<S>(initialState: S | (() => S)): UseResetStateResult<S>',
+    category: 'state',
+    description: {
+      en: 'Adds a stable reset action that restores the first resolved state value.',
+      'zh-CN': '增加稳定的 reset 操作，将状态恢复为首次解析得到的初始值。',
+    },
+    ssrBehavior: {
+      en: 'Captures the initial React state during SSR without accessing browser APIs.',
+      'zh-CN': 'SSR 期间捕获初始 React 状态，不会访问浏览器 API。',
+    },
+  }),
+  defineHook({
     slug: 'use-debounce',
     name: 'useDebounce',
     importPath: 'better-hook/use-debounce',
@@ -187,7 +232,7 @@ export const hooks = [
     name: 'useDebounceFn',
     importPath: 'better-hook/use-debounce-fn',
     signature:
-      'useDebounceFn<Args, Result>(fn: (...args: Args) => Result, options: DebounceOptions): DebouncedFunction<Args, Result>',
+      'useDebounceFn<Args, Result>(fn: (...args: Args) => Result, options: DebounceFnOptions): DebouncedFunction<Args, Result>',
     category: 'async',
     description: {
       en: 'Debounces function calls with cancel, flush, and pending controls.',
@@ -203,7 +248,7 @@ export const hooks = [
     name: 'useThrottleFn',
     importPath: 'better-hook/use-throttle-fn',
     signature:
-      'useThrottleFn<Args, Result>(fn: (...args: Args) => Result, options: ThrottleOptions): ThrottledFunction<Args, Result>',
+      'useThrottleFn<Args, Result>(fn: (...args: Args) => Result, options: ThrottleFnOptions): ThrottledFunction<Args, Result>',
     category: 'async',
     description: {
       en: 'Throttles function calls while preserving the latest committed callback.',
@@ -219,7 +264,7 @@ export const hooks = [
     name: 'useTimeout',
     importPath: 'better-hook/use-timeout',
     signature:
-      'useTimeout(callback: () => void, delay: number | null): { cancel: () => void; pending: boolean }',
+      'useTimeout(callback: () => void, delay: number | null, options?: UseTimeoutOptions): { cancel: () => void; pending: boolean }',
     category: 'async',
     description: {
       en: 'Runs the latest callback once after a delay, with cancellation state.',
@@ -234,7 +279,8 @@ export const hooks = [
     slug: 'use-interval',
     name: 'useInterval',
     importPath: 'better-hook/use-interval',
-    signature: 'useInterval(callback: () => void, delay: number | null): void',
+    signature:
+      'useInterval(callback: () => void, delay: number | null, options?: UseIntervalOptions): void',
     category: 'async',
     description: {
       en: 'Runs the latest callback on a declarative interval.',
@@ -261,10 +307,27 @@ export const hooks = [
     },
   }),
   defineHook({
+    slug: 'use-lock-fn',
+    name: 'useLockFn',
+    importPath: 'better-hook/use-lock-fn',
+    signature:
+      'useLockFn<Args extends readonly unknown[], Result>(fn: (...args: Args) => Result | PromiseLike<Result>, options?: UseLockFnOptions): LockFn<Args, Awaited<Result>>',
+    category: 'async',
+    description: {
+      en: 'Prevents overlapping calls to an async or synchronous action.',
+      'zh-CN': '防止异步或同步操作并发执行。',
+    },
+    ssrBehavior: {
+      en: 'Creates a stable wrapper during SSR without invoking the action.',
+      'zh-CN': 'SSR 期间只创建稳定包装函数，不会执行操作。',
+    },
+  }),
+  defineHook({
     slug: 'use-event-listener',
     name: 'useEventListener',
     importPath: 'better-hook/use-event-listener',
-    signature: 'useEventListener(target?, type, listener, options?): void',
+    signature:
+      'useEventListener(target?, type, listener, options?: UseEventListenerOptions | boolean): void',
     category: 'browser-dom',
     description: {
       en: 'Subscribes to an EventTarget with typed window events and automatic cleanup.',
@@ -280,7 +343,7 @@ export const hooks = [
     name: 'useClickOutside',
     importPath: 'better-hook/use-click-outside',
     signature:
-      'useClickOutside<T extends HTMLElement>(ref: RefTarget<T>, onOutside: (event: PointerEvent) => void, enabled?: boolean): void',
+      'useClickOutside<T extends HTMLElement>(ref: RefTarget<T>, onOutside: (event: PointerEvent) => void, enabledOrOptions?: boolean | UseClickOutsideOptions): void',
     category: 'browser-dom',
     description: {
       en: 'Calls a handler for pointer presses outside a referenced element.',
@@ -334,6 +397,52 @@ export const hooks = [
     ssrBehavior: {
       en: 'Returns true for the server snapshot to keep markup deterministic.',
       'zh-CN': '服务端快照固定返回 true，保证服务端输出稳定。',
+    },
+  }),
+  defineHook({
+    slug: 'use-document-visibility',
+    name: 'useDocumentVisibility',
+    importPath: 'better-hook/use-document-visibility',
+    signature: 'useDocumentVisibility(options?: UseDocumentVisibilityOptions): VisibilityState',
+    category: 'browser-dom',
+    description: {
+      en: 'Tracks document visibility through a shared external-store subscription.',
+      'zh-CN': '通过共享的外部状态订阅跟踪文档可见性。',
+    },
+    ssrBehavior: {
+      en: 'Returns visible on the server and subscribes only when a document is available.',
+      'zh-CN': '服务端返回 visible，只有存在 document 时才会建立订阅。',
+    },
+  }),
+  defineHook({
+    slug: 'use-key-press',
+    name: 'useKeyPress',
+    importPath: 'better-hook/use-key-press',
+    signature:
+      'useKeyPress(keyFilter: KeyFilter, handler: KeyPressHandler, options?: UseKeyPressOptions): void',
+    category: 'browser-dom',
+    description: {
+      en: 'Runs a handler for matching keyboard keys, key codes, predicates, and modifier combinations.',
+      'zh-CN': '为匹配的按键、键码、谓词或组合键执行处理函数。',
+    },
+    ssrBehavior: {
+      en: 'Skips native subscription when window or the configured target is unavailable.',
+      'zh-CN': 'window 或配置的目标不可用时不会建立原生订阅。',
+    },
+  }),
+  defineHook({
+    slug: 'use-hover',
+    name: 'useHover',
+    importPath: 'better-hook/use-hover',
+    signature: 'useHover(target?: HoverTarget, options?: UseHoverOptions): boolean',
+    category: 'browser-dom',
+    description: {
+      en: 'Tracks mouseenter and mouseleave state for a target and follows ref changes.',
+      'zh-CN': '跟踪目标的鼠标进入与离开状态，并跟随 ref 目标变化。',
+    },
+    ssrBehavior: {
+      en: 'Returns false during SSR and attaches native listeners after the client commits.',
+      'zh-CN': 'SSR 期间返回 false，并在客户端提交后添加原生监听器。',
     },
   }),
   defineHook({
@@ -413,6 +522,21 @@ export const hooks = [
       'zh-CN': 'window 不可用时使用 useEffect，避免服务端出现 layout effect 警告。',
     },
   }),
+  defineHook({
+    slug: 'use-unmounted-ref',
+    name: 'useUnmountedRef',
+    importPath: 'better-hook/use-unmounted-ref',
+    signature: 'useUnmountedRef(): RefObject<boolean>',
+    category: 'lifecycle',
+    description: {
+      en: 'Exposes a stable ref that becomes true during unmount cleanup.',
+      'zh-CN': '提供稳定的 ref，在卸载清理阶段变为 true。',
+    },
+    ssrBehavior: {
+      en: 'Starts as false during SSR and remains false until a mounted component is cleaned up.',
+      'zh-CN': 'SSR 期间初始为 false，组件挂载并清理前都保持为 false。',
+    },
+  }),
 ] as const satisfies readonly HookDefinition[];
 
 export const aggregateEntries = [
@@ -441,12 +565,12 @@ export const apiEntries = [
 ] as const satisfies readonly ApiEntryDefinition[];
 
 export const hookCategoryCounts = {
-  state: 5,
-  async: 7,
-  'browser-dom': 5,
+  state: 8,
+  async: 8,
+  'browser-dom': 8,
   forms: 1,
   storage: 2,
-  lifecycle: 2,
+  lifecycle: 3,
 } as const satisfies Record<HookCategory, number>;
 
 export function getHookBySlug(slug: string): HookDefinition | undefined {

@@ -17,13 +17,13 @@ order: 121
 function useClickOutside<T extends HTMLElement>(
   ref: { readonly current: T | null },
   onOutside: (event: PointerEvent) => void,
-  enabled?: boolean,
+  enabledOrOptions?: boolean | { enabled?: boolean; onError?: (error: unknown) => void },
 ): void;
 ```
 
 ## 参数
 
-`ref` 指定内部区域；`onOutside` 始终使用最近一次已提交的回调；`enabled` 默认为 `true`。
+`ref` 指定内部区域；`onOutside` 始终使用最近一次已提交的回调。传入布尔值可以直接启用或禁用监听器；对象形式支持 `enabled` 和 `onError` 观察器，`enabled` 默认为 `true`。
 
 ## 返回值
 
@@ -31,7 +31,7 @@ function useClickOutside<T extends HTMLElement>(
 
 ## 行为
 
-非 `Node` 类型的事件目标会被忽略。引用元素尚不存在时，事件不会被视为外部点击；禁用 Hook 或卸载组件都会移除监听器。
+非 `Node` 类型的事件目标会被忽略。引用元素尚不存在时，事件不会被视为外部点击；禁用 Hook 或卸载组件都会移除监听器。`onOutside` 抛错时，会先调用 `onError`，再重新抛出原始错误。
 
 ## SSR / RSC
 

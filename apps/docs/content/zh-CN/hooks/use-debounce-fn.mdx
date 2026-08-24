@@ -16,7 +16,7 @@ order: 112
 ```ts
 function useDebounceFn<Args extends unknown[], Result>(
   fn: (...args: Args) => Result,
-  options: DebounceOptions,
+  options: DebounceFnOptions,
 ): {
   run: (...args: Args) => void;
   cancel: () => void;
@@ -27,7 +27,7 @@ function useDebounceFn<Args extends unknown[], Result>(
 
 ## 参数
 
-`fn` 始终使用最近一次已提交的版本。选项包含必填的 `delay`，以及可选的 `leading`、`trailing` 和有限 `maxWait`。
+`fn` 始终使用最近一次已提交的版本。选项包含必填的 `delay`，以及可选的 `leading`、`trailing`、有限 `maxWait` 和 `onError` 观察器。
 
 ## 返回值
 
@@ -35,7 +35,7 @@ function useDebounceFn<Args extends unknown[], Result>(
 
 ## 行为
 
-默认只在尾端执行。`flush` 会清理两个定时器并返回回调结果；组件卸载时会丢弃并清理任务，不再执行回调。
+默认只在尾端执行。`flush` 会清理两个定时器并返回回调结果；组件卸载时会丢弃并清理任务，不再执行回调。回调抛错时，会先清理等待参数和定时器，再调用 `onError` 并重新抛出原始错误。
 
 ## SSR / RSC
 

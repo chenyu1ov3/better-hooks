@@ -17,19 +17,19 @@ order: 120
 function useEventListener<K extends keyof WindowEventMap>(
   type: K,
   listener: (event: WindowEventMap[K]) => void,
-  options?: AddEventListenerOptions | boolean,
+  options?: UseEventListenerOptions | boolean,
 ): void;
 function useEventListener(
   target: EventListenerTarget,
   type: string,
   listener: (event: Event) => void,
-  options?: AddEventListenerOptions | boolean,
+  options?: UseEventListenerOptions | boolean,
 ): void;
 ```
 
 ## Parameters
 
-Omit `target` to use `window`, or pass an `EventTarget`, nullable target, or ref-like `{ current }`. Native capture, passive, once, and signal options are supported.
+Omit `target` to use `window`, or pass an `EventTarget`, nullable target, or ref-like `{ current }`. Native capture, passive, once, and signal options are supported. `onError` observes listener failures.
 
 ## Returns
 
@@ -37,7 +37,7 @@ Nothing. Subscription lifetime follows the component and relevant inputs.
 
 ## Behavior
 
-The callback ref updates at commit. The native listener is replaced when the target, type, or meaningful options change and is removed with the same capture value.
+The callback ref updates at commit. The native listener is replaced when the target, type, or meaningful options change and is removed with the same capture value. A thrown listener error is reported to `onError` and then rethrown; the subscription remains removable.
 
 ## SSR / RSC
 

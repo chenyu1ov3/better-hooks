@@ -1,0 +1,50 @@
+---
+title: useKeyPress
+description: Run a handler for matching keys, key codes, predicates, and modifier combinations.
+section: Browser & DOM
+order: 126
+---
+
+# useKeyPress
+
+## Overview
+
+`useKeyPress` subscribes to keyboard events and matches modern key names, legacy numeric key codes, alternative lists, predicates, and combinations such as `ctrl.s`.
+
+## Signature
+
+```ts
+function useKeyPress(
+  keyFilter: KeyFilter,
+  handler: KeyPressHandler,
+  options?: UseKeyPressOptions,
+): void;
+```
+
+## Parameters
+
+The default event is `keydown`. Use `events` for `keyup` or `keypress`, `target`/`ref` for a scoped EventTarget, `exactMatch` for strict modifiers, and `enabled` to pause. `onError` observes predicate or handler failures.
+
+## Returns
+
+Nothing. The native subscription follows the target, event, and enabled options and is removed on cleanup.
+
+## Behavior
+
+Key filters can be strings, numbers, arrays of alternatives, or predicates. Matching callback errors are reported through `onError` and then rethrown; they are not swallowed.
+
+## SSR / RSC
+
+No listener is attached when `window` or the configured target is unavailable. Use the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Combine with `useLockFn` for keyboard-triggered mutations or `useBoolean` for modal and command-palette shortcuts.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-key-press/index.ts).

@@ -1,0 +1,46 @@
+---
+title: useMemoizedFn
+description: 保持回调引用稳定，同时调用最近一次提交的实现。
+section: 状态
+order: 105
+---
+
+# useMemoizedFn
+
+## 概览
+
+`useMemoizedFn` 在组件生命周期内返回同一个函数引用，同时将调用转发给最近一次已提交的回调。
+
+## 函数签名
+
+```ts
+function useMemoizedFn<T extends (...args: never[]) => unknown>(fn: T): T;
+```
+
+## 参数
+
+`fn` 是要执行的回调。它的参数、返回值和 `this` 上下文都会被保留。
+
+## 返回值
+
+返回一个与 `fn` 具有相同参数和返回类型的稳定函数。
+
+## 行为
+
+即使 `fn` 变化，包装函数的引用也不会变化。实现从 layout effect 中发布，因此被放弃的并发渲染不会替换事件或定时器实际调用的回调。
+
+## SSR / RSC
+
+SSR 期间可以创建包装函数，但渲染阶段不会调用 `fn`。当回调访问浏览器 API 时，请在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+当命令式订阅需要稳定 listener、又必须读取最新 props 或 state 时，可以使用此 Hook。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-memoized-fn/index.ts)。

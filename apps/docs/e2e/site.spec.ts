@@ -41,11 +41,16 @@ const defaultExampleText = {
   'use-throttle': 'Value',
   'use-debounce-fn': 'Save now',
   'use-throttle-fn': 'Move the pointer here.',
+  'use-document-visibility': 'visible',
   'use-timeout': 'Saved successfully',
   'use-interval': /Pause at \d+/,
   'use-async': 'Ready',
   'use-event-listener': /\d+px/,
   'use-click-outside': 'Account settings',
+  'use-hover': /Hovered|Move here/,
+  'use-key-press': null,
+  'use-lock-fn': 'Save',
+  'use-memoized-fn': 'Greet',
   'use-media-query': /(?:Compact|Full) navigation/,
   'use-window-size': /\d+ x \d+/,
   'use-online': /Online|Offline/,
@@ -54,7 +59,10 @@ const defaultExampleText = {
   'use-session-storage': 'Discard',
   'use-is-mounted': 'idle',
   'use-isomorphic-layout-effect': /Measured width: \d+px/,
+  'use-reset-state': 'Reset',
+  'use-safe-state': /Count: 0/,
   'use-storage': 'Visits:',
+  'use-unmounted-ref': 'Waiting',
 } as const;
 
 function appRoute(path = '') {
@@ -344,7 +352,7 @@ export function BrokenExample() {
     await expect(reset).toBeDisabled();
   });
 
-  test('All 23 default Playground examples compile and render', async ({ page }) => {
+  test('All 31 default Playground examples compile and render', async ({ page }) => {
     await openPage(page, 'playground');
     const playground = page.locator('.playground-workbench');
     const selector = playground.getByRole('combobox', { name: 'Example' });
@@ -355,7 +363,7 @@ export function BrokenExample() {
       })),
     );
 
-    expect(options).toHaveLength(23);
+    expect(options).toHaveLength(31);
     expect(options.map(({ value }) => value).sort()).toEqual(
       Object.keys(defaultExampleText).sort(),
     );
@@ -366,9 +374,10 @@ export function BrokenExample() {
       await expect(
         playground.getByRole('textbox', { name: 'Editable TSX', exact: true }),
       ).toContainText(`better-hook/${value}`);
-      await expect(playground.locator('.live-code-preview__canvas')).toContainText(
-        defaultExampleText[value as keyof typeof defaultExampleText],
-      );
+      const expectedText = defaultExampleText[value as keyof typeof defaultExampleText];
+      if (expectedText !== null) {
+        await expect(playground.locator('.live-code-preview__canvas')).toContainText(expectedText);
+      }
       await expect(playground.getByRole('alert')).toHaveCount(0);
     }
   });

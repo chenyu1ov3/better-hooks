@@ -1,0 +1,46 @@
+---
+title: useUnmountedRef
+description: 提供稳定的 ref，在卸载清理阶段变为 true。
+section: 生命周期
+order: 152
+---
+
+# useUnmountedRef
+
+## 概览
+
+`useUnmountedRef` 提供稳定的布尔 ref，用于防护组件移除后才完成的延迟工作。
+
+## 函数签名
+
+```ts
+function useUnmountedRef(): RefObject<boolean>;
+```
+
+## 参数
+
+此 Hook 不接收参数。
+
+## 返回值
+
+返回稳定 ref。组件存活时 `current` 为 `false`，卸载清理期间变为 `true`。
+
+## 行为
+
+ref 在多次渲染间保持不变。清理阶段将它设为 `true`；Strict Mode 的开发环境重放会在下一次 setup 时恢复 `false`，避免仍存活的组件被标记为已卸载。
+
+## SSR / RSC
+
+SSR 初始值为 `false`，不会访问浏览器 API。请在 Client Component 的 effect 或回调中读取此 ref。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+当定时器、订阅或 Promise continuation 无法显式取消时，可以用它保护可选的状态更新。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-unmounted-ref/index.ts)。

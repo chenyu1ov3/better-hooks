@@ -1,0 +1,46 @@
+---
+title: useResetState
+description: 增加稳定的重置操作，将状态恢复为首次解析得到的值。
+section: 状态
+order: 107
+---
+
+# useResetState
+
+## 概览
+
+`useResetState` 将安全状态与 reset 操作结合，恢复首次渲染捕获的初始值。
+
+## 函数签名
+
+```ts
+function useResetState<S>(initialState: S | (() => S)): UseResetStateResult<S>;
+```
+
+## 参数
+
+`initialState` 可以是值或惰性初始化函数。首次解析出的值会被保留为 reset 快照。
+
+## 返回值
+
+返回只读元组 `[state, setState, resetState]`，两个操作函数的引用都保持稳定。
+
+## 行为
+
+`setState` 遵循 `useSafeState`，卸载后忽略调用。`resetState` 恢复首次快照，即使后续渲染收到不同的初始化参数或基于 props 的值也不会改变快照。
+
+## SSR / RSC
+
+初始快照捕获过程不访问浏览器，因此 SSR 输出是确定的。操作函数应在 hydration 后的 Client Component 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+适合可编辑表单、筛选器或对话框，让用户一键回到打开时的状态。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-reset-state/index.ts)。

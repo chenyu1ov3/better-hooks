@@ -8,22 +8,30 @@ import * as UseClickOutsideModule from 'better-hook/use-click-outside';
 import * as UseControllableStateModule from 'better-hook/use-controllable-state';
 import * as UseDebounceModule from 'better-hook/use-debounce';
 import * as UseDebounceFnModule from 'better-hook/use-debounce-fn';
+import * as UseDocumentVisibilityModule from 'better-hook/use-document-visibility';
 import * as UseEventListenerModule from 'better-hook/use-event-listener';
+import * as UseHoverModule from 'better-hook/use-hover';
 import * as UseInputModule from 'better-hook/use-input';
 import * as UseIntervalModule from 'better-hook/use-interval';
 import * as UseIsMountedModule from 'better-hook/use-is-mounted';
 import * as UseIsomorphicLayoutEffectModule from 'better-hook/use-isomorphic-layout-effect';
+import * as UseKeyPressModule from 'better-hook/use-key-press';
 import * as UseLatestModule from 'better-hook/use-latest';
+import * as UseLockFnModule from 'better-hook/use-lock-fn';
 import * as UseLocalStorageModule from 'better-hook/use-local-storage';
+import * as UseMemoizedFnModule from 'better-hook/use-memoized-fn';
 import * as UseMediaQueryModule from 'better-hook/use-media-query';
 import * as UseOnlineModule from 'better-hook/use-online';
 import * as UsePreviousModule from 'better-hook/use-previous';
+import * as UseResetStateModule from 'better-hook/use-reset-state';
+import * as UseSafeStateModule from 'better-hook/use-safe-state';
 import * as UseSessionStorageModule from 'better-hook/use-session-storage';
 import * as UseStorageModule from 'better-hook/use-storage';
 import * as UseThrottleModule from 'better-hook/use-throttle';
 import * as UseThrottleFnModule from 'better-hook/use-throttle-fn';
 import * as UseTimeoutModule from 'better-hook/use-timeout';
 import * as UseToggleModule from 'better-hook/use-toggle';
+import * as UseUnmountedRefModule from 'better-hook/use-unmounted-ref';
 import * as UseWindowSizeModule from 'better-hook/use-window-size';
 import * as React from 'react';
 import { useContext, useEffect, useId, useRef, useState } from 'react';
@@ -50,22 +58,30 @@ const modules = {
   'better-hook/use-controllable-state': UseControllableStateModule,
   'better-hook/use-debounce': UseDebounceModule,
   'better-hook/use-debounce-fn': UseDebounceFnModule,
+  'better-hook/use-document-visibility': UseDocumentVisibilityModule,
   'better-hook/use-event-listener': UseEventListenerModule,
+  'better-hook/use-hover': UseHoverModule,
   'better-hook/use-input': UseInputModule,
   'better-hook/use-interval': UseIntervalModule,
   'better-hook/use-is-mounted': UseIsMountedModule,
   'better-hook/use-isomorphic-layout-effect': UseIsomorphicLayoutEffectModule,
+  'better-hook/use-key-press': UseKeyPressModule,
   'better-hook/use-latest': UseLatestModule,
+  'better-hook/use-lock-fn': UseLockFnModule,
   'better-hook/use-local-storage': UseLocalStorageModule,
+  'better-hook/use-memoized-fn': UseMemoizedFnModule,
   'better-hook/use-media-query': UseMediaQueryModule,
   'better-hook/use-online': UseOnlineModule,
   'better-hook/use-previous': UsePreviousModule,
+  'better-hook/use-reset-state': UseResetStateModule,
+  'better-hook/use-safe-state': UseSafeStateModule,
   'better-hook/use-session-storage': UseSessionStorageModule,
   'better-hook/use-storage': UseStorageModule,
   'better-hook/use-throttle': UseThrottleModule,
   'better-hook/use-throttle-fn': UseThrottleFnModule,
   'better-hook/use-timeout': UseTimeoutModule,
   'better-hook/use-toggle': UseToggleModule,
+  'better-hook/use-unmounted-ref': UseUnmountedRefModule,
   'better-hook/use-window-size': UseWindowSizeModule,
 } as const;
 const supportedModules = new Set<string>(Object.keys(modules));

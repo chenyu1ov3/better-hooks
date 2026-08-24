@@ -1,0 +1,46 @@
+---
+title: useSafeState
+description: 提供在组件卸载后会忽略更新的状态。
+section: 状态
+order: 106
+---
+
+# useSafeState
+
+## 概览
+
+`useSafeState` 遵循 React 状态语义，并让组件卸载后的延迟 setter 调用变得安全。
+
+## 函数签名
+
+```ts
+function useSafeState<S>(initialState: S | (() => S)): UseSafeStateResult<S>;
+```
+
+## 参数
+
+`initialState` 与 `useState` 一样，可以是值或惰性初始化函数。
+
+## 返回值
+
+返回包含当前状态和稳定 `setState` 操作的只读元组。
+
+## 行为
+
+组件卸载前，值更新和函数式更新都会交给 React。卸载后调用会成为 no-op，函数式 updater 也不会被执行，从而避免保留或执行过期工作。
+
+## SSR / RSC
+
+SSR 使用确定性的初始状态，不会读取浏览器 API。客户端挂载 effect 提交后 setter 才会生效，请在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+当异步任务或定时器不需要强制取消、只需忽略晚到结果时，可以搭配此 Hook。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-safe-state/index.ts)。

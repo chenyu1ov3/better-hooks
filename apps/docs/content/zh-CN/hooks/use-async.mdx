@@ -17,7 +17,7 @@ order: 116
 type AsyncTask<T> = (signal: AbortSignal) => Promise<T> | T;
 function useAsync<T>(
   task: AsyncTask<T>,
-  options?: { immediate?: boolean },
+  options?: { immediate?: boolean; onError?: (error: unknown) => void },
 ): {
   status: 'idle' | 'pending' | 'success' | 'error';
   data: T | undefined;
@@ -30,7 +30,7 @@ function useAsync<T>(
 
 ## 参数
 
-每次执行都会向 `task` 传入新的 `AbortSignal`。`immediate` 默认为 `false`；设为 `true` 时，任务会在组件提交后自动执行。
+每次执行都会向 `task` 传入新的 `AbortSignal`。`immediate` 默认为 `false`；设为 `true` 时，任务会在组件提交后自动执行。`onError` 用于观察最近一次未取消任务的错误。
 
 ## 返回值
 
@@ -38,7 +38,7 @@ function useAsync<T>(
 
 ## 行为
 
-开始新任务时会中止前一个 `AbortController`。序号检查会阻止旧结果更新状态。`cancel` 保留 `data` 并回到 `idle`；`reset` 还会清空 `data` 和 `error`。
+开始新任务时会中止前一个 `AbortController`。序号检查会阻止旧结果更新状态。`cancel` 保留 `data` 并回到 `idle`；`reset` 还会清空 `data` 和 `error`。当前任务失败时会将状态设为 `error`，先调用 `onError`（如果提供），再保留原始 Promise 拒绝。已取消或已过期的任务不会上报错误。
 
 ## SSR / RSC
 

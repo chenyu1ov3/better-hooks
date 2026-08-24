@@ -1,0 +1,49 @@
+---
+title: useLockFn
+description: Prevent overlapping calls to an asynchronous or synchronous action.
+section: Async
+order: 117
+---
+
+# useLockFn
+
+## Overview
+
+`useLockFn` wraps an action with a small concurrency lock. While one invocation is pending, later calls resolve to `undefined`.
+
+## Signature
+
+```ts
+function useLockFn<Args extends readonly unknown[], Result>(
+  fn: (...args: Args) => Result | PromiseLike<Result>,
+  options?: UseLockFnOptions,
+): LockFn<Args, Awaited<Result>>;
+```
+
+## Parameters
+
+`fn` may return a value or a promise. `options.onError` observes a failure before the original rejection is rethrown.
+
+## Returns
+
+A stable function returning `Promise<Result | undefined>`. A call made while the lock is held resolves to `undefined`.
+
+## Behavior
+
+The lock is acquired before invoking `fn` and released in `finally`, including when `fn` throws or rejects. Errors are never swallowed; `onError` is only an observation hook.
+
+## SSR / RSC
+
+The wrapper is safe to create during SSR and does not invoke `fn` during render. Invoke it from a Client Component event or action.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use it for submit, save, or mutation actions where duplicate requests must be prevented without disabling the surrounding UI.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-lock-fn/index.ts).

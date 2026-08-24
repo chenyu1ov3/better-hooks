@@ -1,0 +1,46 @@
+---
+title: useSafeState
+description: Provide state whose setter ignores updates after the component unmounts.
+section: State
+order: 106
+---
+
+# useSafeState
+
+## Overview
+
+`useSafeState` follows React state semantics while making delayed setters safe to call after a component has unmounted.
+
+## Signature
+
+```ts
+function useSafeState<S>(initialState: S | (() => S)): UseSafeStateResult<S>;
+```
+
+## Parameters
+
+`initialState` accepts a value or a lazy initializer, just like `useState`.
+
+## Returns
+
+A readonly tuple containing the current state and a stable `setState` action.
+
+## Behavior
+
+Before unmount, value and functional updates are forwarded to React. After unmount, calls are no-ops; functional updaters are not evaluated, which avoids retaining or executing stale work.
+
+## SSR / RSC
+
+The initial state is deterministic during SSR and no browser API is read. The setter is active after the client mount effect commits. Use it in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Pair it with an async task or timer when cancellation is optional and a late completion should simply be ignored.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-safe-state/index.ts).

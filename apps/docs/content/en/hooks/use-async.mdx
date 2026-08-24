@@ -17,7 +17,7 @@ order: 116
 type AsyncTask<T> = (signal: AbortSignal) => Promise<T> | T;
 function useAsync<T>(
   task: AsyncTask<T>,
-  options?: { immediate?: boolean },
+  options?: { immediate?: boolean; onError?: (error: unknown) => void },
 ): {
   status: 'idle' | 'pending' | 'success' | 'error';
   data: T | undefined;
@@ -30,7 +30,7 @@ function useAsync<T>(
 
 ## Parameters
 
-`task` receives a new `AbortSignal` for each run. `immediate` defaults to false and starts a run after commit when true.
+`task` receives a new `AbortSignal` for each run. `immediate` defaults to false and starts a run after commit when true. `onError` observes the error from the latest non-cancelled run.
 
 ## Returns
 
@@ -38,7 +38,7 @@ State plus stable `run`, `cancel`, and `reset` actions. `run` preserves the task
 
 ## Behavior
 
-A new run aborts the prior controller. Sequence checks prevent older results from updating state. `cancel` keeps data and sets status to idle; `reset` also clears data and error.
+A new run aborts the prior controller. Sequence checks prevent older results from updating state. `cancel` keeps data and sets status to idle; `reset` also clears data and error. A current task failure sets `status` to `error`, calls `onError` when provided, and keeps the original promise rejection. Cancelled or stale runs do not report errors.
 
 ## SSR / RSC
 

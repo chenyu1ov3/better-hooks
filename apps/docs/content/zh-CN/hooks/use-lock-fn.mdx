@@ -1,0 +1,49 @@
+---
+title: useLockFn
+description: 防止异步或同步操作重叠执行。
+section: 异步
+order: 117
+---
+
+# useLockFn
+
+## 概览
+
+`useLockFn` 为操作包裹并发锁。一次调用处于 pending 期间，后续调用会解析为 `undefined`。
+
+## 函数签名
+
+```ts
+function useLockFn<Args extends readonly unknown[], Result>(
+  fn: (...args: Args) => Result | PromiseLike<Result>,
+  options?: UseLockFnOptions,
+): LockFn<Args, Awaited<Result>>;
+```
+
+## 参数
+
+`fn` 可以返回普通值或 Promise。`options.onError` 会在原始 rejection 重新抛出前观察错误。
+
+## 返回值
+
+返回稳定函数，结果类型为 `Promise<Result | undefined>`。锁定期间调用会解析为 `undefined`。
+
+## 行为
+
+调用 `fn` 前获取锁，并在 `finally` 中释放，即使 `fn` 抛出或 reject 也一样。错误不会被吞掉，`onError` 只是观测回调。
+
+## SSR / RSC
+
+SSR 期间可以创建包装函数，但渲染时不会调用 `fn`。请在 Client Component 的事件或 action 中调用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+适用于提交、保存或 mutation 操作，在不禁用外围界面的情况下阻止重复请求。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-lock-fn/index.ts)。

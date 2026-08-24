@@ -16,7 +16,7 @@ order: 112
 ```ts
 function useDebounceFn<Args extends unknown[], Result>(
   fn: (...args: Args) => Result,
-  options: DebounceOptions,
+  options: DebounceFnOptions,
 ): {
   run: (...args: Args) => void;
   cancel: () => void;
@@ -27,7 +27,7 @@ function useDebounceFn<Args extends unknown[], Result>(
 
 ## Parameters
 
-`fn` is read from the latest commit. Options use required `delay`, optional `leading`, `trailing`, and finite `maxWait`.
+`fn` is read from the latest commit. Options use required `delay`, optional `leading`, `trailing`, finite `maxWait`, and an `onError` observer.
 
 ## Returns
 
@@ -35,7 +35,7 @@ function useDebounceFn<Args extends unknown[], Result>(
 
 ## Behavior
 
-Defaults are trailing-only. `flush` clears both timers and returns the callback result; unmount clears pending work without invoking it.
+Defaults are trailing-only. `flush` clears both timers and returns the callback result; unmount clears pending work without invoking it. If the callback throws, pending arguments and timers are cleared before `onError` runs and the original error is rethrown.
 
 ## SSR / RSC
 

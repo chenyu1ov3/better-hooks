@@ -14,12 +14,15 @@ order: 122
 ## 函数签名
 
 ```ts
-function useMediaQuery(query: string, options?: { readonly defaultMatches?: boolean }): boolean;
+function useMediaQuery(
+  query: string,
+  options?: { readonly defaultMatches?: boolean; readonly onError?: (error: unknown) => void },
+): boolean;
 ```
 
 ## 参数
 
-`query` 是 CSS 媒体查询。`defaultMatches` 是服务端及不受支持环境中的回退值，默认为 `false`。
+`query` 是 CSS 媒体查询。`defaultMatches` 是服务端及不受支持环境中的回退值，默认为 `false`；`onError` 用于观察 `matchMedia` 和订阅异常。
 
 ## 返回值
 
@@ -27,7 +30,7 @@ function useMediaQuery(query: string, options?: { readonly defaultMatches?: bool
 
 ## 行为
 
-订阅者共享缓存的 `MediaQueryList`；最后一个订阅者离开时会移除原生监听器。只有现代方法不可用时，才会使用旧版 `addListener`。
+订阅者共享缓存的 `MediaQueryList`；最后一个订阅者离开时会移除原生监听器。只有现代方法不可用时，才会使用旧版 `addListener`。如果 `matchMedia` 抛错，Hook 会上报错误并返回 `defaultMatches`，而不会打断渲染。
 
 ## SSR / RSC
 

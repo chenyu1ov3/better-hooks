@@ -17,12 +17,13 @@ order: 114
 function useTimeout(
   callback: () => void,
   delay: number | null,
+  options?: { onError?: (error: unknown) => void },
 ): { readonly cancel: () => void; readonly pending: boolean };
 ```
 
 ## 参数
 
-`callback` 始终使用最近一次已提交的版本；`delay` 最小为零，传入 `null` 可以禁用定时器。
+`callback` 始终使用最近一次已提交的版本；`delay` 最小为零，传入 `null` 可以禁用定时器。`onError` 用于观察回调异常。
 
 ## 返回值
 
@@ -30,7 +31,7 @@ function useTimeout(
 
 ## 行为
 
-改变 `delay` 会重启定时器，只改变 `callback` 则不会。任务完成或取消后，`pending` 都会变为 `false`；组件卸载时会清理定时器。
+改变 `delay` 会重启定时器，只改变 `callback` 则不会。任务完成或取消后，`pending` 都会变为 `false`；组件卸载时会清理定时器。回调抛错时，会先清理 pending 状态和定时器，再调用 `onError`，最后重新抛出原始错误。
 
 ## SSR / RSC
 

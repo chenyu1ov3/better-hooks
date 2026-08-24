@@ -17,12 +17,13 @@ order: 114
 function useTimeout(
   callback: () => void,
   delay: number | null,
+  options?: { onError?: (error: unknown) => void },
 ): { readonly cancel: () => void; readonly pending: boolean };
 ```
 
 ## Parameters
 
-`callback` is updated from the latest commit. `delay` is clamped to zero; `null` disables the timer.
+`callback` is updated from the latest commit. `delay` is clamped to zero; `null` disables the timer. `onError` observes callback failures.
 
 ## Returns
 
@@ -30,7 +31,7 @@ A stable `cancel` action and a `pending` flag.
 
 ## Behavior
 
-Changing `delay` restarts the timer. Changing only `callback` does not. Completion and `cancel` set `pending` to false; unmount clears the timer.
+Changing `delay` restarts the timer. Changing only `callback` does not. Completion and `cancel` set `pending` to false; unmount clears the timer. If the callback throws, pending state and the timer are cleared before `onError` runs and the original error is rethrown.
 
 ## SSR / RSC
 

@@ -1,0 +1,46 @@
+---
+title: useUnmountedRef
+description: Expose a stable ref that becomes true during unmount cleanup.
+section: Lifecycle
+order: 152
+---
+
+# useUnmountedRef
+
+## Overview
+
+`useUnmountedRef` provides a stable boolean ref for guarding delayed work that may finish after a component has been removed.
+
+## Signature
+
+```ts
+function useUnmountedRef(): RefObject<boolean>;
+```
+
+## Parameters
+
+This Hook takes no parameters.
+
+## Returns
+
+A stable ref whose `current` value is `false` while the component is live and `true` during unmount cleanup.
+
+## Behavior
+
+The ref remains stable across renders. Cleanup sets it to `true`; Strict Mode's development replay restores `false` during the next setup so a live component is not marked as unmounted.
+
+## SSR / RSC
+
+The initial value is `false` during SSR and no browser API is accessed. Read the ref from Client Component effects or callbacks.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use it as a guard around optional state updates from timers, subscriptions, or promise continuations when explicit cancellation is not available.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-unmounted-ref/index.ts).
