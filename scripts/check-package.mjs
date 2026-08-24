@@ -78,7 +78,16 @@ const rawLimitOverrides = new Map([
   ['./use-local-storage', 6144],
   ['./use-session-storage', 6144],
   ['./use-storage', 6144],
+  // Error observers and cleanup guards add a small, intentional amount of
+  // runtime code to these callback-oriented entries.
+  ['./use-async', 5120],
+  ['./use-click-outside', 5120],
+  ['./use-debounce-fn', 5120],
+  ['./use-hover', 6144],
+  ['./use-key-press', 9216],
+  ['./use-throttle-fn', 5120],
 ]);
+const gzipLimitOverrides = new Map([['./use-key-press', 3072]]);
 const rows = [];
 
 for (const [subpath, descriptor] of Object.entries(packageExports)) {
@@ -90,6 +99,9 @@ for (const [subpath, descriptor] of Object.entries(packageExports)) {
   const rawLimit = configuredRawLimit
     ? defaultRawLimit
     : (rawLimitOverrides.get(subpath) ?? defaultRawLimit);
+  const entryGzipLimit = configuredRawLimit
+    ? gzipLimit
+    : (gzipLimitOverrides.get(subpath) ?? gzipLimit);
   const row = {
     entry: subpath,
     modules: graph.modules,
@@ -97,17 +109,18 @@ for (const [subpath, descriptor] of Object.entries(packageExports)) {
     gzip: gzipSync(graph.contents).byteLength,
     brotli: brotliCompressSync(graph.contents).byteLength,
     rawLimit,
+    gzipLimit: entryGzipLimit,
   };
   rows.push(row);
-  if (row.bytes > rawLimit || row.gzip > gzipLimit) {
+  if (row.bytes > rawLimit || row.gzip > entryGzipLimit) {
     failures.push(
-      `${subpath}: ${row.bytes}/${rawLimit} raw bytes, ${row.gzip}/${gzipLimit} gzip bytes`,
+      `${subpath}: ${row.bytes}/${rawLimit} raw bytes, ${row.gzip}/${entryGzipLimit} gzip bytes`,
     );
   }
 }
 
 console.table(rows);
-exitOnFailures(`Direct entries exceed a size budget (gzip limit: ${gzipLimit} bytes)`);
+exitOnFailures(`Direct entries exceed a size budget (default gzip limit: ${gzipLimit} bytes)`);
 console.log(`Validated size budgets for ${rows.length} direct entries.`);
 
 const tempDirectory = await mkdtemp(path.join(os.tmpdir(), 'better-hooks-pack-'));
