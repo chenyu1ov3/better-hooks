@@ -1,17 +1,21 @@
 ---
 title: 安装
-description: 了解预览版发布状态、运行环境要求与包入口约定。
+description: 安装已发布的包，了解运行环境要求与包入口约定。
 section: 文档
 order: 2
 ---
 
 # 安装
 
-## 预览版状态
+## 安装包
 
-`better-hook` 的 npm 发布仍在准备中。目前 npm 上还没有与这版文档对应且经过验证的产物，请勿将未经确认的安装命令加入生产配置。
+已验证的 `0.2.0` 版本可以通过 pnpm 安装：
 
-你可以在 [GitHub 仓库](https://github.com/chenyu1ov3/better-hooks)中审阅实现并跟踪发布进度。只有包正式发布且 exports 验证通过后，本页才会提供准确的 pnpm 命令。
+```sh
+pnpm add better-hook
+```
+
+也可以使用 npm 或其他包管理器；版本信息请查看 [npm 包页面](https://www.npmjs.com/package/better-hook)。
 
 ## 运行要求
 
@@ -27,8 +31,8 @@ React 是 peer dependency。除了由使用方应用提供的 React API，这个
 
 ## 导入方式
 
-计划发布的包名为 `better-hook`。根入口适合集中导入，每个 Hook 也有 `better-hook/use-toggle` 这样的显式直接入口。直接入口能更清楚地表达依赖关系，并配合包的 `sideEffects: false` 声明完成 Tree Shaking。
+包名为 `better-hook`。根入口适合集中导入，每个 Hook 也有 `better-hook/use-toggle` 这样的显式直接入口。直接入口能更清楚地表达依赖关系，并配合包的 `sideEffects: false` 声明完成 Tree Shaking。
 
 ## 发布验证
 
-在提供安装命令之前，发布产物需要通过 exports 检查、类型声明生成、包验证、体积预算和完整文档构建。首次发布的进展会记录在[更新日志](/zh/changelog)中。
+`0.2.0` 发布产物已通过 exports 检查、类型声明生成、包验证、体积预算和完整文档构建。后续版本会记录在[更新日志](/zh/changelog)中。

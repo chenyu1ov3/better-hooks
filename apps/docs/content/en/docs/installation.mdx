@@ -1,17 +1,21 @@
 ---
 title: Installation
-description: Preview release status, runtime requirements, and package entry conventions.
+description: Install the published package, review runtime requirements, and choose package entries.
 section: Docs
 order: 2
 ---
 
 # Installation
 
-## Preview status
+## Install the package
 
-The `better-hook` npm release is pending. Do not add an installation command to production setup yet: there is no verified registry artifact for this documentation version.
+Install the verified `0.2.0` release with pnpm:
 
-You can review the implementation and follow release progress in the [GitHub repository](https://github.com/chenyu1ov3/better-hooks). This page will publish the exact pnpm command only after the package has been released and its exports have been validated.
+```sh
+pnpm add better-hook
+```
+
+The same package is available through npm and other package managers. Review the [npm package page](https://www.npmjs.com/package/better-hook) for release metadata.
 
 ## Runtime requirements
 
@@ -27,8 +31,8 @@ React is a peer dependency. The package has no runtime dependency beyond the Rea
 
 ## Import model
 
-The planned package name is `better-hook`. The root export is convenient, while every Hook also has an explicit direct entry such as `better-hook/use-toggle`. Direct entries make the requested module graph clear and work with the package's `sideEffects: false` declaration.
+The package name is `better-hook`. The root export is convenient, while every Hook also has an explicit direct entry such as `better-hook/use-toggle`. Direct entries make the requested module graph clear and work with the package's `sideEffects: false` declaration.
 
 ## Release verification
 
-Before the install command is published, the release must pass export checks, declaration generation, package validation, size budgets, and a clean documentation build. Follow the [Changelog](/changelog) for the first published version.
+The `0.2.0` release passed export checks, declaration generation, package validation, size budgets, and a clean documentation build. Follow the [Changelog](/changelog) for subsequent releases.

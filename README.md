@@ -17,8 +17,11 @@
 </p>
 
 > [!IMPORTANT]
-> Better Hooks is in preview. The `better-hook` package has not been published
-> to npm yet; verified installation instructions will arrive with the first release.
+> Better Hooks is in preview, and `better-hook@0.2.0` is available on npm.
+
+```sh
+pnpm add better-hook
+```
 
 ## Included Hooks
 
