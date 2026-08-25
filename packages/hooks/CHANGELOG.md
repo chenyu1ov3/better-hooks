@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1
+
+### Patch Changes
+
+- 81c1bf3: Publish the WebSocket and observer hooks under a reusable npm version because 1.1.0 is tombstoned in the registry.
+
 ## 1.1.0
 
 ### Minor Changes
