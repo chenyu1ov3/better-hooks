@@ -10,6 +10,7 @@ import * as documentVisibilityEntry from 'better-hooks/use-document-visibility';
 import * as eventListenerEntry from 'better-hooks/use-event-listener';
 import * as hoverEntry from 'better-hooks/use-hover';
 import * as inputEntry from 'better-hooks/use-input';
+import * as intersectionObserverEntry from 'better-hooks/use-intersection-observer';
 import * as intervalEntry from 'better-hooks/use-interval';
 import * as isMountedEntry from 'better-hooks/use-is-mounted';
 import * as isomorphicEntry from 'better-hooks/use-isomorphic-layout-effect';
@@ -22,6 +23,7 @@ import * as mediaQueryEntry from 'better-hooks/use-media-query';
 import * as onlineEntry from 'better-hooks/use-online';
 import * as previousEntry from 'better-hooks/use-previous';
 import * as resetStateEntry from 'better-hooks/use-reset-state';
+import * as resizeObserverEntry from 'better-hooks/use-resize-observer';
 import * as safeStateEntry from 'better-hooks/use-safe-state';
 import * as sessionStorageEntry from 'better-hooks/use-session-storage';
 import * as throttleEntry from 'better-hooks/use-throttle';
@@ -29,6 +31,7 @@ import * as throttleFnEntry from 'better-hooks/use-throttle-fn';
 import * as timeoutEntry from 'better-hooks/use-timeout';
 import * as toggleEntry from 'better-hooks/use-toggle';
 import * as unmountedRefEntry from 'better-hooks/use-unmounted-ref';
+import * as websocketEntry from 'better-hooks/use-websocket';
 import * as windowSizeEntry from 'better-hooks/use-window-size';
 
 test('direct entries match the root API', () => {
@@ -46,6 +49,9 @@ test('direct entries match the root API', () => {
   expectTypeOf(eventListenerEntry.useEventListener).toEqualTypeOf<typeof root.useEventListener>();
   expectTypeOf(hoverEntry.useHover).toEqualTypeOf<typeof root.useHover>();
   expectTypeOf(inputEntry.useInput).toEqualTypeOf<typeof root.useInput>();
+  expectTypeOf(intersectionObserverEntry.useIntersectionObserver).toEqualTypeOf<
+    typeof root.useIntersectionObserver
+  >();
   expectTypeOf(intervalEntry.useInterval).toEqualTypeOf<typeof root.useInterval>();
   expectTypeOf(isMountedEntry.useIsMounted).toEqualTypeOf<typeof root.useIsMounted>();
   expectTypeOf(isomorphicEntry.useIsomorphicLayoutEffect).toEqualTypeOf<
@@ -60,6 +66,9 @@ test('direct entries match the root API', () => {
   expectTypeOf(onlineEntry.useOnline).toEqualTypeOf<typeof root.useOnline>();
   expectTypeOf(previousEntry.usePrevious).toEqualTypeOf<typeof root.usePrevious>();
   expectTypeOf(resetStateEntry.useResetState).toEqualTypeOf<typeof root.useResetState>();
+  expectTypeOf(resizeObserverEntry.useResizeObserver).toEqualTypeOf<
+    typeof root.useResizeObserver
+  >();
   expectTypeOf(safeStateEntry.useSafeState).toEqualTypeOf<typeof root.useSafeState>();
   expectTypeOf(sessionStorageEntry.useSessionStorage).toEqualTypeOf<
     typeof root.useSessionStorage
@@ -69,6 +78,7 @@ test('direct entries match the root API', () => {
   expectTypeOf(timeoutEntry.useTimeout).toEqualTypeOf<typeof root.useTimeout>();
   expectTypeOf(toggleEntry.useToggle).toEqualTypeOf<typeof root.useToggle>();
   expectTypeOf(unmountedRefEntry.useUnmountedRef).toEqualTypeOf<typeof root.useUnmountedRef>();
+  expectTypeOf(websocketEntry.useWebSocket).toEqualTypeOf<typeof root.useWebSocket>();
   expectTypeOf(windowSizeEntry.useWindowSize).toEqualTypeOf<typeof root.useWindowSize>();
 });
 
@@ -128,6 +138,22 @@ test('generic Hooks preserve useful inference', () => {
   const hovering = root.useHover({ enabled: true });
   expectTypeOf(hovering).toBeBoolean();
 
+  const intersection = root.useIntersectionObserver({ current: null }, { threshold: 0.5 });
+  expectTypeOf(intersection.entry).toEqualTypeOf<IntersectionObserverEntry | null>();
+  expectTypeOf(intersection.isIntersecting).toBeBoolean();
+  const readonlyThreshold = [0, 0.5] as const;
+  root.useIntersectionObserver({ threshold: readonlyThreshold });
+
+  const resized = root.useResizeObserver({ current: null }, { box: 'border-box' });
+  expectTypeOf(resized.rect).toEqualTypeOf<DOMRectReadOnly | null>();
+  expectTypeOf(resized.width).toBeNumber();
+  expectTypeOf(resized.height).toBeNumber();
+
+  const socket = root.useWebSocket(null, { reconnect: { maxAttempts: 2 } });
+  expectTypeOf(socket.status).toEqualTypeOf<root.WebSocketStatus>();
+  expectTypeOf(socket.data).toEqualTypeOf<MessageEvent['data'] | undefined>();
+  expectTypeOf(socket.send).parameter(0).toEqualTypeOf<Parameters<WebSocket['send']>[0]>();
+
   const keyPressHandler = (event: KeyboardEvent, key: root.KeyType): void => {
     expectTypeOf(event).toEqualTypeOf<KeyboardEvent>();
     expectTypeOf(key).toEqualTypeOf<root.KeyType>();
@@ -164,6 +190,9 @@ test('error observers accept unknown errors across callback hooks', () => {
   root.useKeyPress('Enter', () => undefined, { onError });
   root.useHover({ onError });
   root.useLockFn(() => undefined, { onError });
+  root.useIntersectionObserver(null, { onError });
+  root.useResizeObserver(null, { onError });
+  root.useWebSocket(null, { onError });
 });
 
 test('invalid calls are rejected', () => {

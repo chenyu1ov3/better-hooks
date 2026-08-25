@@ -1,0 +1,55 @@
+---
+title: useResizeObserver
+description: 使用 ResizeObserver 跟踪元素尺寸，并提供对称清理。
+section: 浏览器与 DOM
+order: 129
+---
+
+# useResizeObserver
+
+## 概览
+
+`useResizeObserver` 跟踪元素或 ref，并返回最近的内容矩形、宽度和高度。
+
+## 函数签名
+
+```ts
+function useResizeObserver(options?: UseResizeObserverOptions): ResizeObserverState;
+function useResizeObserver(
+  target: ResizeObserverTarget,
+  options?: Omit<UseResizeObserverOptions, 'target' | 'ref'>,
+): ResizeObserverState;
+```
+
+## 参数
+
+可以传入直接的 `Element`、类 ref 目标或 `null`。`box` 选择原生
+ResizeObserver 盒模型选项；`enabled`、`onChange` 和 `onError` 控制订阅及
+回调行为。
+
+## 返回值
+
+返回 `rect`、`width`、`height` 和最近的 `error`。SSR 快照为
+`{ rect: null, width: 0, height: 0, error: undefined }`。
+
+## 行为
+
+目标或有效选项变化时会重建 observer，禁用或卸载时断开 observer。浏览器不
+支持该 API 时会静默降级。建立和回调异常会通过 `onError` 报告，且不会替换
+原始异常；回调失败会先断开 observer。
+
+## SSR / RSC
+
+SSR 返回零尺寸，不会创建 `ResizeObserver`。请在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以用尺寸选择响应式布局；昂贵的 resize 计算可与 `useDebounce` 组合。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-resize-observer/index.ts)。

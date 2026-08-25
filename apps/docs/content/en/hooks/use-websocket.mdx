@@ -1,0 +1,64 @@
+---
+title: useWebSocket
+description: Manage a browser WebSocket with stable actions and bounded reconnects.
+section: Async
+order: 118
+---
+
+# useWebSocket
+
+## Overview
+
+`useWebSocket` opens a browser WebSocket after commit and exposes the latest raw
+message, connection status, stable actions, and optional bounded reconnects.
+
+## Signature
+
+```ts
+function useWebSocket(url: string | URL | null, options?: UseWebSocketOptions): UseWebSocketResult;
+```
+
+## Parameters
+
+Pass a URL or `null` to keep the connection closed. `protocols` and `enabled`
+follow the native constructor. `reconnect` is disabled by default; when enabled
+it retries server-initiated closes, including clean close codes, with bounded
+exponential backoff. `onOpen`, `onMessage`, and `onClose` use the latest
+committed callbacks. `onError` observes native socket errors and callback
+failures.
+
+## Returns
+
+The result contains `status`, raw `data`, the latest `error`, and stable
+`send`, `close`, and `reconnect` actions. `send` only writes while the socket
+is `open`; every other state throws an `InvalidStateError` and reports it to
+`onError`. Native failures from an open socket are preserved.
+
+## Behavior
+
+Changing the URL, protocols, or enabled state closes the previous socket and
+ignores stale events. Reconnect policy updates apply to future retry decisions
+without needlessly replacing an active socket. Server-initiated closes schedule
+bounded retries when enabled; manual close and unmount cancel reconnect timers.
+Callback errors close the active socket, cancel retries, and are reported to
+`onError` before being rethrown; an observer error is reported in a microtask
+without replacing the original error.
+
+## SSR / RSC
+
+SSR returns a closed snapshot and never constructs a socket. Connections start
+only after a Client Component commits.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useAsync` for request/response workflows and keep this Hook for a live
+transport. Store application-level parsing outside the Hook so binary and text
+messages remain available.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-websocket/index.ts).

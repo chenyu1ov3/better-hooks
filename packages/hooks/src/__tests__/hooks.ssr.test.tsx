@@ -12,6 +12,7 @@ import {
   useEventListener,
   useHover,
   useInput,
+  useIntersectionObserver,
   useInterval,
   useIsMounted,
   useIsomorphicLayoutEffect,
@@ -24,6 +25,7 @@ import {
   useOnline,
   usePrevious,
   useResetState,
+  useResizeObserver,
   useSafeState,
   useSessionStorage,
   useThrottle,
@@ -31,6 +33,7 @@ import {
   useTimeout,
   useToggle,
   useUnmountedRef,
+  useWebSocket,
   useWindowSize,
 } from '../index.js';
 
@@ -61,6 +64,9 @@ function ServerHarness(): JSX.Element {
   const visibility = useDocumentVisibility();
   useKeyPress('Enter', () => undefined);
   const hovering = useHover(null);
+  const intersection = useIntersectionObserver(null);
+  const resized = useResizeObserver(null);
+  const socket = useWebSocket(null);
   useLockFn(async () => 'locked');
 
   useIsomorphicLayoutEffect(() => undefined, []);
@@ -77,6 +83,8 @@ function ServerHarness(): JSX.Element {
       data-input={input.value}
       data-visibility={visibility}
       data-hovering={String(hovering)}
+      data-intersectioning={String(intersection.isIntersecting)}
+      data-intersection-entry={String(intersection.entry)}
       data-unmounted={String(unmountedRef.current)}
       data-new-state={`${memoized()}:${safe}:${resettable}`}
       data-latest={latest.current}
@@ -86,6 +94,8 @@ function ServerHarness(): JSX.Element {
       data-online={String(online)}
       data-previous={previous}
       data-session={session.value}
+      data-socket={socket.status}
+      data-resize={`${resized.width}:${resized.height}:${String(resized.rect)}`}
       data-timeout={String(timeout.pending)}
       data-values={`${toggle}:${boolean.value}:${debounced}:${throttled}`}
       data-width={size.width}
@@ -108,6 +118,10 @@ describe('server rendering', () => {
     expect(html).toContain('data-mounted="false"');
     expect(html).toContain('data-visibility="visible"');
     expect(html).toContain('data-hovering="false"');
+    expect(html).toContain('data-intersectioning="false"');
+    expect(html).toContain('data-intersection-entry="null"');
+    expect(html).toContain('data-resize="0:0:null"');
+    expect(html).toContain('data-socket="closed"');
     expect(html).toContain('data-unmounted="false"');
     expect(html).toContain('data-new-state="memoized:safe:resettable"');
     expect(error).not.toHaveBeenCalled();

@@ -23,16 +23,16 @@ pnpm add better-hooks
 
 ## Included Hooks
 
-The public surface contains 30 Hooks.
+The public surface contains 33 Hooks.
 
-| Area             | Hooks                                                                                                                                       |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| State            | `useBoolean`, `useToggle`, `useInput`, `useControllableState`, `usePrevious`, `useLatest`, `useSafeState`, `useResetState`, `useMemoizedFn` |
-| Scheduling       | `useDebounce`, `useDebounceFn`, `useThrottle`, `useThrottleFn`, `useTimeout`, `useInterval`                                                 |
-| Async and events | `useAsync`, `useLockFn`, `useEventListener`, `useClickOutside`                                                                              |
-| Browser state    | `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover`                                           |
-| Lifecycle        | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                              |
-| Storage          | `useLocalStorage`, `useSessionStorage`                                                                                                      |
+| Area             | Hooks                                                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| State            | `useBoolean`, `useToggle`, `useInput`, `useControllableState`, `usePrevious`, `useLatest`, `useSafeState`, `useResetState`, `useMemoizedFn`       |
+| Scheduling       | `useDebounce`, `useDebounceFn`, `useThrottle`, `useThrottleFn`, `useTimeout`, `useInterval`                                                       |
+| Async and events | `useAsync`, `useLockFn`, `useWebSocket`, `useEventListener`, `useClickOutside`                                                                    |
+| Browser state    | `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover`, `useIntersectionObserver`, `useResizeObserver` |
+| Lifecycle        | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                                    |
+| Storage          | `useLocalStorage`, `useSessionStorage`                                                                                                            |
 
 See the [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/) for API details and live examples.
 

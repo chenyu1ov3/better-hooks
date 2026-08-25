@@ -1,0 +1,61 @@
+---
+title: useIntersectionObserver
+description: Track element intersection state with a deterministic SSR snapshot.
+section: Browser & DOM
+order: 128
+---
+
+# useIntersectionObserver
+
+## Overview
+
+`useIntersectionObserver` observes an element or ref and returns the latest
+native entry together with an `isIntersecting` boolean.
+
+## Signature
+
+```ts
+function useIntersectionObserver(
+  options?: UseIntersectionObserverOptions,
+): IntersectionObserverState;
+function useIntersectionObserver(
+  target: IntersectionObserverTarget,
+  options?: Omit<UseIntersectionObserverOptions, 'target' | 'ref'>,
+): IntersectionObserverState;
+```
+
+## Parameters
+
+The target may be a direct `Element`, a ref-like object, or `null`. Native
+`root`, `rootMargin`, and `threshold` options are supported alongside
+`enabled`, `onChange`, and `onError`.
+
+## Returns
+
+The result contains `entry`, `isIntersecting`, and the latest `error`. The empty
+snapshot is `{ entry: null, isIntersecting: false, error: undefined }`.
+
+## Behavior
+
+Observation follows ref target changes and disconnects the previous observer
+before installing a new one. Missing browser support is a no-op. Native setup
+failures and callback errors remain observable and preserve their original
+exception; callback failures disconnect the observer before propagation.
+
+## SSR / RSC
+
+SSR returns the empty snapshot and never reads or constructs
+`IntersectionObserver`. Use the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Combine `isIntersecting` with `useAsync` to defer work until content becomes
+visible, or use `onChange` for analytics that should not affect rendering.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-intersection-observer/index.ts).

@@ -20,7 +20,7 @@ pnpm add better-hooks
 
 ## 特性
 
-- 30 个专注单一职责的 Hook，包含独立的 localStorage 与 sessionStorage 入口。
+- 33 个专注单一职责的 Hook，包含独立的 localStorage 与 sessionStorage 入口。
 - 每个公共入口都提供 TypeScript 声明和显式 ESM exports。
 - 可通过独立入口缩小初始模块图，并获得可靠的 tree shaking。
 - 面向 React 19 并发渲染设计的稳定回调 API。
@@ -63,16 +63,16 @@ import { useDebounce } from 'better-hooks/use-debounce';
 
 ## API
 
-包内包含 30 个 Hook，以及重新导出 Hook API 的根入口。
+包内包含 33 个 Hook，以及重新导出 Hook API 的根入口。
 
-| 分类              | Hooks                                                                                                                                    | 独立入口                                                                                                                                               |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 状态（8）         | `useToggle`、`useBoolean`、`useControllableState`、`usePrevious`、`useLatest`、`useMemoizedFn`、`useSafeState`、`useResetState`          | `use-toggle`、`use-boolean`、`use-controllable-state`、`use-previous`、`use-latest`、`use-memoized-fn`、`use-safe-state`、`use-reset-state`            |
-| 异步与计时（8）   | `useDebounce`、`useThrottle`、`useDebounceFn`、`useThrottleFn`、`useTimeout`、`useInterval`、`useAsync`、`useLockFn`                     | `use-debounce`、`use-throttle`、`use-debounce-fn`、`use-throttle-fn`、`use-timeout`、`use-interval`、`use-async`、`use-lock-fn`                        |
-| 浏览器与 DOM（8） | `useEventListener`、`useClickOutside`、`useMediaQuery`、`useWindowSize`、`useOnline`、`useDocumentVisibility`、`useKeyPress`、`useHover` | `use-event-listener`、`use-click-outside`、`use-media-query`、`use-window-size`、`use-online`、`use-document-visibility`、`use-key-press`、`use-hover` |
-| 表单（1）         | `useInput`                                                                                                                               | `use-input`                                                                                                                                            |
-| 存储（2）         | `useLocalStorage`、`useSessionStorage`                                                                                                   | `use-local-storage`、`use-session-storage`                                                                                                             |
-| 生命周期（3）     | `useIsMounted`、`useIsomorphicLayoutEffect`、`useUnmountedRef`                                                                           | `use-is-mounted`、`use-isomorphic-layout-effect`、`use-unmounted-ref`                                                                                  |
+| 分类               | Hooks                                                                                                                                                                                    | 独立入口                                                                                                                                                                                                   |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 状态（8）          | `useToggle`、`useBoolean`、`useControllableState`、`usePrevious`、`useLatest`、`useMemoizedFn`、`useSafeState`、`useResetState`                                                          | `use-toggle`、`use-boolean`、`use-controllable-state`、`use-previous`、`use-latest`、`use-memoized-fn`、`use-safe-state`、`use-reset-state`                                                                |
+| 异步与计时（9）    | `useDebounce`、`useThrottle`、`useDebounceFn`、`useThrottleFn`、`useTimeout`、`useInterval`、`useAsync`、`useLockFn`、`useWebSocket`                                                     | `use-debounce`、`use-throttle`、`use-debounce-fn`、`use-throttle-fn`、`use-timeout`、`use-interval`、`use-async`、`use-lock-fn`、`use-websocket`                                                           |
+| 浏览器与 DOM（10） | `useEventListener`、`useClickOutside`、`useMediaQuery`、`useWindowSize`、`useOnline`、`useDocumentVisibility`、`useKeyPress`、`useHover`、`useIntersectionObserver`、`useResizeObserver` | `use-event-listener`、`use-click-outside`、`use-media-query`、`use-window-size`、`use-online`、`use-document-visibility`、`use-key-press`、`use-hover`、`use-intersection-observer`、`use-resize-observer` |
+| 表单（1）          | `useInput`                                                                                                                                                                               | `use-input`                                                                                                                                                                                                |
+| 存储（2）          | `useLocalStorage`、`useSessionStorage`                                                                                                                                                   | `use-local-storage`、`use-session-storage`                                                                                                                                                                 |
+| 生命周期（3）      | `useIsMounted`、`useIsomorphicLayoutEffect`、`useUnmountedRef`                                                                                                                           | `use-is-mounted`、`use-isomorphic-layout-effect`、`use-unmounted-ref`                                                                                                                                      |
 
 完整的函数签名、行为契约、示例和 SSR 说明请查看[官方文档](https://chenyu1ov3.github.io/better-hooks/zh/)。
 

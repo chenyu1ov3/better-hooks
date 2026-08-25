@@ -1,0 +1,59 @@
+---
+title: useIntersectionObserver
+description: 跟踪元素交叉状态，并提供确定性的 SSR 快照。
+section: 浏览器与 DOM
+order: 128
+---
+
+# useIntersectionObserver
+
+## 概览
+
+`useIntersectionObserver` 观察元素或 ref，并返回最近的原生 entry 与
+`isIntersecting` 布尔值。
+
+## 函数签名
+
+```ts
+function useIntersectionObserver(
+  options?: UseIntersectionObserverOptions,
+): IntersectionObserverState;
+function useIntersectionObserver(
+  target: IntersectionObserverTarget,
+  options?: Omit<UseIntersectionObserverOptions, 'target' | 'ref'>,
+): IntersectionObserverState;
+```
+
+## 参数
+
+target 可以是直接的 `Element`、类 ref 对象或 `null`。除原生的 `root`、
+`rootMargin` 和 `threshold` 外，还支持 `enabled`、`onChange` 与 `onError`。
+
+## 返回值
+
+返回 `entry`、`isIntersecting` 和最近的 `error`。空快照为
+`{ entry: null, isIntersecting: false, error: undefined }`。
+
+## 行为
+
+观察会跟随 ref 目标变化，并在安装新 observer 前断开旧 observer。浏览器不
+支持该 API 时会静默降级。原生建立失败和回调异常仍会被观察，并保留原始
+异常；回调失败会先断开 observer。
+
+## SSR / RSC
+
+SSR 返回空快照，不会读取或创建 `IntersectionObserver`。请在 Client
+Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以将 `isIntersecting` 与 `useAsync` 组合，在内容可见后再开始任务；不影响
+渲染的分析逻辑则适合放到 `onChange`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-intersection-observer/index.ts)。
