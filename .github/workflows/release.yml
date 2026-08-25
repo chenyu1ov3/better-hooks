@@ -40,7 +40,7 @@ jobs:
       BETTER_HOOKS_RELEASE_COMMIT: ${{ inputs.commit }}
       BETTER_HOOKS_RELEASE_VERSION: ${{ inputs.version }}
       BETTER_HOOKS_RELEASE_CHANNEL: ${{ inputs.channel }}
-      BETTER_HOOKS_RELEASE_ARTIFACT_DIR: ${{ github.workspace }}/.release-assets
+      BETTER_HOOKS_RELEASE_ARTIFACT_DIR: ${{ github.workspace }}/release-assets
     steps:
       - name: Checkout exact release candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -69,12 +69,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: better-hooks@${{ inputs.version }}
-          ASSET_DIR: ${{ github.workspace }}/.release-assets
+          ASSET_DIR: ${{ github.workspace }}/release-assets
         run: |
           gh release upload "$RELEASE_TAG" "$ASSET_DIR"/* --repo "$GITHUB_REPOSITORY" --clobber
       - name: Store release assets as an Actions artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: better-hooks-${{ inputs.version }}
-          path: ${{ github.workspace }}/.release-assets
+          path: ${{ github.workspace }}/release-assets
           if-no-files-found: error
