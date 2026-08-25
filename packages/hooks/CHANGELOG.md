@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- f5d7bda: Add `useWebSocket`, `useIntersectionObserver`, and `useResizeObserver` with SSR-safe snapshots, stable actions, and observable error handling.
+
 ## 1.0.0
 
 ### Major Changes
