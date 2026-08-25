@@ -37,7 +37,7 @@ export function SiteHeader({
             className="size-7 text-foreground transition-opacity duration-150 group-hover:opacity-65 sm:size-[30px]"
             aria-hidden="true"
           />
-          <span className="max-[359px]:hidden">BETTER HOOKS</span>
+          <span className="max-[389px]:hidden">BETTER HOOKS</span>
         </Link>
         <nav
           className="hidden items-center gap-1 xl:flex"

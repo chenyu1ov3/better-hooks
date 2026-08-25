@@ -237,22 +237,29 @@ test.describe('responsive layout', () => {
     });
   }
 
-  test('mobile header controls retain 44px targets at the minimum width', async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 568 });
-    await openPage(page);
-    const targets = [
-      page.getByRole('button', { name: 'Search documentation' }),
-      page.getByRole('link', { name: '中文' }),
-      page.getByRole('button', { name: 'Theme' }),
-      page.getByRole('button', { name: 'Open menu' }),
-    ];
+  test('mobile header controls retain 44px targets within the viewport', async ({ page }) => {
+    for (const width of [320, 361]) {
+      await page.setViewportSize({ width, height: 640 });
+      await openPage(page);
+      await expect(
+        page.getByRole('banner').getByText('BETTER HOOKS', { exact: true }),
+      ).toBeHidden();
+      const targets = [
+        page.getByRole('button', { name: 'Search documentation' }),
+        page.getByRole('link', { name: '中文' }),
+        page.getByRole('button', { name: 'Theme' }),
+        page.getByRole('button', { name: 'Open menu' }),
+      ];
 
-    for (const target of targets) {
-      await expect(target).toBeVisible();
-      const bounds = await target.boundingBox();
-      expect(bounds).not.toBeNull();
-      expect(bounds!.width).toBeGreaterThanOrEqual(44);
-      expect(bounds!.height).toBeGreaterThanOrEqual(44);
+      for (const target of targets) {
+        await expect(target).toBeVisible();
+        const bounds = await target.boundingBox();
+        expect(bounds).not.toBeNull();
+        expect(bounds!.x).toBeGreaterThanOrEqual(0);
+        expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+        expect(bounds!.width).toBeGreaterThanOrEqual(44);
+        expect(bounds!.height).toBeGreaterThanOrEqual(44);
+      }
     }
   });
 
