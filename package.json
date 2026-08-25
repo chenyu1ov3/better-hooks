@@ -24,7 +24,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "pnpm --filter ./apps/docs test:e2e",
     "docs:dev": "pnpm --filter ./packages/hooks build && pnpm --parallel --filter ./packages/hooks --filter ./apps/docs run dev",
-    "docs:build": "pnpm --filter ./apps/docs... build",
+    "docs:build": "pnpm build && pnpm --filter ./apps/docs build",
     "check:package": "pnpm build && node scripts/check-package.mjs",
     "check:examples": "node scripts/check-hook-examples.mjs",
     "check:docs-locales": "node scripts/check-doc-locales.mjs",
