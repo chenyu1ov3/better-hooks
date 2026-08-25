@@ -23,11 +23,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
       playground: {
         title: 'Hook 在线演练',
-        description: '编辑并运行每个 Hook 的示例，预览结果来自当前工作区构建的包。',
+        description: '直接在浏览器中编辑并运行每个 Hook 的示例。',
       },
       changelog: {
         title: '更新日志',
-        description: '首个 npm 版本通过验证并发布后，发行说明会在这里更新。',
+        description: '按发布影响分类记录已发布 npm 包的变更。',
       },
     } as const;
     return metadataForPage({ locale: 'zh-CN', pathname: `/${path[0]}`, ...metadata[path[0]] });

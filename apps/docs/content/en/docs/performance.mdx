@@ -1,30 +1,30 @@
 ---
 title: Performance
-description: Verifiable package properties, subscription sharing, and performance boundaries.
+description: Import boundaries, shared browser work, and evidence-based performance guidance.
 section: Concepts
 order: 6
 ---
 
 # Performance
 
-## Verified package properties
+Performance in a Hook library means keeping the module graph and the amount of live browser work understandable. The package documents facts that can be checked in the published artifact and avoids promises that depend on an unknown application.
 
-The current source contains independently exported Hook entries and an aggregate storage entry, explicit package exports, no runtime dependencies, and a React peer dependency. The package is ESM-only and declares `sideEffects: false`.
+## Choose an explicit package entry
+
+Every Hook has a direct ESM entry such as `better-hooks/use-media-query`, alongside the root entry. Direct imports make ownership obvious and let bundlers start with the smallest requested graph. The package has no runtime dependency beyond the React peer dependency and declares `sideEffects: false`.
 
 These are package properties, not a claim that every bundler or application produces the same output.
 
-## Import only the behavior you need
+## Share native work when ownership is clear
 
-In `0.2.0`, each Hook is available through a direct entry such as `better-hooks/use-media-query`. Direct imports reduce ambiguity in application graphs; production size still depends on the consuming compiler, target, minifier, and surrounding code.
+External-store Hooks share native work where ownership and cleanup remain explicit. Media-query subscribers share an entry per `Window` and query, online status uses one listener pair per browser realm, and window size uses one resize listener for current subscribers.
 
-## Shared subscriptions
+## Schedule after commit and clean up first
 
-Where the browser source permits it, external-store Hooks share native work. Media-query subscribers share an entry per `Window` and query. Online status uses one listener pair per browser realm. Window size uses one resize listener for current subscribers.
+Timer and listener setup occurs after commit. Cleanup runs when dependencies change or a component unmounts, and stable callback refs avoid rebuilding native listeners for every render.
 
-## Scheduling discipline
+Async, timer, and event callbacks also clean up their internal work before an error escapes. An `onError` observer can inspect the failure, but it cannot replace the original throw or rejection; stale or cancelled work may be suppressed according to its Hook contract.
 
-Timer and listener setup occurs after commit. Cleanup runs on dependency changes and unmount. Stable callback refs avoid tearing down native listeners merely because a callback function received a new identity.
+## Measure the built artifact
 
-## Measurements
-
-This site does not publish competitor comparisons or synthetic benchmark numbers. Bundle figures may be shown only when generated from the current build, with the entry, compression method, and version identified.
+This site does not publish competitor comparisons or synthetic benchmark numbers. Bundle figures belong only when generated from the current build and labelled with the entry, compression method, and version. Unverified numbers remain absent instead of becoming stale placeholders.

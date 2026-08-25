@@ -9,7 +9,7 @@ order: 126
 
 ## Overview
 
-`useKeyPress` subscribes to keyboard events and matches modern key names, legacy numeric key codes, alternative lists, predicates, and combinations such as `ctrl.s`.
+`useKeyPress` subscribes to keyboard events and matches modern key names, legacy numeric key codes, alternative lists, predicates, and string combinations such as `ctrl+s` or `ctrl.s`.
 
 ## Signature
 
@@ -31,7 +31,7 @@ Nothing. The native subscription follows the target, event, and enabled options 
 
 ## Behavior
 
-Key filters can be strings, numbers, arrays of alternatives, or predicates. Matching callback errors are reported through `onError` and then rethrown; they are not swallowed.
+Key filters can be strings, numbers, arrays of alternatives, or predicates. Arrays always represent independent alternatives, so use `'ctrl+s'` or `'ctrl.s'` for a chord rather than `['ctrl', 's']`. With `exactMatch`, undeclared modifier keys prevent a match. The handler receives the event and the matched string or numeric filter; a predicate may return that key explicitly. Matching callback errors are reported through `onError` and then rethrown; they are not swallowed.
 
 ## SSR / RSC
 

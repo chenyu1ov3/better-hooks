@@ -2,5 +2,15 @@ packages:
   - packages/*
   - apps/*
 
+autoInstallPeers: false
+strictPeerDependencies: true
+sharedWorkspaceLockfile: true
+preferFrozenLockfile: true
+resolutionMode: highest
+
+overrides:
+  postcss: 8.5.26
+  sharp: 0.35.3
+
 onlyBuiltDependencies:
   - esbuild

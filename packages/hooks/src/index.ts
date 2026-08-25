@@ -24,7 +24,7 @@ export * from './use-previous/index.js';
 export * from './use-reset-state/index.js';
 export * from './use-safe-state/index.js';
 export * from './use-session-storage/index.js';
-export type { StorageOptions, StorageState, UseStorageResult } from './use-storage/index.js';
+export type { StorageOptions, StorageState, UseStorageResult } from './utils/storage.js';
 export * from './use-throttle/index.js';
 export * from './use-throttle-fn/index.js';
 export * from './use-timeout/index.js';

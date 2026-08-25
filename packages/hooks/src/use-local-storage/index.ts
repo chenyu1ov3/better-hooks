@@ -1,4 +1,4 @@
 'use client';
 
-export { useLocalStorage } from '../use-storage/index.js';
-export type { StorageOptions, StorageState, UseStorageResult } from '../use-storage/index.js';
+export { useLocalStorage } from '../utils/storage.js';
+export type { StorageOptions, StorageState, UseStorageResult } from '../utils/storage.js';

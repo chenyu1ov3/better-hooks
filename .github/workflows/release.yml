@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: Full candidate commit SHA; must equal the dispatch run's github.sha
+        required: true
+        type: string
+      version:
+        description: Exact package version in the candidate commit
+        required: true
+        type: string
+      channel:
+        description: npm dist-tag (next for an RC, latest for stable)
+        required: true
+        type: choice
+        options:
+          - next
+          - latest
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    environment:
+      name: npm-release
+    env:
+      BETTER_HOOKS_RELEASE_ENVIRONMENT: npm-release
+      BETTER_HOOKS_RELEASE_COMMIT: ${{ inputs.commit }}
+      BETTER_HOOKS_RELEASE_VERSION: ${{ inputs.version }}
+      BETTER_HOOKS_RELEASE_CHANNEL: ${{ inputs.channel }}
+      BETTER_HOOKS_RELEASE_ARTIFACT_DIR: ${{ runner.temp }}/better-hooks-release-assets
+    steps:
+      - name: Checkout exact release candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.commit }}
+          fetch-depth: 0
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Pin Trusted Publishing npm client
+        run: npm install --global npm@11.19.0
+      - name: Validate npm client
+        run: npm --version
+      - name: Validate release candidate
+        run: node scripts/publish-package.mjs validate
+      - name: Validate package artifact
+        run: pnpm check:package
+      - name: Publish package and reconcile GitHub records
+        run: node scripts/publish-package.mjs publish
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Upload release tarball and SHA-256 to the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: better-hooks@${{ inputs.version }}
+          ASSET_DIR: ${{ runner.temp }}/better-hooks-release-assets
+        run: |
+          gh release upload "$RELEASE_TAG" "$ASSET_DIR"/* --repo "$GITHUB_REPOSITORY" --clobber
+      - name: Store release assets as an Actions artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: better-hooks-${{ inputs.version }}
+          path: ${{ runner.temp }}/better-hooks-release-assets
+          if-no-files-found: error

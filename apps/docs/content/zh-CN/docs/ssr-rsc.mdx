@@ -1,21 +1,21 @@
 ---
 title: SSR 与 RSC
-description: 了解 Better Hooks 的服务端快照、Client Component 边界与 hydration 规则。
+description: 了解 Client Component 边界，以及如何让浏览器状态保持确定。
 section: 核心概念
 order: 5
 ---
 
 # SSR 与 RSC
 
-## Client Component 边界
+## 在调用 Hook 的位置设置边界
 
-所有 Better Hooks 都会调用 React 客户端 Hook，因此必须在 Client Component 中运行。Server Component 可以渲染使用 Better Hooks 的子组件，但不能直接调用这些 Hook。
+所有 Better Hooks 都会调用 React 客户端 Hook，因此必须在 Client Component 中运行。请把 `'use client'` 放在实际调用 Hook 的最小组件中。Server Component 可以渲染这个子组件并传递可序列化 props，但不能直接调用 Hook。
 
-## 导入安全
+## 导入安全，调用属于客户端工作
 
-包不会在导入时注册监听器、启动定时器、读取存储或访问 DOM。因此，这些模块可以安全地进入服务端构建；但这并不表示 Hook 可以在 Server Component 中调用。
+包不会在导入时注册监听器、启动定时器、读取存储或访问 DOM，因此模块可以安全地进入服务端构建；但导入安全不表示 Hook 可以在 Server Component 中调用。
 
-## 服务端快照
+## 选择确定的服务端快照
 
 面向浏览器的 Hook 使用确定的回退值：
 
@@ -27,9 +27,15 @@ order: 5
 | 存储 Hooks       | 调用方提供的初始值                   |
 | 监听与定时 Hooks | 服务端渲染期间不创建订阅或定时器     |
 
+如果界面需要不同的中性状态，请显式传入初始值。快照是 Hook 契约的一部分，而不是根据浏览器环境猜测出来的实现细节。
+
 ## Hydration 一致性
 
 请选择能够渲染合理初始界面的服务端回退值。Hydration 完成后，React 会同步浏览器快照。浏览器测量结果未知时，应优先使用稳定的中性布局，不要据此切换整棵服务端节点树。
+
+## 浏览器失败也属于契约
+
+浏览器 API 可能不存在，或拒绝访问。Hook 会检测相应目标，并暴露文档约定的回退值或错误；调用方应渲染有意义的中性状态，而不是假定浏览器 API 永远存在。
 
 ## RSC-friendly 不等于可在服务端调用
 

@@ -10,7 +10,7 @@ export type KeyType = string | number;
 /** A key predicate may return a truthy key to expose to the handler. @public */
 export type KeyPredicate = (event: KeyboardEvent) => KeyType | boolean | undefined;
 
-/** A key, key-code, list of alternatives, or custom predicate. @public */
+/** A key, key-code, list of independent alternatives, or custom predicate. @public */
 export type KeyFilter = KeyType | readonly KeyType[] | KeyPredicate;
 
 /** Native keyboard events supported by {@link useKeyPress}. @public */
@@ -216,10 +216,6 @@ function splitCombo(value: string): readonly string[] {
     .filter(Boolean);
 }
 
-function isModifierToken(value: string): boolean {
-  return modifierFor(value) !== undefined;
-}
-
 function countActiveModifiers(event: KeyboardEvent): number {
   return (['ctrl', 'shift', 'alt', 'meta'] as const).reduce(
     (count, modifier) => count + (modifierIsActive(event, modifier) ? 1 : 0),
@@ -259,21 +255,9 @@ function matchesFilter(
   if (typeof filter === 'number') return eventCode(event) === filter ? filter : false;
   if (typeof filter === 'string') return matchesString(event, filter, exactMatch) ? filter : false;
   if (Array.isArray(filter)) {
-    // Arrays are alternatives. Keep the compact modifier-array spelling as a
-    // fallback so `['ctrl', 's']` remains useful without stealing matches from
-    // arrays that happen to contain `meta`.
     for (const item of filter) {
       const matched = matchesFilter(event, item, exactMatch);
       if (matched !== false) return matched;
-    }
-    if (
-      filter.length > 1 &&
-      filter.every((item): item is string => typeof item === 'string') &&
-      filter.some(isModifierToken) &&
-      filter.some((item) => !isModifierToken(item))
-    ) {
-      const combo = filter.join('.');
-      return matchesString(event, combo, exactMatch) ? combo : false;
     }
   }
   return false;
@@ -282,7 +266,8 @@ function matchesFilter(
 /**
  * Runs a callback for matching keyboard events. Filters support key strings,
  * legacy numeric key codes, arrays of alternatives, predicates, and modifier
- * combinations such as `ctrl.s`, `ctrl+s`, or `['ctrl', 's']`.
+ * combinations expressed as strings such as `ctrl.s` or `ctrl+s`. Arrays are
+ * always independent alternatives and never form a modifier combination.
  *
  * @public
  */

@@ -65,8 +65,6 @@ const moduleLoaders = {
     import(
       /* webpackChunkName: "better-hooks-use-session-storage" */ 'better-hooks/use-session-storage'
     ),
-  'better-hooks/use-storage': () =>
-    import(/* webpackChunkName: "better-hooks-use-storage" */ 'better-hooks/use-storage'),
   'better-hooks/use-throttle': () =>
     import(/* webpackChunkName: "better-hooks-use-throttle" */ 'better-hooks/use-throttle'),
   'better-hooks/use-throttle-fn': () =>

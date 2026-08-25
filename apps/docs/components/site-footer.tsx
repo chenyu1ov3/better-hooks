@@ -1,4 +1,4 @@
-import { GitFork } from 'lucide-react';
+import { GitFork, PackageOpen } from 'lucide-react';
 import Link from 'next/link';
 import { hrefFor } from '../lib/content';
 import { dictionaryFor, type Locale } from '../lib/i18n';
@@ -11,6 +11,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
     [dictionary.navigation.docs, 'docs'],
     [dictionary.navigation.hooks, 'hooks'],
     [dictionary.navigation.playground, 'playground'],
+    [dictionary.navigation.changelog, 'changelog'],
   ] as const;
   return (
     <footer className="site-footer">
@@ -32,13 +33,16 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               {label}
             </Link>
           ))}
+          <a href={siteConfig.npmUrl} target="_blank" rel="noreferrer">
+            <PackageOpen aria-hidden="true" size={15} /> npm
+          </a>
           <a href={siteConfig.repositoryUrl} target="_blank" rel="noreferrer">
             <GitFork aria-hidden="true" size={15} /> GitHub
           </a>
         </nav>
         <div className="site-footer__meta">
-          <span>MIT License</span>
-          <span>{dictionary.status.releasePending}</span>
+          <a href={`${siteConfig.repositoryUrl}/blob/main/LICENSE`}>MIT License</a>
+          <span>React 19 / ESM</span>
         </div>
       </div>
     </footer>

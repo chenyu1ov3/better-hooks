@@ -1,7 +1,21 @@
 {
   "name": "better-hooks",
   "version": "0.2.0",
-  "description": "React 19-first, concurrent-safe hooks primitives with near-zero runtime dependencies.",
+  "description": "Type-safe, SSR-aware React 19 Hooks with stable callbacks and direct ESM entry points.",
+  "keywords": [
+    "debounce",
+    "esm",
+    "hooks",
+    "react",
+    "react-19",
+    "react-hooks",
+    "react-server-components",
+    "ssr",
+    "state",
+    "storage",
+    "throttle",
+    "typescript"
+  ],
   "homepage": "https://chenyu1ov3.github.io/better-hooks/",
   "bugs": {
     "url": "https://github.com/chenyu1ov3/better-hooks/issues"
@@ -15,6 +29,8 @@
   "files": [
     "dist",
     "README.md",
+    "README.zh-CN.md",
+    "assets",
     "LICENSE",
     "CHANGELOG.md"
   ],
@@ -179,11 +195,6 @@
       "import": "./dist/use-session-storage/index.js",
       "default": "./dist/use-session-storage/index.js"
     },
-    "./use-storage": {
-      "types": "./dist/use-storage/index.d.ts",
-      "import": "./dist/use-storage/index.js",
-      "default": "./dist/use-storage/index.js"
-    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -193,7 +204,7 @@
   "scripts": {
     "build": "tsdown && tsc --project tsconfig.build.json",
     "clean": "node -e \"import('node:fs').then(({rmSync}) => rmSync('dist', { recursive: true, force: true }))\"",
-    "dev": "tsdown --watch",
+    "dev": "tsdown --watch --no-clean",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {

@@ -24,13 +24,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
       playground: {
         title: 'Hook playground',
-        description:
-          'Edit and run every Hook example against the package built from this workspace.',
+        description: 'Edit and run every Hook example directly in the browser.',
       },
       changelog: {
         title: 'Changelog',
-        description:
-          'Release notes will be published here when the first verified npm release is available.',
+        description: 'Published package history, grouped by release impact.',
       },
     } as const;
     return metadataForPage({ locale: 'en', pathname: `/${path[0]}`, ...metadata[path[0]] });

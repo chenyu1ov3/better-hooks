@@ -1,21 +1,31 @@
 ---
 title: React 19
-description: 了解 Better Hooks 如何遵循 React 19 的渲染、提交与 Strict Mode 语义。
+description: 了解 Better Hooks 的生命周期、回调、清理和错误语义。
 section: 核心概念
 order: 4
 ---
 
 # React 19
 
-## 感知提交的值
+Better Hooks 补充 React 内置状态与 Effect 周边的小型生命周期能力。重点不是重新包装已有 API，而是在 React 可能渲染、暂停、重放或放弃工作时，仍保持稳定且可组合的契约。
+
+## 只暴露已提交的值
 
 `useLatest` 与 `usePrevious` 在 Effect 中更新 ref，因此暴露的是已经提交的值，而不是被中断或放弃的渲染结果。当长生命周期回调在并发渲染期间读取状态时，这一区别尤其重要。
 
-## 可安全重放的清理
+## 操作函数跨渲染保持可用
+
+只要契约允许，Hook 返回的操作函数就会保持稳定引用。长生命周期的定时器、监听器和异步任务会调用最近一次已提交的回调，而不会继续使用过期渲染中的闭包。组件更新输入时，无需因此重建每个订阅。
+
+## 清理可以承受 Strict Mode 重放
 
 开发环境中的 React Strict Mode 可能重放 Effect 和订阅。监听器、定时器、存储和外部状态源 Hook 都采用成对的建立与清理逻辑，避免重放后遗留重复的原生订阅。
 
-## 外部存储
+## 错误保持可观察
+
+定时器、事件和 Promise 回调会先清理自己的任务，再报告错误。可选的 `onError` 观察器可以检查失败，但原始抛出或拒绝仍交给应用处理；已经取消或过期的任务可以按契约抑制错误。
+
+## 浏览器状态使用外部状态源
 
 `useMediaQuery`、`useOnline`、`useWindowSize`、`useLocalStorage` 和 `useSessionStorage` 使用 `useSyncExternalStore` 连接浏览器状态。它们都提供稳定的服务端快照，并且只在组件提交后建立订阅。
 

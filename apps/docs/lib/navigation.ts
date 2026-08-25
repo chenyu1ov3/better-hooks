@@ -29,27 +29,6 @@ export function documentationNavigation(locale: Locale): NavGroup[] {
         { href: localized(locale, '/docs/support-matrix'), label: docs.supportMatrix },
       ],
     },
-    {
-      label: locale === 'en' ? 'Architecture decisions' : '架构决策记录',
-      items: [
-        {
-          href: localized(locale, '/docs/architecture/adr/001-boundaries'),
-          label: locale === 'en' ? 'Runtime boundaries' : '运行时边界',
-        },
-        {
-          href: localized(locale, '/docs/architecture/adr/002-api-semantics'),
-          label: locale === 'en' ? 'API semantics' : 'API 语义',
-        },
-        {
-          href: localized(locale, '/docs/architecture/adr/003-toolchain'),
-          label: locale === 'en' ? 'Toolchain' : '工具链',
-        },
-        {
-          href: localized(locale, '/docs/architecture/adr/004-performance'),
-          label: locale === 'en' ? 'Performance budget' : '性能预算',
-        },
-      ],
-    },
     ...hookCategories.map((category) => ({
       label: dictionary.categories[category],
       items: apiEntries

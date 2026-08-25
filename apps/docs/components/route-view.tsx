@@ -10,7 +10,7 @@ import { SiteFrame } from './site-frame';
 export async function RouteView({ locale, path }: { locale: Locale; path: string[] }) {
   if (!path.length) {
     return (
-      <SiteFrame locale={locale} currentPath={path} mainClassName="home-main" showFooter={false}>
+      <SiteFrame locale={locale} currentPath={path} mainClassName="home-main">
         <LandingPage locale={locale} />
       </SiteFrame>
     );

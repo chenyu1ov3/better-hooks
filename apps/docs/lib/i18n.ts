@@ -84,11 +84,6 @@ export type UiDictionary = {
     composition: string;
     source: string;
   };
-  status: {
-    preview: string;
-    releasePending: string;
-    unavailable: string;
-  };
   common: {
     react19: string;
     clientOnly: string;
@@ -179,11 +174,6 @@ export const dictionaries = {
       composition: 'Composition',
       source: 'Source',
     },
-    status: {
-      preview: 'Preview',
-      releasePending: 'Not yet published on npm',
-      unavailable: 'Not available yet',
-    },
     common: {
       react19: 'React 19',
       clientOnly: 'Client Component',
@@ -271,11 +261,6 @@ export const dictionaries = {
       example: '示例',
       composition: '组合使用',
       source: '源码',
-    },
-    status: {
-      preview: '预览版',
-      releasePending: '尚未发布到 npm',
-      unavailable: '暂不可用',
     },
     common: {
       react19: 'React 19',

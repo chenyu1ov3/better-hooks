@@ -33,11 +33,7 @@ export type HookDefinition = ApiEntryBase & {
   readonly name: `use${string}`;
 };
 
-export type AggregateDefinition = ApiEntryBase & {
-  readonly kind: 'aggregate';
-};
-
-export type ApiEntryDefinition = HookDefinition | AggregateDefinition;
+export type ApiEntryDefinition = HookDefinition;
 
 const repository = 'https://github.com/chenyu1ov3/better-hooks';
 
@@ -56,22 +52,6 @@ function defineHook(
     sourceUrl: `${repository}/blob/main/packages/hooks/src/${definition.slug}/index.ts`,
     demoId: `${definition.category}:${definition.slug}`,
   } as HookDefinition;
-}
-
-function defineAggregate(
-  definition: Omit<
-    AggregateDefinition,
-    'kind' | 'reactRange' | 'clientBoundary' | 'sourceUrl' | 'demoId'
-  >,
-): AggregateDefinition {
-  return {
-    ...definition,
-    kind: 'aggregate',
-    reactRange: '>=19.0.0 <20.0.0',
-    clientBoundary: true,
-    sourceUrl: `${repository}/blob/main/packages/hooks/src/${definition.slug}/index.ts`,
-    demoId: `${definition.category}:${definition.slug}`,
-  } as AggregateDefinition;
 }
 
 export const hooks = [
@@ -422,8 +402,8 @@ export const hooks = [
       'useKeyPress(keyFilter: KeyFilter, handler: KeyPressHandler, options?: UseKeyPressOptions): void',
     category: 'browser-dom',
     description: {
-      en: 'Runs a handler for matching keyboard keys, key codes, predicates, and modifier combinations.',
-      'zh-CN': '为匹配的按键、键码、谓词或组合键执行处理函数。',
+      en: 'Matches key alternatives, predicates, and string chords such as ctrl+s.',
+      'zh-CN': '匹配按键候选、谓词，以及 ctrl+s 形式的字符串组合键。',
     },
     ssrBehavior: {
       en: 'Skips native subscription when window or the configured target is unavailable.',
@@ -539,31 +519,7 @@ export const hooks = [
   }),
 ] as const satisfies readonly HookDefinition[];
 
-export const aggregateEntries = [
-  defineAggregate({
-    slug: 'use-storage',
-    name: 'use-storage',
-    importPath: 'better-hooks/use-storage',
-    importStatement:
-      "import { useLocalStorage, useSessionStorage } from 'better-hooks/use-storage'",
-    signature:
-      'exports useLocalStorage, useSessionStorage, StorageOptions, StorageState, UseStorageResult',
-    category: 'storage',
-    description: {
-      en: 'Aggregate entry for both browser-storage Hooks and their shared TypeScript types.',
-      'zh-CN': '统一导出两个浏览器存储 Hook 及其共享的 TypeScript 类型。',
-    },
-    ssrBehavior: {
-      en: 'Re-exports the same SSR-safe storage Hooks without adding a runtime wrapper.',
-      'zh-CN': '直接转出同一组支持 SSR 的存储 Hook，不增加额外的运行时包装。',
-    },
-  }),
-] as const satisfies readonly AggregateDefinition[];
-
-export const apiEntries = [
-  ...hooks,
-  ...aggregateEntries,
-] as const satisfies readonly ApiEntryDefinition[];
+export const apiEntries = hooks as readonly ApiEntryDefinition[];
 
 export const hookCategoryCounts = {
   state: 8,

@@ -9,7 +9,7 @@ order: 21
 
 ## Status
 
-Accepted for the preview implementation.
+Accepted.
 
 ## Context
 
@@ -27,6 +27,10 @@ their internal work first, notify the optional `onError` observer, and then
 preserve the original throw or rejection. Cancellation and stale-run guards may
 intentionally suppress errors from work that is no longer current.
 
+If an `onError` observer throws, the Hook still preserves the original error.
+The observer failure is reported in a microtask so it cannot replace the
+original throw or promise rejection.
+
 React Error Boundaries only handle errors thrown during render, lifecycle
 methods, and constructors in their descendant tree. They do not catch errors
 from a timer, a native event listener, or a promise callback. Applications that
@@ -39,5 +43,4 @@ Implementation refs are updated at commit boundaries. APIs may expose a small st
 
 Cleanup is part of the error contract: a failed callback cannot leave a pending
 timeout, interval, debounce window, lock, or event subscription active unless
-the API explicitly documents that behavior. Render-phase errors remain the
-application's responsibility and can be handled by a React Error Boundary.
+the API explicitly documents that behavior. Render-phase errors remain the application's responsibility and can be handled by a React Error Boundary.

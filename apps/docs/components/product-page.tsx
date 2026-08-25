@@ -1,7 +1,6 @@
-import { ArrowRight, GitFork } from 'lucide-react';
-import Link from 'next/link';
-import { hrefFor } from '../lib/content';
+import { GitFork, PackageOpen } from 'lucide-react';
 import { hooks } from '../lib/hooks';
+import { changelogFor } from '../lib/changelog';
 import { dictionaryFor, type Locale } from '../lib/i18n';
 import { siteConfig } from '../lib/site';
 import { HookExplorer } from './hook-explorer';
@@ -54,8 +53,8 @@ export function PlaygroundPage({ locale }: { locale: Locale }) {
         title={locale === 'en' ? 'Hook playground' : 'Hook 在线演练'}
         description={
           locale === 'en'
-            ? 'Edit and run every Hook example against the package built from this workspace.'
-            : '编辑并运行每个 Hook 的示例，预览结果来自当前工作区构建的包。'
+            ? 'Edit and run every Hook example directly in the browser.'
+            : '直接在浏览器中编辑并运行每个 Hook 的示例。'
         }
       />
       <Playground locale={locale} />
@@ -65,45 +64,48 @@ export function PlaygroundPage({ locale }: { locale: Locale }) {
 
 export function ChangelogPage({ locale }: { locale: Locale }) {
   const dictionary = dictionaryFor(locale);
+  const release = changelogFor(locale);
+  const releaseId = `release-${release.version.replaceAll(/[^a-zA-Z0-9]+/g, '-')}`;
   return (
     <div className="product-page page-container changelog-page">
       <PageIntro
-        eyebrow={locale === 'en' ? 'Project history' : '项目历史'}
+        eyebrow={release.eyebrow}
         title={dictionary.navigation.changelog}
-        description={
-          locale === 'en'
-            ? 'Release notes will be published here when the first verified npm release is available.'
-            : '首个 npm 版本通过验证并发布后，发行说明会在这里更新。'
-        }
+        description={release.description}
       />
-      <section className="release-row">
-        <div>
-          <span>{locale === 'en' ? 'Next' : '下一版'}</span>
-          <small>{dictionary.status.preview}</small>
+      <article className="release-row" aria-labelledby={releaseId}>
+        <header>
+          <span>npm</span>
+          <h2 id={releaseId}>{release.version}</h2>
+        </header>
+        <div className="release-notes">
+          {release.sections.map((section) => (
+            <section key={section.title}>
+              <h3>{section.title}</h3>
+              <p>{section.description}</p>
+            </section>
+          ))}
         </div>
-        <div>
-          <h2>{dictionary.status.releasePending}</h2>
-          <p>
-            {locale === 'en'
-              ? 'The source, API reference, examples, and package validation are public. No registry version is advertised until it can be verified.'
-              : '源码、API 文档、示例和包校验结果均已公开。npm 版本通过验证前，这里不会显示发布信息。'}
-          </p>
-        </div>
-      </section>
+      </article>
       <div className="changelog-actions">
         <a
           className="button button--secondary"
-          href={`${siteConfig.repositoryUrl}/commits/main`}
+          href={`${siteConfig.npmUrl}/v/${release.version}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <PackageOpen aria-hidden="true" size={16} />
+          {release.viewNpm}: {release.version}
+        </a>
+        <a
+          className="button button--secondary"
+          href={`${siteConfig.repositoryUrl}/releases/tag/better-hooks@${release.version}`}
           target="_blank"
           rel="noreferrer"
         >
           <GitFork aria-hidden="true" size={16} />
-          {locale === 'en' ? 'Repository history' : '提交记录'}
+          {release.history}
         </a>
-        <Link className="text-link" href={hrefFor(locale, 'docs')}>
-          {dictionary.actions.viewDocs}
-          <ArrowRight aria-hidden="true" size={15} />
-        </Link>
       </div>
     </div>
   );

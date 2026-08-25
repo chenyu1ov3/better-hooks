@@ -51,14 +51,42 @@ describe('useKeyPress', () => {
     looseHook.unmount();
 
     const exact = vi.fn();
-    const exactHook = renderHook(() => useKeyPress(['ctrl', 's'], exact, { exactMatch: true }));
+    const exactHook = renderHook(() => useKeyPress('ctrl.s', exact, { exactMatch: true }));
     act(() =>
       window.dispatchEvent(keyEvent('keydown', { key: 's', ctrlKey: true, shiftKey: true })),
     );
     expect(exact).not.toHaveBeenCalled();
     act(() => window.dispatchEvent(keyEvent('keydown', { key: 's', ctrlKey: true })));
-    expect(exact).toHaveBeenCalledTimes(1);
+    expect(exact).toHaveBeenCalledWith(expect.any(KeyboardEvent), 'ctrl.s');
     exactHook.unmount();
+  });
+
+  it('treats arrays as alternatives instead of modifier combinations', () => {
+    const target = new EventTarget();
+    const callback = vi.fn();
+    const { unmount } = renderHook(() =>
+      useKeyPress(['ctrl', 's'], callback, { exactMatch: true, target }),
+    );
+
+    act(() => target.dispatchEvent(keyEvent('keydown', { key: 's', ctrlKey: true })));
+    expect(callback).toHaveBeenLastCalledWith(expect.any(KeyboardEvent), 'ctrl');
+
+    act(() => target.dispatchEvent(keyEvent('keydown', { key: 's' })));
+    expect(callback).toHaveBeenLastCalledWith(expect.any(KeyboardEvent), 's');
+    expect(callback).toHaveBeenCalledTimes(2);
+    unmount();
+  });
+
+  it('matches a standalone Ctrl key with exact matching', () => {
+    const target = new EventTarget();
+    const callback = vi.fn();
+    const { unmount } = renderHook(() =>
+      useKeyPress('ctrl', callback, { exactMatch: true, target }),
+    );
+
+    act(() => target.dispatchEvent(keyEvent('keydown', { key: 'Control', ctrlKey: true })));
+    expect(callback).toHaveBeenCalledWith(expect.any(KeyboardEvent), 'ctrl');
+    unmount();
   });
 
   it('supports event lists, capture, enabled, and a ref that moves targets', () => {
@@ -108,19 +136,45 @@ describe('useKeyPress', () => {
     expect(callback).toHaveBeenCalledOnce();
   });
 
-  it('reports predicate and handler errors before rethrowing them', () => {
+  it('preserves handler errors when the error observer also throws', () => {
     const target = new EventTarget();
     const failure = new Error('key failed');
-    const onError = vi.fn();
+    const observerFailure = new Error('observer failed');
+    const queuedMicrotasks: VoidFunction[] = [];
+    const queueMicrotaskSpy = vi
+      .spyOn(globalThis, 'queueMicrotask')
+      .mockImplementation((callback) => queuedMicrotasks.push(callback));
+    const onError = vi.fn(() => {
+      throw observerFailure;
+    });
     const handler = vi.fn(() => {
       throw failure;
     });
-    const add = vi.spyOn(target, 'addEventListener');
-    const { unmount } = renderHook(() => useKeyPress('x', handler, { target, onError }));
-    const listener = add.mock.calls.find(([type]) => type === 'keydown')?.[1] as EventListener;
-    expect(() => listener(keyEvent('keydown', { key: 'x' }))).toThrow(failure);
-    expect(onError).toHaveBeenCalledWith(failure);
-    unmount();
+
+    try {
+      const add = vi.spyOn(target, 'addEventListener');
+      const { unmount } = renderHook(() => useKeyPress('x', handler, { target, onError }));
+      const listener = add.mock.calls.find(([type]) => type === 'keydown')?.[1] as EventListener;
+      let thrown: unknown;
+      try {
+        listener(keyEvent('keydown', { key: 'x' }));
+      } catch (error) {
+        thrown = error;
+      }
+      expect(thrown).toBe(failure);
+      expect(onError).toHaveBeenCalledWith(failure);
+      expect(queuedMicrotasks).toHaveLength(1);
+      let reported: unknown;
+      try {
+        queuedMicrotasks[0]?.();
+      } catch (error) {
+        reported = error;
+      }
+      expect(reported).toBe(observerFailure);
+      unmount();
+    } finally {
+      queueMicrotaskSpy.mockRestore();
+    }
   });
 
   it('keeps the latest callback and survives StrictMode replay', () => {

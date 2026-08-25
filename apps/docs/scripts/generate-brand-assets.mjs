@@ -70,7 +70,7 @@ try {
           .top { height: 62px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid ${colors.border}; padding-bottom: 18px; }
           .lockup { display: flex; align-items: center; gap: 14px; font-size: 23px; font-weight: 780; }
           .lockup svg { width: 45px; height: 45px; }
-          .release { border: 1px solid ${colors.border}; background: ${colors.surface}; padding: 8px 12px; color: ${colors.muted}; font-size: 14px; font-weight: 650; }
+          .format { border: 1px solid ${colors.border}; background: ${colors.surface}; padding: 8px 12px; color: ${colors.muted}; font-size: 14px; font-weight: 650; }
           .copy { position: absolute; left: 72px; top: 172px; width: 650px; }
           .eyebrow { margin: 0 0 18px; color: ${colors.primary}; font-size: 14px; font-weight: 780; }
           h1 { margin: 0; font-size: 70px; font-weight: 760; line-height: 1.08; }
@@ -83,7 +83,7 @@ try {
         <main class="frame">
           <header class="top">
             <div class="lockup">${smallMark}<span>BETTER HOOKS</span></div>
-            <div class="release">REACT 19 / PREVIEW</div>
+            <div class="format">REACT 19 / ESM</div>
           </header>
           <section class="copy">
             <p class="eyebrow">TYPESCRIPT FIRST</p>

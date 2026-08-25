@@ -5,25 +5,25 @@
 <h1 align="center">Better Hooks</h1>
 
 <p align="center">
-  Small, type-safe React Hooks with predictable lifecycle behavior.
+  Type-safe React 19 Hooks with predictable cleanup and explicit SSR boundaries.
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> | <a href="README.zh-CN.md">简体中文</a>
+  English | <a href="README.zh-CN.md">简体中文</a>
 </p>
 
 <p align="center">
+  <a href="https://www.npmjs.com/package/better-hooks"><img src="https://img.shields.io/npm/v/better-hooks?color=0f766e&amp;label=npm" alt="npm version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0f766e" alt="MIT license" /></a>
 </p>
-
-> [!IMPORTANT]
-> Better Hooks is in preview, and `better-hooks@0.2.0` is available on npm.
 
 ```sh
 pnpm add better-hooks
 ```
 
 ## Included Hooks
+
+The public surface contains 30 Hooks.
 
 | Area             | Hooks                                                                                                                                       |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -32,7 +32,7 @@ pnpm add better-hooks
 | Async and events | `useAsync`, `useLockFn`, `useEventListener`, `useClickOutside`                                                                              |
 | Browser state    | `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover`                                           |
 | Lifecycle        | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                              |
-| Storage          | `useStorage`, `useLocalStorage`, `useSessionStorage`                                                                                        |
+| Storage          | `useLocalStorage`, `useSessionStorage`                                                                                                      |
 
 See the [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/) for API details and live examples.
 
@@ -40,6 +40,8 @@ See the [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/) for A
 
 - [Documentation](https://chenyu1ov3.github.io/better-hooks/)
 - [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/)
+- [npm package](https://www.npmjs.com/package/better-hooks)
+- [Changelog](packages/hooks/CHANGELOG.md)
 - [Contributing](.github/CONTRIBUTING.md)
 - [Security](.github/SECURITY.md)
 - [License](LICENSE)

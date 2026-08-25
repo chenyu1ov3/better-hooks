@@ -1,21 +1,21 @@
 ---
 title: SSR and RSC
-description: Server snapshots, Client Component boundaries, and hydration rules for Better Hooks.
+description: Where to place Client Component boundaries and how to keep browser state deterministic.
 section: Concepts
 order: 5
 ---
 
 # SSR and RSC
 
-## Client Component boundary
+## Put the boundary where the Hook is called
 
-All Better Hooks call React client hooks and must run in a Client Component. A Server Component may render a child that uses Better Hooks, but it cannot call a Better Hook itself.
+All Better Hooks call React client hooks and must run in a Client Component. Put `'use client'` in the smallest component that calls the Hook. A Server Component may render that child and pass serializable props, but it cannot call a Better Hook itself.
 
-## Import safety
+## Importing is safe; calling is client work
 
-The package does not register listeners, start timers, read storage, or access the DOM as an import-time side effect. Importing a module in a server build is therefore distinct from calling its Hook in a Server Component.
+The package does not register listeners, start timers, read storage, or access the DOM as an import-time side effect. A module can therefore enter a server build safely; importing it is still different from calling its Hook in a Server Component.
 
-## Server snapshots
+## Choose a deterministic server snapshot
 
 Browser-facing Hooks use deterministic fallbacks:
 
@@ -27,9 +27,15 @@ Browser-facing Hooks use deterministic fallbacks:
 | storage Hooks            | the supplied initial value                       |
 | listener and timer Hooks | no subscription or timer during server rendering |
 
-## Hydration consistency
+Use an explicit initial value when the UI needs a different neutral state. The snapshot is part of the Hook's contract, not an implementation detail to infer from the browser.
+
+## Keep hydration stable
 
 Choose a server fallback that can render acceptable initial markup. React will reconcile the browser snapshot after hydration. Do not branch the server tree on an unknown browser measurement when a stable neutral layout will do.
+
+## Browser failures stay inside the contract
+
+Browser APIs can be missing or reject access. Hooks feature-detect the relevant target and expose the documented fallback or error behavior; callers should render a useful neutral state instead of assuming a browser API exists.
 
 ## RSC-friendly does not mean server-callable
 

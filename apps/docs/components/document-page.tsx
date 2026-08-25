@@ -55,10 +55,12 @@ export async function DocumentPage({ document }: { document: DocumentRecord }) {
   return (
     <article className="prose-doc">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
-      <div className="doc-kicker">
-        <span>{hook ? dictionary.navigation.hooks : dictionary.navigation.docs}</span>
-        {hook ? <span>{dictionary.common.clientOnly}</span> : null}
-      </div>
+      {hook ? (
+        <div className="doc-kicker">
+          <span>{dictionary.categories[hook.category]}</span>
+          <span>{dictionary.common.clientOnly}</span>
+        </div>
+      ) : null}
       {content}
       <div className="document-actions">
         <a

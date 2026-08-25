@@ -1,25 +1,35 @@
 ---
 title: React 19
-description: How Better Hooks follows React 19 rendering, commit, and Strict Mode semantics.
+description: The lifecycle, callback, cleanup, and error rules that shape Better Hooks APIs.
 section: Concepts
 order: 4
 ---
 
 # React 19
 
-## Commit-aware values
+Better Hooks fills the small lifecycle gaps around React's built-in state and effect primitives. The useful unit is not a clever wrapper; it is a stable contract that remains correct when React renders, pauses, replays, or abandons work.
+
+## Values are published after commit
 
 `useLatest` and `usePrevious` update their refs in effects. They therefore expose committed values, not values from an interrupted or abandoned render. This distinction matters when a long-lived callback observes state during concurrent rendering.
 
-## Replay-safe cleanup
+## Actions stay usable across renders
+
+Actions returned by a Hook keep a stable identity whenever the contract allows it. Long-lived timers, listeners, and async jobs call the latest committed callback instead of closing over an obsolete render. This lets a component update its inputs without rebuilding every subscription.
+
+## Cleanup survives Strict Mode replay
 
 React Strict Mode may replay effects and subscriptions in development. Listener, timer, storage, and external-store Hooks use symmetric setup and cleanup so replay does not leave duplicate native subscriptions behind.
 
-## External stores
+## Errors remain observable
+
+Timer, event, and promise callbacks clean up their own work before reporting an error. An optional `onError` observer can inspect the failure, while the original throw or rejection remains the application error. Cancellation and stale-run guards may suppress work that is no longer current.
+
+## Browser state uses external stores
 
 `useMediaQuery`, `useOnline`, `useWindowSize`, `useLocalStorage`, and `useSessionStorage` use `useSyncExternalStore` for browser state. Each provides a stable server snapshot and subscribes only after commit.
 
-## Use React when React already owns the problem
+## Use React when React owns the problem
 
 Better Hooks does not wrap an API simply to rename it. Continue to use React's `useTransition`, `useDeferredValue`, `useOptimistic`, `useActionState`, and `use` directly. Better Hooks is for lifecycle behavior those APIs do not provide.
 

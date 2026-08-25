@@ -10,9 +10,16 @@ function reviewScreenshot(name: string) {
 }
 
 const viewports = [
+  { width: 320, height: 568 },
+  { width: 340, height: 640 },
+  { width: 361, height: 640 },
+  { width: 370, height: 640 },
+  { width: 375, height: 667 },
   { width: 375, height: 812 },
   { width: 390, height: 844 },
+  { width: 667, height: 375 },
   { width: 768, height: 1024 },
+  { width: 844, height: 390 },
   { width: 1024, height: 768 },
   { width: 1280, height: 800 },
   { width: 1440, height: 900 },
@@ -61,7 +68,6 @@ const defaultExampleText = {
   'use-isomorphic-layout-effect': /Measured width: \d+px/,
   'use-reset-state': 'Reset',
   'use-safe-state': /Count: 0/,
-  'use-storage': 'Visits:',
   'use-unmounted-ref': 'Waiting',
 } as const;
 
@@ -114,17 +120,44 @@ async function expectNoHorizontalOverflow(page: Page) {
   ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 }
 
-async function expectWithinViewport(page: Page) {
-  const dimensions = await page.evaluate(() => ({
-    bodyHeight: document.body.scrollHeight,
-    rootHeight: document.documentElement.scrollHeight,
+async function expectNextBandVisible(page: Page) {
+  const dimensions = await page.locator('.home-categories').evaluate((element) => ({
+    top: element.getBoundingClientRect().top,
+    bottom: element.getBoundingClientRect().bottom,
     viewportHeight: window.innerHeight,
   }));
 
   expect(
-    Math.max(dimensions.bodyHeight, dimensions.rootHeight),
-    `Homepage exceeds the ${dimensions.viewportHeight}px viewport: ${JSON.stringify(dimensions)}`,
-  ).toBeLessThanOrEqual(dimensions.viewportHeight + 1);
+    dimensions.top,
+    `Category band is below the first viewport: ${JSON.stringify(dimensions)}`,
+  ).toBeLessThan(dimensions.viewportHeight);
+  expect(dimensions.bottom).toBeGreaterThan(0);
+}
+
+async function expectCompactProductSpacing(page: Page) {
+  const dimensions = await page.locator('.product-page').evaluate((element) => {
+    const intro = element.querySelector<HTMLElement>('.page-intro');
+    const content = element.querySelector<HTMLElement>(
+      '.hook-explorer, .playground-workbench, .release-row',
+    );
+    if (!intro || !content)
+      throw new Error('Product page is missing its intro or primary content.');
+
+    const pageBounds = element.getBoundingClientRect();
+    const introBounds = intro.getBoundingClientRect();
+    const contentBounds = content.getBoundingClientRect();
+    return {
+      viewportWidth: window.innerWidth,
+      paddingTop: Number.parseFloat(getComputedStyle(element).paddingTop),
+      introOffset: introBounds.top - pageBounds.top,
+      contentGap: contentBounds.top - introBounds.bottom,
+    };
+  });
+
+  const maximum = dimensions.viewportWidth <= 820 ? 33 : 49;
+  expect(dimensions.paddingTop).toBeGreaterThan(0);
+  expect(dimensions.introOffset).toBeLessThanOrEqual(maximum);
+  expect(dimensions.contentGap).toBeLessThanOrEqual(maximum);
 }
 
 async function expectWcagAa(page: Page) {
@@ -145,20 +178,48 @@ async function expectWcagAa(page: Page) {
 
 test.describe('responsive layout', () => {
   for (const viewport of viewports) {
-    test(`home has no horizontal overflow at ${viewport.width}px`, async ({ page }) => {
+    test(`home has no horizontal overflow at ${viewport.width}x${viewport.height}`, async ({
+      page,
+    }) => {
       await page.setViewportSize(viewport);
       await openPage(page);
       await expect(page.getByRole('heading', { level: 1, name: 'Better Hooks' })).toBeVisible();
       await expectNoHorizontalOverflow(page);
-      await expectWithinViewport(page);
+      await expectNextBandVisible(page);
       if (viewport.width === 1440) {
         await page.screenshot({
           path: reviewScreenshot('home-en-1440x900.png'),
           animations: 'disabled',
         });
       }
+      if (viewport.width === 320) {
+        await page.screenshot({
+          path: reviewScreenshot('home-en-320x568.png'),
+          animations: 'disabled',
+        });
+      }
     });
   }
+
+  test('mobile header controls retain 44px targets at the minimum width', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await openPage(page);
+    const targets = page.locator(
+      '.site-header .search-trigger, .site-header .language-link, .site-header .control-menu > summary, .site-header .mobile-menu-button',
+    );
+
+    await expect(targets).toHaveCount(4);
+    const sizes = await targets.evaluateAll((elements) =>
+      elements.map((element) => {
+        const bounds = element.getBoundingClientRect();
+        return { width: bounds.width, height: bounds.height };
+      }),
+    );
+    for (const size of sizes) {
+      expect(size.width).toBeGreaterThanOrEqual(44);
+      expect(size.height).toBeGreaterThanOrEqual(44);
+    }
+  });
 
   for (const route of keyPageRoutes) {
     for (const viewport of representativeViewports) {
@@ -171,6 +232,19 @@ test.describe('responsive layout', () => {
       });
     }
   }
+
+  test('product pages keep compact intro and content spacing', async ({ page }) => {
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      for (const path of ['hooks', 'playground', 'changelog']) {
+        await openPage(page, path);
+        await expectCompactProductSpacing(page);
+      }
+    }
+  });
 });
 
 test.describe('brand structure', () => {
@@ -189,14 +263,55 @@ test.describe('brand structure', () => {
     await expect(mark.locator('circle, rect')).toHaveCount(0);
   });
 
-  test('Homepage uses the Hook animation without the legacy logo, footer, or commit loop', async ({
+  test('Homepage uses the Hook animation without the legacy logo or commit loop', async ({
     page,
   }) => {
     await openPage(page);
     await expect(page.getByTestId('hook-lifecycle-visual')).toBeVisible();
     await expect(page.locator('.hero__visual svg, .hero__visual .hero__mark')).toHaveCount(0);
-    await expect(page.locator('.site-footer')).toHaveCount(0);
+    await expect(page.locator('.site-footer')).toBeVisible();
     await expect(page.locator('.commit-loop')).toHaveCount(0);
+  });
+
+  test('Homepage exposes install, API counts, category deep links, and real project links', async ({
+    context,
+    page,
+  }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await openPage(page);
+
+    const install = page.locator('.hero__install');
+    await expect(install.getByText('pnpm add better-hooks', { exact: true })).toBeVisible();
+    await install.getByRole('button', { name: 'Copy install command' }).click();
+    await expect(install.getByRole('button', { name: 'Install command copied' })).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe('pnpm add better-hooks');
+
+    await expect(page.getByRole('heading', { level: 2, name: '30 Hooks' })).toBeVisible();
+    const categories = page.getByRole('navigation', { name: 'Hook categories' });
+    await expect(categories.getByRole('link')).toHaveCount(6);
+    await categories.getByRole('link', { name: /State 8 Hooks/ }).click();
+    await expect.poll(() => new URL(page.url()).searchParams.get('category')).toBe('state');
+    await expect(page.getByRole('button', { name: 'State', exact: true })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await expect(
+      page.locator('.site-header').getByRole('link', { name: 'View on GitHub' }),
+    ).toHaveAttribute('title', 'View on GitHub');
+    await expect(page.locator('.site-footer').getByRole('link', { name: 'npm' })).toHaveAttribute(
+      'href',
+      'https://www.npmjs.com/package/better-hooks',
+    );
+  });
+
+  test('Homepage removes preview and pseudo-star messaging', async ({ page }) => {
+    await openPage(page);
+    await expect(page.getByText('Preview', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Star', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Not yet published on npm', { exact: true })).toHaveCount(0);
   });
 });
 
@@ -299,6 +414,7 @@ test.describe('core interactions', () => {
 
   test('Playground selector reads and updates the hook query parameter', async ({ page }) => {
     await openPage(page, 'playground?hook=use-throttle');
+    await expect(page.getByText(/package built from this workspace/i)).toHaveCount(0);
     const playground = page.locator('.playground-workbench');
     const selector = playground.getByRole('combobox', { name: 'Example' });
 
@@ -399,7 +515,7 @@ export function BrokenExample() {
     await expect(reset).toBeDisabled();
   });
 
-  test('All 31 default Playground examples compile and render', async ({ page }) => {
+  test('All 30 default Playground examples compile and render', async ({ page }) => {
     await openPage(page, 'playground');
     const playground = page.locator('.playground-workbench');
     const selector = playground.getByRole('combobox', { name: 'Example' });
@@ -410,7 +526,7 @@ export function BrokenExample() {
       })),
     );
 
-    expect(options).toHaveLength(31);
+    expect(options).toHaveLength(30);
     expect(options.map(({ value }) => value).sort()).toEqual(
       Object.keys(defaultExampleText).sort(),
     );
@@ -475,16 +591,13 @@ export function BrokenExample() {
 });
 
 test.describe('documentation navigation', () => {
-  test('Examples navigation, routes, and sitemap entries are removed', async ({
-    page,
-    request,
-  }) => {
+  test('Removed routes and sitemap entries stay unavailable', async ({ page, request }) => {
     await openPage(page);
     await expect(
       page.locator('.site-header').getByRole('link', { name: 'Examples', exact: true }),
     ).toHaveCount(0);
 
-    for (const path of ['examples', 'zh/examples']) {
+    for (const path of ['examples', 'zh/examples', 'hooks/use-storage', 'zh/hooks/use-storage']) {
       const response = await request.get(appRoute(path));
       expect(response.status(), `Expected /${path}/ to return 404`).toBe(404);
     }
@@ -494,20 +607,116 @@ test.describe('documentation navigation', () => {
     expect(await sitemapResponse.text()).not.toContain('/examples/');
   });
 
-  test('aggregate storage entry has bilingual docs, a live example, and typed code labels', async ({
+  test('Architecture decision records are archived outside the public docs', async ({
     page,
+    request,
   }) => {
-    await openPage(page, 'hooks/use-storage');
-    await expect(page.getByRole('heading', { level: 1, name: 'use-storage' })).toBeVisible();
-    await expect(page.locator('.live-example .live-code-preview__canvas')).toBeVisible();
-    await expect(
-      page.locator('.prose-doc .code-frame__bar').first().getByText('ts', { exact: true }),
-    ).toBeVisible();
+    await openPage(page, 'docs');
+    const navigationText = (await page.locator('.docs-navigation').allTextContents()).join(' ');
+    expect(navigationText).not.toContain('Architecture decisions');
+    expect(navigationText).not.toContain('架构决策记录');
+
+    await page.keyboard.press('Control+K');
+    const searchDialog = page.locator('dialog.search-dialog');
+    const searchbox = searchDialog.getByRole('combobox', { name: 'Search documentation' });
+    await searchbox.fill('ADR 001');
+    await expect(searchDialog.getByText('No results found.', { exact: true })).toBeVisible();
+    await searchDialog.getByRole('button', { name: 'Close menu' }).click();
+    await expect(searchDialog).toBeHidden();
+
+    for (const path of [
+      'docs/architecture/adr/001-boundaries',
+      'zh/docs/architecture/adr/001-boundaries',
+    ]) {
+      const response = await request.get(appRoute(path));
+      expect(response.status(), `Expected /${path}/ to return 404`).toBe(404);
+    }
+
+    const sitemapResponse = await request.get('./sitemap.xml');
+    expect(sitemapResponse.ok()).toBe(true);
+    const sitemap = await sitemapResponse.text();
+    expect(sitemap).not.toContain('/docs/architecture/adr/');
+    expect(sitemap).not.toContain('/zh/docs/architecture/adr/');
 
     await page.locator('.language-link').click();
-    await expect(page).toHaveURL(/\/zh\/hooks\/use-storage\/$/);
-    await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-    await expect(page.getByRole('heading', { level: 1, name: 'use-storage' })).toBeVisible();
+    await expect(page).toHaveURL(/\/zh\/docs\/$/);
+    await page.keyboard.press('Control+K');
+    const chineseSearch = page.locator('dialog.search-dialog');
+    const chineseSearchbox = chineseSearch.getByRole('combobox', { name: '搜索文档' });
+    await chineseSearchbox.fill('架构决策');
+    await expect(chineseSearch.getByText('没有找到匹配内容。', { exact: true })).toBeVisible();
+  });
+
+  test('Core concept pages describe lifecycle and runtime contracts in both locales', async ({
+    page,
+  }) => {
+    await openPage(page, 'docs/react-19');
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Actions stay usable across renders' }),
+    ).toBeVisible();
+    await expect(page.locator('.prose-doc')).toContainText('Errors remain observable');
+
+    await page.locator('.language-link').click();
+    await expect(
+      page.getByRole('heading', { level: 2, name: '操作函数跨渲染保持可用' }),
+    ).toBeVisible();
+    await expect(page.locator('.prose-doc')).toContainText('错误保持可观察');
+
+    await openPage(page, 'zh/docs/ssr-rsc');
+    await expect(
+      page.getByRole('heading', { level: 2, name: '在调用 Hook 的位置设置边界' }),
+    ).toBeVisible();
+    await expect(page.locator('.prose-doc')).toContainText('选择确定的服务端快照');
+  });
+
+  test('document labels are meaningful and useKeyPress documents the frozen chord contract', async ({
+    page,
+  }) => {
+    await openPage(page, 'docs/getting-started');
+    await expect(page.locator('.doc-kicker')).toHaveCount(0);
+
+    await openPage(page, 'hooks/use-key-press');
+    await expect(page.locator('.doc-kicker')).toContainText('Browser & DOM');
+    await expect(page.locator('.doc-kicker')).toContainText('Client Component');
+    await expect(page.locator('.prose-doc')).toContainText(
+      'Arrays always represent independent alternatives',
+    );
+    await expect(page.locator('.prose-doc')).toContainText("'ctrl+s'");
+
+    await page.locator('.language-link').click();
+    await expect(page.locator('.prose-doc')).toContainText('数组始终表示彼此独立的候选项');
+    await expect(page.locator('.prose-doc')).toContainText("'ctrl+s'");
+  });
+
+  test('Changelog renders the package version and release data in both languages', async ({
+    page,
+  }) => {
+    await openPage(page, 'changelog');
+    const versionHeading = page.getByRole('heading', { level: 2 });
+    await expect(versionHeading).toHaveText(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
+    const version = (await versionHeading.textContent())?.trim();
+    expect(version).toBeTruthy();
+    await expect(page.locator('.release-notes h3')).toHaveCount(2);
+    await expect(
+      page.getByRole('link', { name: new RegExp(`View this version on npm: ${version}`) }),
+    ).toHaveAttribute('href', `https://www.npmjs.com/package/better-hooks/v/${version}`);
+    await expect(page.getByRole('link', { name: 'GitHub Release' })).toHaveAttribute(
+      'href',
+      `https://github.com/chenyu1ov3/better-hooks/releases/tag/better-hooks@${version}`,
+    );
+    await expect(page.getByText('Not yet published on npm', { exact: true })).toHaveCount(0);
+
+    await page.locator('.language-link').click();
+    await expect(page).toHaveURL(/\/zh\/changelog\/$/);
+    await expect(page.getByRole('heading', { level: 2, name: version! })).toBeVisible();
+    await expect(page.locator('.release-notes h3')).toHaveCount(2);
+    await expect(
+      page.getByRole('link', { name: new RegExp(`在 npm 查看此版本: ${version}`) }),
+    ).toHaveAttribute('href', `https://www.npmjs.com/package/better-hooks/v/${version}`);
+    await expect(page.getByRole('link', { name: 'GitHub Release' })).toHaveAttribute(
+      'href',
+      `https://github.com/chenyu1ov3/better-hooks/releases/tag/better-hooks@${version}`,
+    );
   });
 
   test('desktop documentation shows a linked table of contents', async ({ page }) => {
@@ -591,6 +800,17 @@ test.describe('WCAG A/AA', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openPage(page, 'docs/getting-started');
     await expectWcagAa(page);
+  });
+
+  test('home has no automated WCAG A/AA violations in dark mode', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await openPage(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expectWcagAa(page);
+    await page.screenshot({
+      path: reviewScreenshot('home-en-dark-1280x800.png'),
+      animations: 'disabled',
+    });
   });
 });
 

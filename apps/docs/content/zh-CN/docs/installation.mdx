@@ -9,7 +9,7 @@ order: 2
 
 ## 安装包
 
-已验证的 `0.2.0` 版本可以通过 pnpm 安装：
+使用 pnpm 安装：
 
 ```sh
 pnpm add better-hooks
@@ -33,6 +33,4 @@ React 是 peer dependency。除了由使用方应用提供的 React API，这个
 
 包名为 `better-hooks`。根入口适合集中导入，每个 Hook 也有 `better-hooks/use-toggle` 这样的显式直接入口。直接入口能更清楚地表达依赖关系，并配合包的 `sideEffects: false` 声明完成 Tree Shaking。
 
-## 发布验证
-
-`0.2.0` 发布产物已通过 exports 检查、类型声明生成、包验证、体积预算和完整文档构建。后续版本会记录在[更新日志](/zh/changelog)中。
+版本变更记录在[更新日志](/zh/changelog)中。

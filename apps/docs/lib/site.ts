@@ -5,7 +5,6 @@ export const siteConfig = {
     'Typed, composable React 19 hooks with predictable cleanup and explicit runtime boundaries.',
   repositoryUrl: 'https://github.com/chenyu1ov3/better-hooks',
   npmUrl: 'https://www.npmjs.com/package/better-hooks',
-  releaseStatus: 'preview' as const,
   origin: 'https://chenyu1ov3.github.io',
   basePath: '/better-hooks',
 } as const;

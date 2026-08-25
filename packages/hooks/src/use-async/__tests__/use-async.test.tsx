@@ -349,6 +349,49 @@ describe('useAsync', () => {
     expect(result.current.error).toBe(error);
   });
 
+  it('preserves a task rejection when the error observer also throws', async () => {
+    const error = new Error('task failed');
+    const observerFailure = new Error('observer failed');
+    const queuedMicrotasks: VoidFunction[] = [];
+    const nativeQueueMicrotask = globalThis.queueMicrotask;
+    let captureNextMicrotask = false;
+    const queueMicrotaskSpy = vi
+      .spyOn(globalThis, 'queueMicrotask')
+      .mockImplementation((callback) => {
+        if (captureNextMicrotask) {
+          captureNextMicrotask = false;
+          queuedMicrotasks.push(callback);
+          return;
+        }
+        nativeQueueMicrotask(callback);
+      });
+    const { result } = renderHook(() =>
+      useAsync(() => Promise.reject(error), {
+        onError: () => {
+          captureNextMicrotask = true;
+          throw observerFailure;
+        },
+      }),
+    );
+
+    try {
+      await act(async () => {
+        await expect(result.current.run()).rejects.toBe(error);
+      });
+      expect(result.current.error).toBe(error);
+      expect(queuedMicrotasks).toHaveLength(1);
+      let reported: unknown;
+      try {
+        queuedMicrotasks[0]?.();
+      } catch (queuedError) {
+        reported = queuedError;
+      }
+      expect(reported).toBe(observerFailure);
+    } finally {
+      queueMicrotaskSpy.mockRestore();
+    }
+  });
+
   it('does not report an expected cancellation as a task error', async () => {
     const onError = vi.fn();
     const { result } = renderHook(() =>

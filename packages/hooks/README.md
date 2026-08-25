@@ -1,59 +1,89 @@
-# better-hooks
+<p align="center">
+  <img src="https://chenyu1ov3.github.io/better-hooks/better-hooks-mark.svg" width="96" height="96" alt="Better Hooks logo" />
+</p>
 
-React 19-first, concurrent-safe Hooks primitives with near-zero runtime dependencies.
+<h1 align="center">better-hooks</h1>
 
-The package is ESM-only and exposes the root and individual Hook entry points:
+<p align="center">Type-safe, SSR-aware React 19 Hooks with stable callbacks and direct ESM entry points.</p>
 
-```ts
-import { useToggle } from 'better-hooks';
+<p align="center">
+  English | <a href="https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/README.zh-CN.md">简体中文</a>
+</p>
+
+## Installation
+
+```bash
+pnpm add better-hooks
+```
+
+`react` is a peer dependency. Install React 19 in the consuming application.
+
+## Features
+
+- 30 focused Hooks, including dedicated localStorage and sessionStorage entries.
+- TypeScript declarations and explicit ESM exports for every public entry.
+- Direct imports for a smaller initial module graph and reliable tree shaking.
+- Stable callback-oriented APIs designed for React 19 concurrent rendering.
+- Defined SSR fallbacks and preserved `"use client"` boundaries for RSC applications.
+- No runtime dependency other than the React peer dependency.
+
+## Imports
+
+Use the root entry when several Hooks are needed together:
+
+```tsx
+import { useDebounce, useToggle } from 'better-hooks';
+```
+
+Use a direct entry when you want the smallest initial module graph:
+
+```tsx
 import { useDebounce } from 'better-hooks/use-debounce';
 ```
 
-React is a peer dependency. Every runtime Hook entry is a Client Component
-boundary and preserves the `"use client"` directive. Server Components may
-pass serializable values to components that use these Hooks, and may import the
-package's public types with `import type`.
+Both styles expose the same typed APIs. Direct entries are explicit package exports; imports from `better-hooks/dist/*` are not public API.
 
-Direct Hook entries are the preferred choice for the smallest initial module graph.
-The package is ESM-only and supports Node.js 22.18+ tooling and React
-`>=19.0.0 <20.0.0`.
+## Supported environments
 
-## Hook examples
+| Area            | Support                                                       |
+| --------------- | ------------------------------------------------------------- |
+| React           | `>=19.0.0 <20.0.0`                                            |
+| Node.js tooling | `>=22.18.0`                                                   |
+| Module format   | ESM only                                                      |
+| Types           | Bundled TypeScript declarations                               |
+| Rendering       | Client Components, SSR, and React Server Component boundaries |
 
-The repository maintains a complete English and Chinese Markdown example for
-every direct entry. Examples are linked to GitHub and are not included in the
-published runtime package.
+Browser-facing Hooks require the corresponding browser API after hydration. Their documented initial values keep server rendering deterministic.
 
-| Entry                          | English                                                                                                                           | 中文                                                                                                                                 |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `use-async`                    | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-async/examples/basic.md)                    | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-async/examples/basic.zh-CN.md)                    |
-| `use-boolean`                  | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-boolean/examples/basic.md)                  | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-boolean/examples/basic.zh-CN.md)                  |
-| `use-click-outside`            | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-click-outside/examples/basic.md)            | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-click-outside/examples/basic.zh-CN.md)            |
-| `use-controllable-state`       | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-controllable-state/examples/basic.md)       | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-controllable-state/examples/basic.zh-CN.md)       |
-| `use-debounce`                 | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-debounce/examples/basic.md)                 | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-debounce/examples/basic.zh-CN.md)                 |
-| `use-debounce-fn`              | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-debounce-fn/examples/basic.md)              | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-debounce-fn/examples/basic.zh-CN.md)              |
-| `use-document-visibility`      | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-document-visibility/examples/basic.md)      | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-document-visibility/examples/basic.zh-CN.md)      |
-| `use-event-listener`           | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-event-listener/examples/basic.md)           | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-event-listener/examples/basic.zh-CN.md)           |
-| `use-hover`                    | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-hover/examples/basic.md)                    | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-hover/examples/basic.zh-CN.md)                    |
-| `use-input`                    | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-input/examples/basic.md)                    | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-input/examples/basic.zh-CN.md)                    |
-| `use-interval`                 | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-interval/examples/basic.md)                 | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-interval/examples/basic.zh-CN.md)                 |
-| `use-is-mounted`               | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-is-mounted/examples/basic.md)               | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-is-mounted/examples/basic.zh-CN.md)               |
-| `use-isomorphic-layout-effect` | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-isomorphic-layout-effect/examples/basic.md) | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-isomorphic-layout-effect/examples/basic.zh-CN.md) |
-| `use-key-press`                | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-key-press/examples/basic.md)                | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-key-press/examples/basic.zh-CN.md)                |
-| `use-latest`                   | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-latest/examples/basic.md)                   | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-latest/examples/basic.zh-CN.md)                   |
-| `use-local-storage`            | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-local-storage/examples/basic.md)            | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-local-storage/examples/basic.zh-CN.md)            |
-| `use-lock-fn`                  | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-lock-fn/examples/basic.md)                  | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-lock-fn/examples/basic.zh-CN.md)                  |
-| `use-memoized-fn`              | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-memoized-fn/examples/basic.md)              | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-memoized-fn/examples/basic.zh-CN.md)              |
-| `use-media-query`              | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-media-query/examples/basic.md)              | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-media-query/examples/basic.zh-CN.md)              |
-| `use-online`                   | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-online/examples/basic.md)                   | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-online/examples/basic.zh-CN.md)                   |
-| `use-previous`                 | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-previous/examples/basic.md)                 | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-previous/examples/basic.zh-CN.md)                 |
-| `use-reset-state`              | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-reset-state/examples/basic.md)              | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-reset-state/examples/basic.zh-CN.md)              |
-| `use-safe-state`               | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-safe-state/examples/basic.md)               | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-safe-state/examples/basic.zh-CN.md)               |
-| `use-session-storage`          | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-session-storage/examples/basic.md)          | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-session-storage/examples/basic.zh-CN.md)          |
-| `use-storage`                  | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-storage/examples/basic.md)                  | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-storage/examples/basic.zh-CN.md)                  |
-| `use-throttle`                 | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-throttle/examples/basic.md)                 | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-throttle/examples/basic.zh-CN.md)                 |
-| `use-throttle-fn`              | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-throttle-fn/examples/basic.md)              | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-throttle-fn/examples/basic.zh-CN.md)              |
-| `use-timeout`                  | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-timeout/examples/basic.md)                  | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-timeout/examples/basic.zh-CN.md)                  |
-| `use-toggle`                   | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-toggle/examples/basic.md)                   | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-toggle/examples/basic.zh-CN.md)                   |
-| `use-window-size`              | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-window-size/examples/basic.md)              | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-window-size/examples/basic.zh-CN.md)              |
-| `use-unmounted-ref`            | [Example](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-unmounted-ref/examples/basic.md)            | [示例](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-unmounted-ref/examples/basic.zh-CN.md)            |
+## SSR and React Server Components
+
+Every runtime Hook entry preserves a `"use client"` directive. Call Hooks from Client Components; Server Components may pass serializable props to those components and may import public types with `import type`.
+
+Importing the package does not access `window`, register listeners, or perform other browser or React side effects. Browser listeners and timers are created by Hook effects and cleaned up with the component lifecycle. See each Hook page for its exact SSR fallback and error behavior.
+
+## API
+
+The package contains 30 Hooks and a root entry that re-exports the Hook APIs.
+
+| Category             | Hooks                                                                                                                                    | Direct entries                                                                                                                                         |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| State (8)            | `useToggle`, `useBoolean`, `useControllableState`, `usePrevious`, `useLatest`, `useMemoizedFn`, `useSafeState`, `useResetState`          | `use-toggle`, `use-boolean`, `use-controllable-state`, `use-previous`, `use-latest`, `use-memoized-fn`, `use-safe-state`, `use-reset-state`            |
+| Async and timing (8) | `useDebounce`, `useThrottle`, `useDebounceFn`, `useThrottleFn`, `useTimeout`, `useInterval`, `useAsync`, `useLockFn`                     | `use-debounce`, `use-throttle`, `use-debounce-fn`, `use-throttle-fn`, `use-timeout`, `use-interval`, `use-async`, `use-lock-fn`                        |
+| Browser and DOM (8)  | `useEventListener`, `useClickOutside`, `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover` | `use-event-listener`, `use-click-outside`, `use-media-query`, `use-window-size`, `use-online`, `use-document-visibility`, `use-key-press`, `use-hover` |
+| Forms (1)            | `useInput`                                                                                                                               | `use-input`                                                                                                                                            |
+| Storage (2)          | `useLocalStorage`, `useSessionStorage`                                                                                                   | `use-local-storage`, `use-session-storage`                                                                                                             |
+| Lifecycle (3)        | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                           | `use-is-mounted`, `use-isomorphic-layout-effect`, `use-unmounted-ref`                                                                                  |
+
+The complete signatures, behavior contracts, examples, and SSR notes are available in the [documentation](https://chenyu1ov3.github.io/better-hooks/).
+
+## Links
+
+- [Documentation](https://chenyu1ov3.github.io/better-hooks/)
+- [npm](https://www.npmjs.com/package/better-hooks)
+- [Changelog](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/CHANGELOG.md)
+- [License](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/LICENSE)
+- [GitHub](https://github.com/chenyu1ov3/better-hooks)
+
+## License
+
+[MIT](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/LICENSE)

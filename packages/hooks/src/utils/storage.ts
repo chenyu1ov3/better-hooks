@@ -194,7 +194,7 @@ function write<T>(store: Store<T>, raw: string | null): boolean {
   }
 }
 
-function useStorage<T>(
+function useBrowserStorage<T>(
   kind: StorageKind,
   key: string,
   initialValue: T | (() => T),
@@ -290,7 +290,7 @@ export function useLocalStorage<T>(
   initialValue: T | (() => T),
   options?: StorageOptions<T>,
 ): UseStorageResult<T> {
-  return useStorage('local', key, initialValue, options);
+  return useBrowserStorage('local', key, initialValue, options);
 }
 
 /** Syncs a value with sessionStorage. @public */
@@ -299,5 +299,5 @@ export function useSessionStorage<T>(
   initialValue: T | (() => T),
   options?: StorageOptions<T>,
 ): UseStorageResult<T> {
-  return useStorage('session', key, initialValue, options);
+  return useBrowserStorage('session', key, initialValue, options);
 }

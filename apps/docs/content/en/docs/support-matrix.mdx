@@ -1,23 +1,22 @@
 ---
 title: Support matrix
-description: Current runtime, rendering, module, and browser API support boundaries.
+description: The runtime, rendering, module, and browser API boundaries supported by this release.
 section: Concepts
 order: 7
 ---
 
 # Support matrix
 
-## Runtime and tooling
+## Runtime and package
 
-| Surface                             | Current support                                  |
-| ----------------------------------- | ------------------------------------------------ |
-| React                               | `>=19.0.0 <20.0.0`                               |
-| Package modules                     | ESM only                                         |
-| TypeScript                          | declarations are generated from the typed source |
-| Node.js for repository tasks        | `>=22.18.0`                                      |
-| Package manager for this repository | pnpm                                             |
+| Surface         | Current support                                  |
+| --------------- | ------------------------------------------------ |
+| React           | `>=19.0.0 <20.0.0`                               |
+| Package modules | ESM only                                         |
+| TypeScript      | declarations are generated from the typed source |
+| Node.js         | `>=22.18.0`                                      |
 
-## Rendering environments
+## Rendering boundaries
 
 | Environment             | Support boundary                                           |
 | ----------------------- | ---------------------------------------------------------- |
@@ -27,14 +26,14 @@ order: 7
 | Browser workers         | Not a React DOM target and not claimed                     |
 | React Native            | Not tested or claimed                                      |
 
-## Browser APIs
+## Browser API behavior
 
-Hooks feature-detect the APIs they use. `useMediaQuery` falls back when `matchMedia` is unavailable. Storage Hooks preserve their current value and expose an error when storage access or serialization fails. Event Hooks skip missing targets.
+Hooks feature-detect the APIs they use. `useMediaQuery` falls back when `matchMedia` is unavailable. Storage Hooks preserve their current value and expose an error when storage access or serialization fails. Event Hooks skip missing targets. These fallbacks are part of the documented runtime contract.
 
 ## Frameworks
 
-The project does not publish a framework compatibility matrix yet. A framework can consume the package when it supports React 19, ESM packages, and the relevant Client Component or hydration boundary. Named framework claims require dedicated integration tests.
+Framework compatibility follows three boundaries: React 19, ESM packages, and the relevant Client Component or hydration model. Named framework claims require dedicated integration tests.
 
-## Policy
+## Update policy
 
-This matrix describes the current manifest and implementation. A broader claim belongs here only after it is represented in tests or release validation.
+This matrix describes the current manifest and implementation. A broader claim belongs here only after it is represented in tests or release validation; a framework or browser version is not implied by a passing local example.

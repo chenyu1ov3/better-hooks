@@ -128,13 +128,7 @@ export function HookExplorer({
           <article className="hook-result" key={hook.slug}>
             <div className="hook-result__topline">
               <span>{categoryLabel(hook.category)}</span>
-              <span>
-                {hook.kind === 'aggregate'
-                  ? locale === 'en'
-                    ? 'Aggregate entry'
-                    : '组合入口'
-                  : dictionary.common.react19}
-              </span>
+              <span>{dictionary.common.react19}</span>
             </div>
             <h3>
               <Link href={hrefFor(locale, ['hooks', hook.slug])}>{hook.name}</Link>

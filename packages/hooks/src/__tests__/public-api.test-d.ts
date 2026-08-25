@@ -24,7 +24,6 @@ import * as previousEntry from 'better-hooks/use-previous';
 import * as resetStateEntry from 'better-hooks/use-reset-state';
 import * as safeStateEntry from 'better-hooks/use-safe-state';
 import * as sessionStorageEntry from 'better-hooks/use-session-storage';
-import * as storageEntry from 'better-hooks/use-storage';
 import * as throttleEntry from 'better-hooks/use-throttle';
 import * as throttleFnEntry from 'better-hooks/use-throttle-fn';
 import * as timeoutEntry from 'better-hooks/use-timeout';
@@ -65,8 +64,6 @@ test('direct entries match the root API', () => {
   expectTypeOf(sessionStorageEntry.useSessionStorage).toEqualTypeOf<
     typeof root.useSessionStorage
   >();
-  expectTypeOf(storageEntry.useLocalStorage).toEqualTypeOf<typeof root.useLocalStorage>();
-  expectTypeOf(storageEntry.useSessionStorage).toEqualTypeOf<typeof root.useSessionStorage>();
   expectTypeOf(throttleEntry.useThrottle).toEqualTypeOf<typeof root.useThrottle>();
   expectTypeOf(throttleFnEntry.useThrottleFn).toEqualTypeOf<typeof root.useThrottleFn>();
   expectTypeOf(timeoutEntry.useTimeout).toEqualTypeOf<typeof root.useTimeout>();

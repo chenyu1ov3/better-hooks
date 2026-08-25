@@ -1,7 +1,8 @@
 import { act, renderHook } from '@testing-library/react';
 import { StrictMode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useLocalStorage, useSessionStorage } from '../index.js';
+import { useLocalStorage } from '../index.js';
+import { useSessionStorage } from '../../use-session-storage/index.js';
 
 const localStorageDescriptor = Object.getOwnPropertyDescriptor(window, 'localStorage');
 

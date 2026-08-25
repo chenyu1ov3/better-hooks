@@ -1,4 +1,4 @@
-import { GitFork, Star } from 'lucide-react';
+import { GitFork } from 'lucide-react';
 import Link from 'next/link';
 import { hrefFor, oppositeLocale, type SearchEntry } from '../lib/content';
 import { dictionaryFor, type Locale } from '../lib/i18n';
@@ -33,7 +33,6 @@ export function SiteHeader({
         >
           <LogoMark className="brand__mark" aria-hidden="true" />
           <span>BETTER HOOKS</span>
-          <small>{dictionary.status.preview}</small>
         </Link>
         <nav className="primary-nav" aria-label={locale === 'en' ? 'Primary navigation' : '主导航'}>
           {navigation.map((item) => (
@@ -53,15 +52,15 @@ export function SiteHeader({
         <div className="site-header__actions">
           <GlobalSearch locale={locale} entries={searchEntries} />
           <a
-            className="github-star"
+            className="github-link"
             href={siteConfig.repositoryUrl}
             target="_blank"
             rel="noreferrer"
             aria-label={dictionary.actions.viewOnGitHub}
+            title={dictionary.actions.viewOnGitHub}
           >
-            <GitFork aria-hidden="true" size={17} />
-            <Star aria-hidden="true" size={14} />
-            <span>Star</span>
+            <GitFork aria-hidden="true" size={18} />
+            <span>GitHub</span>
           </a>
           <LanguageLink href={languageHref} hrefLang={oppositeLocale(locale)}>
             {locale === 'en' ? '中文' : 'EN'}

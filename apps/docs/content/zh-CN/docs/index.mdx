@@ -7,7 +7,7 @@ order: 1
 
 # 介绍
 
-Better Hooks 是一组处于预览阶段、小巧且类型安全的 React 19 Hooks。它专注于处理 Effect 周边的生命周期问题，包括订阅、定时器、任务取消、浏览器回退值，以及只暴露已提交数据的状态语义。
+Better Hooks 是一组小巧且类型安全的 React 19 Hooks。它专注于处理 Effect 周边的生命周期问题，包括订阅、定时器、任务取消、浏览器回退值，以及只暴露已提交数据的状态语义。
 
 ## 这个库优先解决什么
 
@@ -16,10 +16,6 @@ Better Hooks 是一组处于预览阶段、小巧且类型安全的 React 19 Hoo
 - **服务端安全渲染。** 导入模块时不触碰浏览器 API；面向浏览器的 Hooks 提供明确的服务端快照。
 - **直接导入。** 每个公开 Hook 都有显式 package export，整个包同时声明 `sideEffects: false`。
 - **类型推断。** 泛型值、回调参数和事件映射可以贯穿公开 API，无需额外断言。
-
-## 项目状态
-
-Better Hooks 当前处于 **Preview（预览版）**。源码和文档已在 [GitHub](https://github.com/chenyu1ov3/better-hooks) 公开，经过验证的 `better-hooks@0.2.0` 已发布在 [npm](https://www.npmjs.com/package/better-hooks)。
 
 ## 接下来阅读什么
 

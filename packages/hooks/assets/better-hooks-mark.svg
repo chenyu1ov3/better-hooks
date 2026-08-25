@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Better Hooks</title>
+  <desc id="desc">An uppercase B formed by two connected Hook loops.</desc>
+  <style>
+    .structure { stroke: #09090b; }
+    @media (prefers-color-scheme: dark) {
+      .structure { stroke: #fafafa; }
+    }
+  </style>
+  <path class="structure" d="M16 8V56" fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+  <path class="structure" d="M16 10H32C43 10 50 14.5 50 22.5S43 32 33 32H24M24 32H34C45 32 52 37 52 45S45 56 34 56H16" fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
