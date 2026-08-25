@@ -1,6 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import type { Locale } from '../lib/i18n';
 import { LiveCodeWorkbench } from './live-code-workbench';
 
@@ -47,34 +54,45 @@ export function InteractivePlayground({
   }
 
   return (
-    <div className="playground-workbench live-playground">
-      <div className="live-playground__selector">
-        <label htmlFor="playground-hook">
-          {locale === 'en' ? 'Example' : '示例'}
-          <select
-            id="playground-hook"
-            value={selected.slug}
-            onChange={(event) => choose(event.target.value)}
-          >
-            {entries.map((entry) => (
-              <option key={entry.slug} value={entry.slug}>
-                {entry.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <span>
+    <div className="playground-workbench live-playground min-w-0">
+      <div className="flex min-h-16 flex-col gap-3 rounded-t-md border border-b-0 border-border bg-muted p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <span className="shrink-0 text-sm font-medium text-foreground" id="playground-hook-label">
+            {locale === 'en' ? 'Example' : '示例'}
+          </span>
+          <Select value={selected.slug} onValueChange={choose}>
+            <SelectTrigger
+              id="playground-hook"
+              className="h-11! w-full min-w-0 border-border-strong bg-background font-mono text-xs shadow-none hover:border-foreground/60 focus-visible:border-foreground dark:border-zinc-500 dark:bg-background sm:w-[260px]"
+              aria-labelledby="playground-hook-label"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent
+              className="max-h-[min(420px,var(--radix-select-content-available-height))] font-mono"
+              position="popper"
+              align="start"
+            >
+              {entries.map((entry) => (
+                <SelectItem key={entry.slug} value={entry.slug}>
+                  {entry.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <span className="font-mono text-xs text-muted-foreground">
           {locale === 'en' ? `${entries.length} public entries` : `${entries.length} 个公开入口`}
         </span>
       </div>
       <LiveCodeWorkbench
         code={drafts[selected.slug] ?? selected.code}
-        defaultSourceOpen
         initialCode={selected.code}
         locale={locale}
         name={selected.name}
         onCodeChange={updateDraft}
         sourceUrl={selected.sourceUrl}
+        variant="playground"
       />
     </div>
   );

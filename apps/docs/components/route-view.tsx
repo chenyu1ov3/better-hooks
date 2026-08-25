@@ -10,7 +10,12 @@ import { SiteFrame } from './site-frame';
 export async function RouteView({ locale, path }: { locale: Locale; path: string[] }) {
   if (!path.length) {
     return (
-      <SiteFrame locale={locale} currentPath={path} mainClassName="home-main">
+      <SiteFrame
+        locale={locale}
+        currentPath={path}
+        mainClassName="min-h-[calc(100svh-var(--header-height))]"
+        showFooter={false}
+      >
         <LandingPage locale={locale} />
       </SiteFrame>
     );
@@ -22,7 +27,7 @@ export async function RouteView({ locale, path }: { locale: Locale; path: string
       changelog: ChangelogPage,
     }[path[0]];
     return (
-      <SiteFrame locale={locale} currentPath={path} mainClassName="product-main">
+      <SiteFrame locale={locale} currentPath={path} mainClassName="min-h-[75vh]">
         <Page locale={locale} />
       </SiteFrame>
     );
@@ -30,7 +35,7 @@ export async function RouteView({ locale, path }: { locale: Locale; path: string
   const document = documentForPath(locale, path);
   if (!document) notFound();
   return (
-    <SiteFrame locale={locale} currentPath={path} mainClassName="documentation-main">
+    <SiteFrame locale={locale} currentPath={path} mainClassName="min-h-[75vh]">
       <DocsShell locale={locale} currentPath={path} headings={document.headings}>
         <DocumentPage document={document} />
       </DocsShell>

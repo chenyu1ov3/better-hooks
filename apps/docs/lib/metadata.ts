@@ -143,10 +143,7 @@ export function metadataForLocale(locale: Locale): Metadata {
 export function viewportForLocale(): Viewport {
   return {
     colorScheme: 'light dark',
-    themeColor: [
-      { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-      { media: '(prefers-color-scheme: dark)', color: '#09090b' },
-    ],
+    themeColor: '#ffffff',
   };
 }
 

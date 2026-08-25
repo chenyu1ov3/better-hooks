@@ -2,9 +2,9 @@
   <title id="title">Better Hooks</title>
   <desc id="desc">An uppercase B formed by two connected Hook loops.</desc>
   <style>
-    .structure { stroke: #09090b; }
+    .structure { stroke: #0a0a0a; }
     @media (prefers-color-scheme: dark) {
-      .structure { stroke: #fafafa; }
+      .structure { stroke: #ffffff; }
     }
   </style>
   <path class="structure" d="M16 8V56" fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />

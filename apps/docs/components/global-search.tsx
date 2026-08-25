@@ -4,6 +4,14 @@ import { Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import type { SearchEntry } from '../lib/content';
 import { dictionaryFor, type Locale } from '../lib/i18n';
 
@@ -12,7 +20,6 @@ function normalized(value: string) {
 }
 
 export function GlobalSearch({ locale, entries }: { locale: Locale; entries: SearchEntry[] }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +28,7 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
   const dictionary = dictionaryFor(locale);
   const labels = {
     open: dictionary.search.label,
-    close: dictionary.actions.closeMenu,
+    close: locale === 'en' ? 'Close search' : '关闭搜索',
     input: dictionary.search.label,
     placeholder: dictionary.search.placeholder,
     empty: dictionary.search.noResults,
@@ -44,33 +51,20 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
     function handleShortcut(event: KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === 'k') {
         event.preventDefault();
-        if (!dialogRef.current?.open) dialogRef.current?.showModal();
         setIsOpen(true);
-        if (window.matchMedia('(pointer: fine)').matches) {
-          window.requestAnimationFrame(() => inputRef.current?.focus());
-        }
       }
     }
     window.addEventListener('keydown', handleShortcut);
     return () => window.removeEventListener('keydown', handleShortcut);
   }, []);
 
-  function open() {
-    if (!dialogRef.current?.open) dialogRef.current?.showModal();
-    setIsOpen(true);
-    if (window.matchMedia('(pointer: fine)').matches) {
-      window.requestAnimationFrame(() => inputRef.current?.focus());
-    }
-  }
-
   function reset() {
-    setIsOpen(false);
     setQuery('');
     setActiveIndex(0);
   }
 
   function close() {
-    dialogRef.current?.close();
+    setIsOpen(false);
     reset();
   }
 
@@ -80,20 +74,35 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
   }
 
   return (
-    <>
-      <button
-        type="button"
-        className="search-trigger"
-        onClick={open}
-        aria-label={labels.open}
-        title={labels.open}
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) reset();
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11 w-11 gap-2 border-border bg-background px-0 text-xs text-muted-foreground shadow-none lg:w-44 lg:justify-start lg:px-3"
+          aria-label={labels.open}
+        >
+          <Search aria-hidden="true" size={17} />
+          <span className="hidden min-w-0 truncate lg:inline">{labels.open}</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent
+        className="max-h-[74dvh] w-[min(42.5rem,calc(100%-2rem))] gap-0 overflow-hidden overscroll-contain rounded-lg border-border-strong p-0 shadow-xl sm:max-w-[680px]"
+        aria-describedby={undefined}
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          inputRef.current?.focus();
+        }}
       >
-        <Search aria-hidden="true" size={17} />
-        <span>{labels.open}</span>
-      </button>
-      <dialog className="search-dialog" ref={dialogRef} aria-label={labels.open} onClose={reset}>
-        <div className="search-dialog__field">
-          <Search aria-hidden="true" size={18} />
+        <DialogTitle className="sr-only">{labels.open}</DialogTitle>
+        <div className="grid min-h-15 grid-cols-[1.5rem_minmax(0,1fr)_2.75rem] items-center gap-2 border-b border-border px-3 py-2 focus-within:ring-2 focus-within:ring-ring focus-within:ring-inset sm:px-4">
+          <Search className="text-muted-foreground" aria-hidden="true" size={18} />
           <label className="sr-only" htmlFor="global-docs-search">
             {labels.input}
           </label>
@@ -104,6 +113,7 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
             type="search"
             role="combobox"
             autoComplete="off"
+            spellCheck={false}
             aria-autocomplete="list"
             aria-controls="global-docs-search-results"
             aria-expanded={isOpen}
@@ -112,6 +122,7 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
             }
             value={query}
             placeholder={labels.placeholder}
+            className="h-11 w-full min-w-0 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
             onChange={(event) => {
               setQuery(event.target.value);
               setActiveIndex(0);
@@ -131,19 +142,21 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
               }
             }}
           />
-          <button
-            type="button"
-            className="icon-button"
-            aria-label={labels.close}
-            title={labels.close}
-            onClick={close}
-          >
-            <X aria-hidden="true" size={18} />
-          </button>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-11"
+              aria-label={labels.close}
+            >
+              <X aria-hidden="true" size={18} />
+            </Button>
+          </DialogClose>
         </div>
-        <div className="search-dialog__results">
+        <div className="max-h-[calc(74dvh-3.75rem)] overflow-y-auto p-2">
           <div id="global-docs-search-results" role="listbox" aria-label={labels.results}>
-            <ul role="presentation">
+            <ul className="m-0 list-none p-0" role="presentation">
               {matches.map((entry, index) => (
                 <li key={entry.href} role="none">
                   <Link
@@ -151,7 +164,7 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
                     role="option"
                     aria-selected={index === activeIndex}
                     tabIndex={-1}
-                    className={index === activeIndex ? 'is-active' : undefined}
+                    className="grid min-h-17 min-w-0 grid-cols-1 gap-1 rounded-md px-3 py-2.5 transition-colors hover:bg-muted aria-selected:bg-muted sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4"
                     href={entry.href}
                     onMouseEnter={() => setActiveIndex(index)}
                     onClick={(event) => {
@@ -166,23 +179,32 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
                       }
                     }}
                   >
-                    <span>
-                      <strong>{entry.title}</strong>
-                      {entry.section ? <small>{entry.section}</small> : null}
+                    <span className="min-w-0">
+                      <strong className="block truncate text-sm text-foreground">
+                        {entry.title}
+                      </strong>
+                      {entry.section ? (
+                        <small className="block truncate text-xs text-brand">{entry.section}</small>
+                      ) : null}
                     </span>
-                    <p>{entry.description}</p>
+                    <p className="m-0 line-clamp-2 min-w-0 text-[13px] leading-5 text-muted-foreground">
+                      {entry.description}
+                    </p>
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
           {!matches.length ? (
-            <p className="search-dialog__empty" aria-live="polite">
+            <p
+              className="m-0 px-4 py-8 text-center text-sm text-muted-foreground"
+              aria-live="polite"
+            >
               {labels.empty}
             </p>
           ) : null}
         </div>
-      </dialog>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }

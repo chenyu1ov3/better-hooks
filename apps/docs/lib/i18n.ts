@@ -123,7 +123,7 @@ export const dictionaries = {
     },
     search: {
       label: 'Search documentation',
-      placeholder: 'Search hooks and docs...',
+      placeholder: 'Search hooks and docs…',
       noResults: 'No results found.',
       clear: 'Clear search',
     },
@@ -211,7 +211,7 @@ export const dictionaries = {
     },
     search: {
       label: '搜索文档',
-      placeholder: '搜索 Hook 和文档...',
+      placeholder: '搜索 Hook 和文档…',
       noResults: '没有找到匹配内容。',
       clear: '清除搜索',
     },

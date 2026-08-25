@@ -1,0 +1,134 @@
+.prose.prose {
+  width: 100%;
+  max-width: 72ch;
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.prose.prose h1 {
+  margin: 0 0 1.5rem;
+  font-size: 42px;
+  font-weight: 740;
+  letter-spacing: 0;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.prose.prose h2 {
+  margin: 3.5rem 0 1rem;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+.prose.prose h3 {
+  margin: 2.25rem 0 0.75rem;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
+.prose.prose h1,
+.prose.prose h2,
+.prose.prose h3 {
+  scroll-margin-top: calc(var(--header-height) + 1.5rem);
+  text-wrap: balance;
+}
+
+.prose.prose p {
+  margin: 0 0 1.25rem;
+  color: var(--foreground);
+  text-wrap: pretty;
+}
+
+.prose.prose h1 + p {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.prose.prose strong {
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.prose.prose ul,
+.prose.prose ol {
+  margin: 0 0 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.prose.prose li {
+  margin: 0.45rem 0;
+  padding-left: 0.25rem;
+}
+
+.prose.prose li::marker {
+  color: var(--muted);
+}
+
+.prose.prose blockquote {
+  margin: 1.75rem 0;
+  border-left: 3px solid var(--border-strong);
+  padding: 0.125rem 0 0.125rem 1.25rem;
+  color: var(--muted);
+}
+
+.prose.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.prose.prose a:not([data-heading-permalink]) {
+  color: var(--foreground);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--foreground) 34%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+}
+
+.prose.prose a:not([data-heading-permalink]):hover {
+  text-decoration-color: currentColor;
+}
+
+.prose.prose :not(pre) > code {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-muted);
+  padding: 0.12em 0.35em;
+  color: var(--foreground);
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}
+
+.prose.prose :global([data-rehype-pretty-code-figure]) {
+  margin: 1.75rem 0;
+}
+
+.prose.prose hr {
+  margin: 3rem 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 639px) {
+  .prose.prose h1 {
+    font-size: 36px;
+  }
+
+  .prose.prose h2 {
+    margin-top: 3rem;
+    font-size: 24px;
+  }
+
+  .prose.prose h3 {
+    font-size: 18px;
+  }
+
+  .prose.prose h1 + p {
+    font-size: 17px;
+  }
+}

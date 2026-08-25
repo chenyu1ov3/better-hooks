@@ -1,5 +1,3 @@
-import '@fontsource-variable/onest';
-import '@fontsource/ibm-plex-mono/400.css';
 import type { ReactNode } from 'react';
 import { LocaleDocument } from '../../../components/locale-document';
 import { metadataForLocale, viewportForLocale } from '../../../lib/metadata';

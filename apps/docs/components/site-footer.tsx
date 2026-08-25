@@ -14,35 +14,59 @@ export function SiteFooter({ locale }: { locale: Locale }) {
     [dictionary.navigation.changelog, 'changelog'],
   ] as const;
   return (
-    <footer className="site-footer">
-      <div className="site-footer__inner">
-        <div className="site-footer__brand">
-          <LogoMark aria-hidden="true" />
-          <div>
-            <strong>BETTER HOOKS</strong>
-            <p>
+    <footer className="site-footer border-t border-border bg-card print:hidden">
+      <div className="mx-auto grid w-full max-w-[1360px] grid-cols-1 items-center gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(260px,1fr)_auto_auto] lg:gap-10 lg:py-10">
+        <Link
+          href={hrefFor(locale, '')}
+          className="flex min-h-11 max-w-full w-fit items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40"
+        >
+          <LogoMark className="size-9 text-foreground" aria-hidden="true" />
+          <span className="min-w-0">
+            <strong className="block text-sm font-extrabold text-foreground">BETTER HOOKS</strong>
+            <span className="mt-0.5 block text-xs break-words text-muted-foreground [overflow-wrap:anywhere]">
               {locale === 'en'
-                ? 'Type-safe React 19 hooks with predictable behavior.'
-                : '类型安全、行为可预测的 React 19 Hook。'}
-            </p>
-          </div>
-        </div>
-        <nav aria-label={locale === 'en' ? 'Footer navigation' : '页脚导航'}>
+                ? 'Type-safe hooks with predictable behavior.'
+                : '类型安全、行为可预测的 Hooks。'}
+            </span>
+          </span>
+        </Link>
+        <nav
+          className="flex flex-wrap items-center gap-x-4 gap-y-1 lg:justify-center"
+          aria-label={locale === 'en' ? 'Footer navigation' : '页脚导航'}
+        >
           {links.map(([label, path]) => (
-            <Link key={path} href={hrefFor(locale, path)}>
+            <Link
+              key={path}
+              href={hrefFor(locale, path)}
+              className="inline-flex min-h-11 items-center text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+            >
               {label}
             </Link>
           ))}
-          <a href={siteConfig.npmUrl} target="_blank" rel="noreferrer">
+          <a
+            href={siteConfig.npmUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center gap-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
             <PackageOpen aria-hidden="true" size={15} /> npm
           </a>
-          <a href={siteConfig.repositoryUrl} target="_blank" rel="noreferrer">
+          <a
+            href={siteConfig.repositoryUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center gap-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
             <GitFork aria-hidden="true" size={15} /> GitHub
           </a>
         </nav>
-        <div className="site-footer__meta">
-          <a href={`${siteConfig.repositoryUrl}/blob/main/LICENSE`}>MIT License</a>
-          <span>React 19 / ESM</span>
+        <div className="grid justify-items-start text-xs text-muted-foreground lg:justify-items-end">
+          <a
+            className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
+            href={`${siteConfig.repositoryUrl}/blob/main/LICENSE`}
+          >
+            MIT License
+          </a>
         </div>
       </div>
     </footer>
