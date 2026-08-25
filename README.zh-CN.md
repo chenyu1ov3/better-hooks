@@ -23,16 +23,16 @@ pnpm add better-hooks
 
 ## 包含的 Hooks
 
-公开 API 包含 30 个 Hook。
+公开 API 包含 33 个 Hook。
 
-| 分类       | Hooks                                                                                                                                       |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 状态       | `useBoolean`, `useToggle`, `useInput`, `useControllableState`, `usePrevious`, `useLatest`, `useSafeState`, `useResetState`, `useMemoizedFn` |
-| 调度       | `useDebounce`, `useDebounceFn`, `useThrottle`, `useThrottleFn`, `useTimeout`, `useInterval`                                                 |
-| 异步与事件 | `useAsync`, `useLockFn`, `useEventListener`, `useClickOutside`                                                                              |
-| 浏览器状态 | `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover`                                           |
-| 生命周期   | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                              |
-| 存储       | `useLocalStorage`, `useSessionStorage`                                                                                                      |
+| 分类       | Hooks                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 状态       | `useBoolean`, `useToggle`, `useInput`, `useControllableState`, `usePrevious`, `useLatest`, `useSafeState`, `useResetState`, `useMemoizedFn`       |
+| 调度       | `useDebounce`, `useDebounceFn`, `useThrottle`, `useThrottleFn`, `useTimeout`, `useInterval`                                                       |
+| 异步与事件 | `useAsync`, `useLockFn`, `useWebSocket`, `useEventListener`, `useClickOutside`                                                                    |
+| 浏览器状态 | `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover`, `useIntersectionObserver`, `useResizeObserver` |
+| 生命周期   | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                                    |
+| 存储       | `useLocalStorage`, `useSessionStorage`                                                                                                            |
 
 API 说明和在线示例请查看 [Hook 参考文档](https://chenyu1ov3.github.io/better-hooks/zh/hooks/)。
 

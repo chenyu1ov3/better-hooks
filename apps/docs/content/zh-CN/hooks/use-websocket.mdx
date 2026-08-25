@@ -1,0 +1,57 @@
+---
+title: useWebSocket
+description: 管理浏览器 WebSocket，提供稳定操作和有界自动重连。
+section: 异步
+order: 118
+---
+
+# useWebSocket
+
+## 概览
+
+`useWebSocket` 会在客户端提交后建立浏览器 WebSocket，并返回最新的原始
+消息、连接状态、稳定操作和可选的有界自动重连。
+
+## 函数签名
+
+```ts
+function useWebSocket(url: string | URL | null, options?: UseWebSocketOptions): UseWebSocketResult;
+```
+
+## 参数
+
+传入 URL，或传入 `null` 保持连接关闭。`protocols` 和 `enabled` 遵循原生
+构造函数语义。`reconnect` 默认关闭；启用后会对服务端主动关闭（包括正常关闭码）
+使用有界指数退避重连。`onOpen`、`onMessage` 和 `onClose` 始终使用最近一次提交的
+回调。`onError` 观察原生 socket 错误和回调异常。
+
+## 返回值
+
+返回 `status`、原始 `data`、最近的 `error`，以及稳定的 `send`、`close` 和
+`reconnect` 操作。`send` 只有在连接为 `open` 时才会发送；其他状态都会抛出
+`InvalidStateError`，并通过 `onError` 报告。已打开连接的原生发送错误会保留。
+
+## 行为
+
+URL、协议或启用状态变化时会关闭旧连接，并忽略旧连接的事件。重连策略更新
+只影响后续重连判断，不会无谓地替换活动连接。启用重连时，服务端主动关闭会安排
+有界重试；手动关闭和卸载会取消重连计时器。回调异常会先关闭活动连接、取消重连并
+通知 `onError`，然后重新抛出；观察器自身的异常会在微任务中报告，不会替换原始错误。
+
+## SSR / RSC
+
+SSR 返回 closed 快照，不会创建 socket。连接只会在 Client Component 完成
+提交后启动。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+请求/响应流程可以使用 `useAsync`；实时传输则使用本 Hook。应用层解析逻辑
+应放在 Hook 外部，以保留文本和二进制消息。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-websocket/index.ts)。

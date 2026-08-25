@@ -47,9 +47,9 @@ const directExports = Object.keys(packageExports).filter((subpath) => subpath.st
 if (Object.hasOwn(packageExports, './use-storage')) {
   failures.push('the removed ./use-storage aggregate export must not be published');
 }
-if (directExports.length !== 30) {
+if (directExports.length !== 33) {
   failures.push(
-    `public API must contain exactly 30 direct Hook entries; received ${directExports.length}`,
+    `public API must contain exactly 33 direct Hook entries; received ${directExports.length}`,
   );
 }
 
@@ -117,10 +117,20 @@ const rawLimitOverrides = new Map([
   ['./use-click-outside', 5120],
   ['./use-debounce-fn', 5120],
   ['./use-hover', 6144],
+  // Browser observer setup, stale-generation guards, and error propagation
+  // intentionally keep these entries self-contained.
+  ['./use-intersection-observer', 8192],
   ['./use-key-press', 9216],
+  ['./use-resize-observer', 7168],
   ['./use-throttle-fn', 5120],
+  // Stable actions, bounded reconnect cleanup, and callback error isolation
+  // intentionally keep this transport entry self-contained.
+  ['./use-websocket', 14336],
 ]);
-const gzipLimitOverrides = new Map([['./use-key-press', 3072]]);
+const gzipLimitOverrides = new Map([
+  ['./use-key-press', 3072],
+  ['./use-websocket', 3072],
+]);
 const rows = [];
 
 for (const [subpath, descriptor] of Object.entries(packageExports)) {
@@ -254,7 +264,7 @@ async function checkPublishedMetadata() {
     '## Supported environments',
     '## SSR and React Server Components',
     '## API',
-    '30 Hooks',
+    '33 Hooks',
     "from 'better-hooks'",
     "from 'better-hooks/use-debounce'",
     'https://chenyu1ov3.github.io/better-hooks/',
@@ -275,7 +285,7 @@ async function checkPublishedMetadata() {
     '## 支持环境',
     '## SSR 与 React Server Components',
     '## API',
-    '30 个 Hook',
+    '33 个 Hook',
     "from 'better-hooks'",
     "from 'better-hooks/use-debounce'",
     'https://chenyu1ov3.github.io/better-hooks/zh/',

@@ -61,6 +61,7 @@ const defaultExampleText = {
   'use-event-listener': /\d+px/,
   'use-click-outside': 'Account settings',
   'use-hover': /Hovered|Move here/,
+  'use-intersection-observer': /Visible|Waiting/,
   'use-key-press': null,
   'use-lock-fn': 'Save',
   'use-memoized-fn': 'Greet',
@@ -73,8 +74,10 @@ const defaultExampleText = {
   'use-is-mounted': 'idle',
   'use-isomorphic-layout-effect': /Measured width: \d+px/,
   'use-reset-state': 'Reset',
+  'use-resize-observer': /\d+ x \d+/,
   'use-safe-state': /Count: 0/,
   'use-unmounted-ref': 'Waiting',
+  'use-websocket': 'No messages yet',
 } as const;
 
 function appRoute(path = '') {
@@ -86,6 +89,7 @@ function appRoute(path = '') {
 }
 
 function hookNameForSlug(slug: string) {
+  if (slug === 'use-websocket') return 'useWebSocket';
   return slug.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
 }
 
@@ -540,7 +544,7 @@ test.describe('core interactions', () => {
 
     await explorer.getByRole('button', { name: 'Async', exact: true }).click();
     await expect.poll(() => new URL(page.url()).searchParams.get('category')).toBe('async');
-    await expect(results).toHaveCount(8);
+    await expect(results).toHaveCount(9);
     await expect(results.getByText('React 19', { exact: true })).toHaveCount(0);
     await expect(results.getByText('Async', { exact: true })).toHaveCount(0);
     await expect(
@@ -676,7 +680,7 @@ export function BrokenExample() {
     await expect(reset).toBeDisabled();
   });
 
-  test('All 30 default Playground examples compile and render', async ({ page }) => {
+  test('All 33 default Playground examples compile and render', async ({ page }) => {
     await openPage(page, 'playground');
     const playground = page.locator('.playground-workbench');
     const selector = playground.getByRole('combobox', { name: 'Example' });
@@ -690,7 +694,7 @@ export function BrokenExample() {
     const optionLabels = (await page.getByRole('option').allTextContents()).map((label) =>
       label.trim(),
     );
-    expect(optionLabels).toHaveLength(30);
+    expect(optionLabels).toHaveLength(33);
     expect(optionLabels.sort()).toEqual(examples.map(({ label }) => label).sort());
     await page.keyboard.press('Escape');
 

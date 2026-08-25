@@ -1,0 +1,59 @@
+---
+title: useResizeObserver
+description: Track element dimensions with ResizeObserver and symmetric cleanup.
+section: Browser & DOM
+order: 129
+---
+
+# useResizeObserver
+
+## Overview
+
+`useResizeObserver` tracks an element or ref and exposes its latest content
+rectangle, width, and height.
+
+## Signature
+
+```ts
+function useResizeObserver(options?: UseResizeObserverOptions): ResizeObserverState;
+function useResizeObserver(
+  target: ResizeObserverTarget,
+  options?: Omit<UseResizeObserverOptions, 'target' | 'ref'>,
+): ResizeObserverState;
+```
+
+## Parameters
+
+Pass a direct `Element`, a ref-like target, or `null`. `box` selects the native
+ResizeObserver box option. `enabled`, `onChange`, and `onError` control the
+subscription and callback behavior.
+
+## Returns
+
+The result contains `rect`, `width`, `height`, and the latest `error`. The SSR
+snapshot is `{ rect: null, width: 0, height: 0, error: undefined }`.
+
+## Behavior
+
+The observer is recreated when the target or effective options change and is
+disconnected on disable or unmount. Missing browser support is a no-op. Setup
+and callback failures are reported through `onError` without replacing the
+original exception; callback failures disconnect the observer first.
+
+## SSR / RSC
+
+SSR returns zero dimensions and does not construct `ResizeObserver`. Use the
+Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use the dimensions to select a responsive layout or combine them with
+`useDebounce` when a resize-driven calculation is expensive.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-resize-observer/index.ts).

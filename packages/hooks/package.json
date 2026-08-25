@@ -135,6 +135,11 @@
       "import": "./dist/use-async/index.js",
       "default": "./dist/use-async/index.js"
     },
+    "./use-websocket": {
+      "types": "./dist/use-websocket/index.d.ts",
+      "import": "./dist/use-websocket/index.js",
+      "default": "./dist/use-websocket/index.js"
+    },
     "./use-event-listener": {
       "types": "./dist/use-event-listener/index.d.ts",
       "import": "./dist/use-event-listener/index.js",
@@ -164,6 +169,16 @@
       "types": "./dist/use-window-size/index.d.ts",
       "import": "./dist/use-window-size/index.js",
       "default": "./dist/use-window-size/index.js"
+    },
+    "./use-intersection-observer": {
+      "types": "./dist/use-intersection-observer/index.d.ts",
+      "import": "./dist/use-intersection-observer/index.js",
+      "default": "./dist/use-intersection-observer/index.js"
+    },
+    "./use-resize-observer": {
+      "types": "./dist/use-resize-observer/index.d.ts",
+      "import": "./dist/use-resize-observer/index.js",
+      "default": "./dist/use-resize-observer/index.js"
     },
     "./use-online": {
       "types": "./dist/use-online/index.d.ts",

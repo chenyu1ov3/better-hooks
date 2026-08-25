@@ -303,6 +303,22 @@ export const hooks = [
     },
   }),
   defineHook({
+    slug: 'use-websocket',
+    name: 'useWebSocket',
+    importPath: 'better-hooks/use-websocket',
+    signature:
+      'useWebSocket(url: string | URL | null, options?: UseWebSocketOptions): UseWebSocketResult',
+    category: 'async',
+    description: {
+      en: 'Manages a browser WebSocket with raw messages, stable actions, and bounded reconnects.',
+      'zh-CN': '管理浏览器 WebSocket，提供原始消息、稳定操作和有界自动重连。',
+    },
+    ssrBehavior: {
+      en: 'Returns a closed snapshot during SSR; sockets are created only after a client commit.',
+      'zh-CN': 'SSR 期间返回 closed 快照；连接只会在客户端提交后创建。',
+    },
+  }),
+  defineHook({
     slug: 'use-event-listener',
     name: 'useEventListener',
     importPath: 'better-hooks/use-event-listener',
@@ -517,14 +533,46 @@ export const hooks = [
       'zh-CN': 'SSR 期间初始为 false，组件挂载并清理前都保持为 false。',
     },
   }),
+  defineHook({
+    slug: 'use-intersection-observer',
+    name: 'useIntersectionObserver',
+    importPath: 'better-hooks/use-intersection-observer',
+    signature:
+      "useIntersectionObserver(options?: UseIntersectionObserverOptions): IntersectionObserverState; useIntersectionObserver(target: IntersectionObserverTarget, options?: Omit<UseIntersectionObserverOptions, 'target' | 'ref'>): IntersectionObserverState",
+    category: 'browser-dom',
+    description: {
+      en: 'Tracks intersection state for an element or ref with a deterministic SSR snapshot.',
+      'zh-CN': '跟踪元素或 ref 的交叉状态，并提供确定性的 SSR 快照。',
+    },
+    ssrBehavior: {
+      en: 'Returns { entry: null, isIntersecting: false } and observes only after the client commits.',
+      'zh-CN': '返回 { entry: null, isIntersecting: false }，只在客户端提交后开始观察。',
+    },
+  }),
+  defineHook({
+    slug: 'use-resize-observer',
+    name: 'useResizeObserver',
+    importPath: 'better-hooks/use-resize-observer',
+    signature:
+      "useResizeObserver(options?: UseResizeObserverOptions): ResizeObserverState; useResizeObserver(target: ResizeObserverTarget, options?: Omit<UseResizeObserverOptions, 'target' | 'ref'>): ResizeObserverState",
+    category: 'browser-dom',
+    description: {
+      en: 'Tracks an element size through ResizeObserver with stable dimensions and cleanup.',
+      'zh-CN': '通过 ResizeObserver 跟踪元素尺寸，并提供稳定的尺寸状态与清理。',
+    },
+    ssrBehavior: {
+      en: 'Returns { rect: null, width: 0, height: 0 } until a client observer is available.',
+      'zh-CN': '在客户端 observer 可用前返回 { rect: null, width: 0, height: 0 }。',
+    },
+  }),
 ] as const satisfies readonly HookDefinition[];
 
 export const apiEntries = hooks as readonly ApiEntryDefinition[];
 
 export const hookCategoryCounts = {
   state: 8,
-  async: 8,
-  'browser-dom': 8,
+  async: 9,
+  'browser-dom': 10,
   forms: 1,
   storage: 2,
   lifecycle: 3,

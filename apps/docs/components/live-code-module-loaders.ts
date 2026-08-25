@@ -29,6 +29,10 @@ const moduleLoaders = {
     ),
   'better-hooks/use-hover': () =>
     import(/* webpackChunkName: "better-hooks-use-hover" */ 'better-hooks/use-hover'),
+  'better-hooks/use-intersection-observer': () =>
+    import(
+      /* webpackChunkName: "better-hooks-use-intersection-observer" */ 'better-hooks/use-intersection-observer'
+    ),
   'better-hooks/use-input': () =>
     import(/* webpackChunkName: "better-hooks-use-input" */ 'better-hooks/use-input'),
   'better-hooks/use-interval': () =>
@@ -59,6 +63,10 @@ const moduleLoaders = {
     import(/* webpackChunkName: "better-hooks-use-previous" */ 'better-hooks/use-previous'),
   'better-hooks/use-reset-state': () =>
     import(/* webpackChunkName: "better-hooks-use-reset-state" */ 'better-hooks/use-reset-state'),
+  'better-hooks/use-resize-observer': () =>
+    import(
+      /* webpackChunkName: "better-hooks-use-resize-observer" */ 'better-hooks/use-resize-observer'
+    ),
   'better-hooks/use-safe-state': () =>
     import(/* webpackChunkName: "better-hooks-use-safe-state" */ 'better-hooks/use-safe-state'),
   'better-hooks/use-session-storage': () =>
@@ -77,6 +85,8 @@ const moduleLoaders = {
     import(
       /* webpackChunkName: "better-hooks-use-unmounted-ref" */ 'better-hooks/use-unmounted-ref'
     ),
+  'better-hooks/use-websocket': () =>
+    import(/* webpackChunkName: "better-hooks-use-websocket" */ 'better-hooks/use-websocket'),
   'better-hooks/use-window-size': () =>
     import(/* webpackChunkName: "better-hooks-use-window-size" */ 'better-hooks/use-window-size'),
 } satisfies Record<string, LiveCodeModuleLoader>;

@@ -20,7 +20,7 @@ pnpm add better-hooks
 
 ## Features
 
-- 30 focused Hooks, including dedicated localStorage and sessionStorage entries.
+- 33 focused Hooks, including dedicated localStorage and sessionStorage entries.
 - TypeScript declarations and explicit ESM exports for every public entry.
 - Direct imports for a smaller initial module graph and reliable tree shaking.
 - Stable callback-oriented APIs designed for React 19 concurrent rendering.
@@ -63,16 +63,16 @@ Importing the package does not access `window`, register listeners, or perform o
 
 ## API
 
-The package contains 30 Hooks and a root entry that re-exports the Hook APIs.
+The package contains 33 Hooks and a root entry that re-exports the Hook APIs.
 
-| Category             | Hooks                                                                                                                                    | Direct entries                                                                                                                                         |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| State (8)            | `useToggle`, `useBoolean`, `useControllableState`, `usePrevious`, `useLatest`, `useMemoizedFn`, `useSafeState`, `useResetState`          | `use-toggle`, `use-boolean`, `use-controllable-state`, `use-previous`, `use-latest`, `use-memoized-fn`, `use-safe-state`, `use-reset-state`            |
-| Async and timing (8) | `useDebounce`, `useThrottle`, `useDebounceFn`, `useThrottleFn`, `useTimeout`, `useInterval`, `useAsync`, `useLockFn`                     | `use-debounce`, `use-throttle`, `use-debounce-fn`, `use-throttle-fn`, `use-timeout`, `use-interval`, `use-async`, `use-lock-fn`                        |
-| Browser and DOM (8)  | `useEventListener`, `useClickOutside`, `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover` | `use-event-listener`, `use-click-outside`, `use-media-query`, `use-window-size`, `use-online`, `use-document-visibility`, `use-key-press`, `use-hover` |
-| Forms (1)            | `useInput`                                                                                                                               | `use-input`                                                                                                                                            |
-| Storage (2)          | `useLocalStorage`, `useSessionStorage`                                                                                                   | `use-local-storage`, `use-session-storage`                                                                                                             |
-| Lifecycle (3)        | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                           | `use-is-mounted`, `use-isomorphic-layout-effect`, `use-unmounted-ref`                                                                                  |
+| Category             | Hooks                                                                                                                                                                                    | Direct entries                                                                                                                                                                                             |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| State (8)            | `useToggle`, `useBoolean`, `useControllableState`, `usePrevious`, `useLatest`, `useMemoizedFn`, `useSafeState`, `useResetState`                                                          | `use-toggle`, `use-boolean`, `use-controllable-state`, `use-previous`, `use-latest`, `use-memoized-fn`, `use-safe-state`, `use-reset-state`                                                                |
+| Async and timing (9) | `useDebounce`, `useThrottle`, `useDebounceFn`, `useThrottleFn`, `useTimeout`, `useInterval`, `useAsync`, `useLockFn`, `useWebSocket`                                                     | `use-debounce`, `use-throttle`, `use-debounce-fn`, `use-throttle-fn`, `use-timeout`, `use-interval`, `use-async`, `use-lock-fn`, `use-websocket`                                                           |
+| Browser and DOM (10) | `useEventListener`, `useClickOutside`, `useMediaQuery`, `useWindowSize`, `useOnline`, `useDocumentVisibility`, `useKeyPress`, `useHover`, `useIntersectionObserver`, `useResizeObserver` | `use-event-listener`, `use-click-outside`, `use-media-query`, `use-window-size`, `use-online`, `use-document-visibility`, `use-key-press`, `use-hover`, `use-intersection-observer`, `use-resize-observer` |
+| Forms (1)            | `useInput`                                                                                                                                                                               | `use-input`                                                                                                                                                                                                |
+| Storage (2)          | `useLocalStorage`, `useSessionStorage`                                                                                                                                                   | `use-local-storage`, `use-session-storage`                                                                                                                                                                 |
+| Lifecycle (3)        | `useIsMounted`, `useIsomorphicLayoutEffect`, `useUnmountedRef`                                                                                                                           | `use-is-mounted`, `use-isomorphic-layout-effect`, `use-unmounted-ref`                                                                                                                                      |
 
 The complete signatures, behavior contracts, examples, and SSR notes are available in the [documentation](https://chenyu1ov3.github.io/better-hooks/).
 
