@@ -1,0 +1,138 @@
+.source {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--code-background);
+}
+
+.source :global(pre) {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent !important;
+  padding: 0.875rem 0;
+  color: var(--code-foreground);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.65;
+  tab-size: 2;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-variant-ligatures: none;
+}
+
+.source :global(pre.shiki) {
+  background: transparent !important;
+}
+
+.source :global(code) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  counter-reset: code-line;
+}
+
+.source :global(code > [data-line]),
+.source :global(code > .line) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 1.65em;
+  padding-right: 0.875rem;
+  padding-left: 3.25rem;
+  text-indent: -2.5rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.source:not(.terminal) :global(code > [data-line])::before,
+.source:not(.terminal) :global(code > .line)::before {
+  display: inline-block;
+  width: 1.75rem;
+  margin-right: 0.75rem;
+  color: var(--code-line-number);
+  content: counter(code-line);
+  counter-increment: code-line;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  text-indent: 0;
+  user-select: none;
+}
+
+.terminal :global(code > [data-line]),
+.terminal :global(code > .line) {
+  padding-left: 2.75rem;
+  text-indent: -2rem;
+}
+
+.terminal :global(code > [data-line])::before,
+.terminal :global(code > .line)::before {
+  display: inline-block;
+  width: 1.25rem;
+  margin-right: 0.75rem;
+  color: var(--code-muted);
+  content: '$ ';
+  text-indent: 0;
+  user-select: none;
+}
+
+.terminal.powershell :global(code > [data-line]),
+.terminal.powershell :global(code > .line) {
+  padding-left: 3.75rem;
+  text-indent: -3rem;
+}
+
+.terminal.powershell :global(code > [data-line])::before,
+.terminal.powershell :global(code > .line)::before {
+  width: 2.25rem;
+  content: 'PS> ';
+}
+
+.terminal :global(code > [data-line]:empty)::before,
+.terminal :global(code > .line:empty)::before,
+.terminal.console :global(code > [data-line])::before,
+.terminal.console :global(code > .line)::before {
+  display: none;
+}
+
+.terminal.console :global(code > [data-line]),
+.terminal.console :global(code > .line) {
+  padding-left: 0.875rem;
+  text-indent: 0;
+}
+
+.source :global([data-highlighted-line]) {
+  border-left: 2px solid var(--code-foreground);
+  background: color-mix(in srgb, var(--code-foreground) 7%, transparent);
+}
+
+.source :global([style*='--shiki-light']) {
+  color: var(--shiki-light) !important;
+}
+
+:global(html[data-theme='dark']) .source :global([style*='--shiki-dark']) {
+  color: var(--shiki-dark) !important;
+}
+
+.inlineToken {
+  color: var(--shiki-light);
+}
+
+:global(html[data-theme='dark']) .inlineToken {
+  color: var(--shiki-dark);
+}
+
+@media (forced-colors: active) {
+  .source,
+  .source :global(.shiki),
+  .source :global([style*='--shiki-light']) {
+    forced-color-adjust: auto;
+    color: CanvasText !important;
+  }
+
+  .inlineToken {
+    color: CanvasText !important;
+  }
+}

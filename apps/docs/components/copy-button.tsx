@@ -2,6 +2,8 @@
 
 import { Check, Copy } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function CopyButton({
   value,
@@ -36,14 +38,20 @@ export function CopyButton({
   }
 
   return (
-    <button
-      type="button"
-      className={className}
-      onClick={copy}
-      aria-label={copied ? copiedLabel : label}
-      title={copied ? copiedLabel : label}
-    >
-      {copied ? <Check aria-hidden="true" size={15} /> : <Copy aria-hidden="true" size={15} />}
-    </button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          className={className}
+          onClick={copy}
+          aria-label={copied ? copiedLabel : label}
+        >
+          {copied ? <Check aria-hidden="true" size={15} /> : <Copy aria-hidden="true" size={15} />}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent sideOffset={6}>{copied ? copiedLabel : label}</TooltipContent>
+    </Tooltip>
   );
 }

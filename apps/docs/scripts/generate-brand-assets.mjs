@@ -7,12 +7,12 @@ const publicRoot = resolve(docsRoot, 'public');
 const geometry = JSON.parse(await readFile(resolve(docsRoot, 'lib', 'brand-mark.json'), 'utf8'));
 
 const colors = {
-  background: '#fafafa',
-  border: '#d4d4d8',
-  body: '#09090b',
-  muted: '#52525b',
-  primary: '#047857',
-  surface: '#ffffff',
+  background: '#ffffff',
+  border: '#e5e5e5',
+  body: '#0a0a0a',
+  muted: '#525252',
+  primary: '#171717',
+  surface: '#fafafa',
 };
 
 function markContents({ body = 'currentColor' } = {}) {
@@ -37,17 +37,6 @@ const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${geometry.vie
 
 await writeFile(resolve(publicRoot, 'better-hooks-mark.svg'), favicon, 'utf8');
 
-const font = await readFile(
-  resolve(
-    docsRoot,
-    'node_modules',
-    '@fontsource-variable',
-    'onest',
-    'files',
-    'onest-latin-wght-normal.woff2',
-  ),
-);
-const fontUrl = `data:font/woff2;base64,${font.toString('base64')}`;
 const largeMark = `<svg viewBox="${geometry.viewBox}" aria-hidden="true">${markContents({ body: colors.body })}</svg>`;
 const smallMark = `<svg viewBox="${geometry.viewBox}" aria-hidden="true">${markContents({ body: colors.body })}</svg>`;
 
@@ -62,16 +51,15 @@ try {
       <head>
         <meta charset="utf-8" />
         <style>
-          @font-face { font-family: Onest; src: url('${fontUrl}') format('woff2'); font-weight: 100 900; }
           * { box-sizing: border-box; }
           html, body { width: 1200px; height: 630px; margin: 0; overflow: hidden; }
-          body { background: ${colors.background}; color: ${colors.body}; font-family: Onest, Arial, sans-serif; }
+          body { background: ${colors.background}; color: ${colors.body}; font-family: system-ui, "Segoe UI", Arial, sans-serif; }
           .frame { position: relative; width: 100%; height: 100%; padding: 58px 72px 54px; }
           .top { height: 62px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid ${colors.border}; padding-bottom: 18px; }
           .lockup { display: flex; align-items: center; gap: 14px; font-size: 23px; font-weight: 780; }
           .lockup svg { width: 45px; height: 45px; }
           .format { border: 1px solid ${colors.border}; background: ${colors.surface}; padding: 8px 12px; color: ${colors.muted}; font-size: 14px; font-weight: 650; }
-          .copy { position: absolute; left: 72px; top: 172px; width: 650px; }
+          .copy { position: absolute; left: 72px; top: 172px; width: 740px; }
           .eyebrow { margin: 0 0 18px; color: ${colors.primary}; font-size: 14px; font-weight: 780; }
           h1 { margin: 0; font-size: 70px; font-weight: 760; line-height: 1.08; }
           .description { margin: 24px 0 0; color: ${colors.muted}; font-size: 24px; line-height: 1.42; }

@@ -1,0 +1,58 @@
+.theme {
+  --live-code-foreground: var(--syntax-foreground);
+  --live-code-comment: var(--syntax-comment);
+  --live-code-punctuation: var(--syntax-punctuation);
+  --live-code-keyword: var(--syntax-keyword);
+  --live-code-function: var(--syntax-function);
+  --live-code-string: var(--syntax-string);
+  --live-code-number: var(--syntax-number);
+  --live-code-tag: var(--syntax-tag);
+  --live-code-attribute: var(--syntax-attribute);
+}
+
+.editor {
+  min-height: 100%;
+  font-family: var(--font-mono);
+}
+
+.editor > :global(pre) {
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  padding: 20px !important;
+  caret-color: var(--live-code-foreground);
+  font-family: inherit !important;
+  font-size: 13px !important;
+  line-height: 1.65 !important;
+  tab-size: 2;
+  font-variant-ligatures: none;
+}
+
+.sourceViewport,
+.previewViewport {
+  min-height: max(17.5rem, min(27.5rem, calc(100dvh - 9rem)));
+}
+
+.previewViewport {
+  min-height: max(16.25rem, min(22.5rem, calc(100dvh - 9rem)));
+}
+
+@media (forced-colors: active) {
+  .editor > :global(pre),
+  .editor > :global(pre span) {
+    forced-color-adjust: auto;
+    color: CanvasText !important;
+  }
+}
+
+.editor > :global(pre:focus-visible) {
+  border-radius: 4px;
+  outline: 2px solid var(--ring) !important;
+  outline-offset: -4px !important;
+}
+
+@media (min-width: 640px) {
+  .editor > :global(pre) {
+    padding: 24px !important;
+  }
+}

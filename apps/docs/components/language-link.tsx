@@ -35,7 +35,12 @@ export function LanguageLink({
   }
 
   return (
-    <Link className="language-link" href={href} hrefLang={hrefLang} onClick={preserveLocationState}>
+    <Link
+      className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-xs font-semibold whitespace-nowrap text-muted-foreground transition-[color,background-color] hover:bg-muted hover:text-foreground"
+      href={href}
+      hrefLang={hrefLang}
+      onClick={preserveLocationState}
+    >
       {children}
     </Link>
   );

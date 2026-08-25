@@ -3,6 +3,9 @@ import { fileURLToPath } from 'node:url';
 const configuredBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const basePath = configuredBasePath === '/' ? '' : configuredBasePath.replace(/\/$/, '');
 const hooksSourceDirectory = fileURLToPath(new URL('../../packages/hooks/src', import.meta.url));
+const hooksPackageManifest = fileURLToPath(
+  new URL('../../packages/hooks/package.json', import.meta.url),
+);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -21,6 +24,7 @@ const nextConfig = {
     if (dev) {
       config.resolve.alias = {
         ...config.resolve.alias,
+        'better-hooks/package.json$': hooksPackageManifest,
         'better-hooks': hooksSourceDirectory,
       };
       config.resolve.extensionAlias = {

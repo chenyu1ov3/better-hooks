@@ -1,0 +1,53 @@
+.mono {
+  font-family: var(--font-mono);
+}
+
+.stage {
+  opacity: 0.9;
+  transform: translateY(3px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.stage[data-active='true'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.progress {
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.progressActive {
+  animation: debounce-progress 400ms linear forwards;
+}
+
+.progressSettled {
+  opacity: 0.35;
+  transform: scaleX(1);
+}
+
+@keyframes debounce-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage {
+    transform: none;
+    transition: none;
+  }
+
+  .progressActive {
+    animation: none;
+    transform: scaleX(1);
+  }
+}

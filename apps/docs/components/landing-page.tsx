@@ -1,121 +1,79 @@
 import { ArrowRight, GitFork } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { hrefFor } from '../lib/content';
-import { hookCategories, hookCategoryCounts, hooks } from '../lib/hooks';
-import { dictionaryFor, type Locale } from '../lib/i18n';
+import type { Locale } from '../lib/i18n';
 import { siteConfig } from '../lib/site';
 import { CopyButton } from './copy-button';
-import { HookSignalVisual } from './hook-signal-visual';
+import { HighlightedCommand } from './highlighted-code';
+import { HookRuntimeDemo } from './hook-runtime-demo';
 
 export function LandingPage({ locale }: { locale: Locale }) {
-  const dictionary = dictionaryFor(locale);
   const copy =
     locale === 'en'
       ? {
-          eyebrow: 'React 19 / TypeScript',
           lead: 'Typed, composable hooks for React applications that need predictable behavior.',
           docs: 'Read the docs',
           source: 'View on GitHub',
           install: 'Install better-hooks',
           copyInstall: 'Copy install command',
           copiedInstall: 'Install command copied',
-          factsLabel: 'Package highlights',
-          facts: [
-            ['React 19', 'Ready'],
-            ['ESM', 'Only'],
-            ['Runtime deps', 'Zero'],
-            ['SSR', 'Friendly'],
-          ],
-          categoriesEyebrow: 'Browse the API',
-          categoriesTitle: `${hooks.length} Hooks`,
-          categoriesLabel: 'Hook categories',
-          hookCount: (count: number) => `${count} ${count === 1 ? 'Hook' : 'Hooks'}`,
         }
       : {
-          eyebrow: 'React 19 / TypeScript',
           lead: '为 React 应用提供类型安全、易于组合且行为可预测的 Hooks。',
           docs: '阅读文档',
           source: '查看 GitHub',
           install: '安装 better-hooks',
           copyInstall: '复制安装命令',
           copiedInstall: '安装命令已复制',
-          factsLabel: '包特性',
-          facts: [
-            ['React 19', '已适配'],
-            ['模块格式', '仅 ESM'],
-            ['运行时依赖', '零'],
-            ['SSR', '友好'],
-          ],
-          categoriesEyebrow: '浏览 API',
-          categoriesTitle: `${hooks.length} 个 Hook`,
-          categoriesLabel: 'Hook 分类',
-          hookCount: (count: number) => `${count} 个 Hook`,
         };
 
   return (
-    <>
-      <section className="hero page-container" aria-labelledby="hero-title">
-        <div className="hero__copy">
-          <p className="eyebrow">{copy.eyebrow}</p>
-          <h1 id="hero-title">Better Hooks</h1>
-          <p className="hero__lead">{copy.lead}</p>
-          <div className="hero__actions">
-            <Link className="button button--primary" href={hrefFor(locale, 'docs')}>
+    <section
+      className="precision-grid mx-auto grid min-h-[calc(100svh-var(--header-height))] w-full max-w-[1360px] grid-cols-1 items-center gap-10 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(500px,1.2fr)] lg:gap-14 xl:gap-24"
+      aria-labelledby="hero-title"
+    >
+      <div className="max-w-[660px]">
+        <h1
+          id="hero-title"
+          className="m-0 text-5xl leading-[0.98] font-[780] text-balance text-foreground sm:text-6xl lg:text-[66px]"
+        >
+          Better Hooks
+        </h1>
+        <p className="mt-5 max-w-[620px] text-lg leading-8 text-pretty text-muted-foreground">
+          {copy.lead}
+        </p>
+        <div className="mt-6 flex flex-wrap gap-2.5">
+          <Button asChild size="lg" className="h-11 px-5 font-bold">
+            <Link href={hrefFor(locale, 'docs')}>
               {copy.docs}
               <ArrowRight aria-hidden="true" size={17} />
             </Link>
-            <a
-              className="button button--secondary"
-              href={siteConfig.repositoryUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
+          </Button>
+          <Button asChild size="lg" variant="outline" className="h-11 px-5 font-bold">
+            <a href={siteConfig.repositoryUrl} target="_blank" rel="noreferrer">
               <GitFork aria-hidden="true" size={17} />
               {copy.source}
             </a>
-          </div>
-          <div className="hero__install" aria-label={copy.install}>
-            <code>pnpm add better-hooks</code>
-            <CopyButton
-              value="pnpm add better-hooks"
-              label={copy.copyInstall}
-              copiedLabel={copy.copiedInstall}
-              className="hero__copy-command"
-            />
-          </div>
+          </Button>
         </div>
-
-        <div className="hero__visual">
-          <HookSignalVisual locale={locale} />
+        <div
+          className="mt-3 grid min-h-11 w-full max-w-[360px] grid-cols-[minmax(0,1fr)_44px] items-center overflow-hidden rounded-md border border-border bg-muted"
+          aria-label={copy.install}
+        >
+          <HighlightedCommand code="pnpm add better-hooks" />
+          <CopyButton
+            value="pnpm add better-hooks"
+            label={copy.copyInstall}
+            copiedLabel={copy.copiedInstall}
+            className="h-11 w-11 rounded-none border-l border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+          />
         </div>
+      </div>
 
-        <ul className="hero__facts" aria-label={copy.factsLabel}>
-          {copy.facts.map(([label, value]) => (
-            <li key={label}>
-              <span>{label}</span>
-              <strong>{value}</strong>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="home-categories section-band" aria-labelledby="hook-categories-title">
-        <div className="home-categories__inner page-container">
-          <header>
-            <p className="eyebrow">{copy.categoriesEyebrow}</p>
-            <h2 id="hook-categories-title">{copy.categoriesTitle}</h2>
-          </header>
-          <nav className="category-rail" aria-label={copy.categoriesLabel}>
-            {hookCategories.map((category) => (
-              <Link key={category} href={`${hrefFor(locale, 'hooks')}?category=${category}`}>
-                <span>{dictionary.categories[category]}</span>
-                <small>{copy.hookCount(hookCategoryCounts[category])}</small>
-                <ArrowRight aria-hidden="true" size={16} />
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </section>
-    </>
+      <div className="min-w-0 w-full lg:justify-self-end">
+        <HookRuntimeDemo locale={locale} />
+      </div>
+    </section>
   );
 }

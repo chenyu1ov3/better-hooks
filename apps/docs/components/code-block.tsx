@@ -1,4 +1,5 @@
 import { isValidElement, type ComponentProps, type ReactNode } from 'react';
+import type { Locale } from '../lib/i18n';
 import { CodeBlockFrame } from './code-block-frame';
 
 type PrettyCodePreProps = ComponentProps<'pre'> & {
@@ -19,7 +20,11 @@ function codeText(children: ReactNode): string {
   return '';
 }
 
-export function CodeBlock({ children, ...props }: PrettyCodePreProps) {
+export function CodeBlock({
+  children,
+  locale = 'en',
+  ...props
+}: PrettyCodePreProps & { locale?: Locale }) {
   const code = codeText(children).replace(/\n$/, '');
   const codeElement = isValidElement<PrettyCodeChildProps>(children) ? children : null;
   const language =
@@ -34,7 +39,9 @@ export function CodeBlock({ children, ...props }: PrettyCodePreProps) {
       code={code}
       language={language}
       filename={filename}
+      locale={locale}
       expandable={code.split('\n').length > 14}
+      withinFigure
     >
       <pre {...props}>{children}</pre>
     </CodeBlockFrame>

@@ -1,11 +1,20 @@
 'use client';
 
 import { Monitor, Moon, Sun } from 'lucide-react';
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { dictionaryFor, type Locale } from '../lib/i18n';
 
 type ThemePreference = 'system' | 'light' | 'dark';
 const storageKey = 'better-hooks:prefs:v1';
+const themeColors = { light: '#ffffff', dark: '#09090b' } as const;
 
 function applyTheme(preference: ThemePreference) {
   const resolved =
@@ -17,6 +26,11 @@ function applyTheme(preference: ThemePreference) {
   document.documentElement.dataset.themePreference = preference;
   document.documentElement.dataset.theme = resolved;
   document.documentElement.style.colorScheme = resolved;
+  const [themeColor, ...duplicates] = document.querySelectorAll<HTMLMetaElement>(
+    'meta[name="theme-color"]',
+  );
+  themeColor?.setAttribute('content', themeColors[resolved]);
+  duplicates.forEach((meta) => meta.remove());
 }
 
 function readPreference(): ThemePreference {
@@ -33,8 +47,6 @@ function readPreference(): ThemePreference {
 }
 
 export function ThemeMenu({ locale }: { locale: Locale }) {
-  const detailsRef = useRef<HTMLDetailsElement>(null);
-  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [preference, setPreference] = useState<ThemePreference>('system');
   const dictionary = dictionaryFor(locale);
   const labels = {
@@ -66,11 +78,6 @@ export function ThemeMenu({ locale }: { locale: Locale }) {
     }
   }
 
-  function choose(next: ThemePreference) {
-    updatePreference(next);
-    detailsRef.current?.removeAttribute('open');
-  }
-
   const CurrentIcon = preference === 'light' ? Sun : preference === 'dark' ? Moon : Monitor;
   const options = [
     { value: 'system' as const, label: labels.system, icon: Monitor },
@@ -78,59 +85,40 @@ export function ThemeMenu({ locale }: { locale: Locale }) {
     { value: 'dark' as const, label: labels.dark, icon: Moon },
   ];
 
-  function moveSelection(index: number) {
-    const option = options[index];
-    if (!option) return;
-    updatePreference(option.value);
-    optionRefs.current[index]?.focus();
-  }
-
-  function handleOptionKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) {
-    let nextIndex: number | undefined;
-
-    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-      nextIndex = (index + 1) % options.length;
-    } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-      nextIndex = (index - 1 + options.length) % options.length;
-    } else if (event.key === 'Home') {
-      nextIndex = 0;
-    } else if (event.key === 'End') {
-      nextIndex = options.length - 1;
-    }
-
-    if (nextIndex === undefined) return;
-    event.preventDefault();
-    moveSelection(nextIndex);
-  }
-
   return (
-    <details className="control-menu" ref={detailsRef}>
-      <summary className="icon-button" aria-label={labels.theme} title={labels.theme}>
-        <CurrentIcon aria-hidden="true" size={17} strokeWidth={1.8} />
-      </summary>
-      <div className="control-menu__panel" role="radiogroup" aria-label={labels.theme}>
-        {options.map((option, index) => {
-          const Icon = option.icon;
-          return (
-            <button
-              ref={(element) => {
-                optionRefs.current[index] = element;
-              }}
-              type="button"
-              role="radio"
-              aria-checked={preference === option.value}
-              tabIndex={preference === option.value ? 0 : -1}
-              className="control-menu__option"
-              key={option.value}
-              onClick={() => choose(option.value)}
-              onKeyDown={(event) => handleOptionKeyDown(event, index)}
-            >
-              <Icon aria-hidden="true" size={16} />
-              <span>{option.label}</span>
-            </button>
-          );
-        })}
-      </div>
-    </details>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-lg"
+          className="size-11"
+          aria-label={labels.theme}
+        >
+          <CurrentIcon aria-hidden="true" size={17} strokeWidth={1.8} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-44 border-border shadow-sm" align="end" sideOffset={8}>
+        <DropdownMenuRadioGroup
+          aria-label={labels.theme}
+          value={preference}
+          onValueChange={(value) => updatePreference(value as ThemePreference)}
+        >
+          {options.map((option) => {
+            const Icon = option.icon;
+            return (
+              <DropdownMenuRadioItem
+                className="min-h-10 text-[13px]"
+                key={option.value}
+                value={option.value}
+              >
+                <Icon aria-hidden="true" size={16} />
+                <span>{option.label}</span>
+              </DropdownMenuRadioItem>
+            );
+          })}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
