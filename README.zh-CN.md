@@ -42,6 +42,5 @@ API 说明和在线示例请查看 [Hook 参考文档](https://chenyu1ov3.github
 - [Hook 参考文档](https://chenyu1ov3.github.io/better-hooks/zh/hooks/)
 - [npm 包](https://www.npmjs.com/package/better-hooks)
 - [更新日志](packages/hooks/CHANGELOG.md)
-- [贡献指南](.github/CONTRIBUTING.md)
 - [安全策略](.github/SECURITY.md)
 - [许可证](LICENSE)

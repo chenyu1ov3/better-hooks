@@ -42,6 +42,5 @@ See the [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/) for A
 - [Hook reference](https://chenyu1ov3.github.io/better-hooks/hooks/)
 - [npm package](https://www.npmjs.com/package/better-hooks)
 - [Changelog](packages/hooks/CHANGELOG.md)
-- [Contributing](.github/CONTRIBUTING.md)
 - [Security](.github/SECURITY.md)
 - [License](LICENSE)
