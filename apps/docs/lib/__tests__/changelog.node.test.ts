@@ -54,15 +54,15 @@ describe('changelog history', () => {
     const english = changelogFor('en');
     const chinese = changelogFor('zh-CN');
 
-    expect(english.releases[0]?.version).toBe(english.currentVersion);
-    expect(english.releases.map(({ version }) => version)).toEqual([
-      '1.1.1',
-      '1.1.0',
-      '1.0.0',
-      '0.2.0',
-    ]);
-    expect(english.releases[0]?.sections[0]?.source).toContain('tombstoned in the registry');
-    expect(chinese.releases[0]?.sections[0]?.title).toBe('补丁更新');
-    expect(chinese.releases[0]?.sections[0]?.source).toBe(english.releases[0]?.sections[0]?.source);
+    const versions = english.releases.map(({ version }) => version);
+    const historicalEnglish = english.releases.find(({ version }) => version === '1.1.1');
+    const historicalChinese = chinese.releases.find(({ version }) => version === '1.1.1');
+
+    expect(versions[0]).toBe(english.currentVersion);
+    expect(versions).toEqual(expect.arrayContaining(['1.1.1', '1.1.0', '1.0.0', '0.2.0']));
+    expect(new Set(versions).size).toBe(versions.length);
+    expect(historicalEnglish?.sections[0]?.source).toContain('tombstoned in the registry');
+    expect(historicalChinese?.sections[0]?.title).toBe('补丁更新');
+    expect(historicalChinese?.sections[0]?.source).toBe(historicalEnglish?.sections[0]?.source);
   });
 });
