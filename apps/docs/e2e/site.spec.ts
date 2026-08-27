@@ -1174,21 +1174,83 @@ test.describe('documentation navigation', () => {
     );
   });
 
-  test('desktop documentation shows a linked table of contents', async ({ page }) => {
+  test('desktop documentation keeps the active navigation group in view', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openPage(page, 'hooks/use-websocket');
+    const docsNavigation = page.locator('[data-docs-navigation="desktop"]');
+
+    async function navigationPosition() {
+      return docsNavigation.evaluate((navigation) => {
+        const activeItem = navigation.querySelector('[aria-current="page"]');
+        const activeGroup = activeItem?.closest('section');
+        const navigationBounds = navigation.getBoundingClientRect();
+        const itemBounds = activeItem?.getBoundingClientRect();
+        const groupBounds = activeGroup?.getBoundingClientRect();
+        return {
+          groupOffset: groupBounds ? groupBounds.top - navigationBounds.top : null,
+          groupVisible:
+            groupBounds !== undefined &&
+            groupBounds.top >= navigationBounds.top - 1 &&
+            groupBounds.top < navigationBounds.bottom,
+          itemVisible:
+            itemBounds !== undefined &&
+            itemBounds.top >= navigationBounds.top &&
+            itemBounds.bottom <= navigationBounds.bottom,
+          scrollTop: navigation.scrollTop,
+        };
+      });
+    }
+
+    await expect(docsNavigation.getByRole('link', { name: 'useWebSocket' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    await expect.poll(async () => (await navigationPosition()).itemVisible).toBe(true);
+    let position = await navigationPosition();
+    expect(position.scrollTop).toBeGreaterThan(0);
+    expect(position.groupVisible).toBe(true);
+    expect(position.groupOffset).toBeGreaterThanOrEqual(-1);
+
+    await docsNavigation.getByRole('link', { name: 'useOnline', exact: true }).click();
+    await expect(page).toHaveURL(/\/hooks\/use-online\/$/);
+    await expect(docsNavigation.getByRole('link', { name: 'useOnline' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    await expect.poll(async () => (await navigationPosition()).itemVisible).toBe(true);
+    position = await navigationPosition();
+    expect(position.scrollTop).toBeGreaterThan(0);
+    expect(position.groupVisible).toBe(true);
+    expect(position.groupOffset).toBeGreaterThanOrEqual(-1);
+  });
+
+  test('desktop documentation shows an accurately positioned table of contents', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await openPage(page, 'docs/getting-started');
     const tableOfContents = page.getByRole('complementary', { name: 'On this page' });
-    const firstLink = tableOfContents.locator('nav a').first();
+    const targetLink = tableOfContents.locator('nav a').nth(1);
 
     await expect(tableOfContents).toBeVisible();
     await expect(page.getByRole('button', { name: 'On this page', exact: true })).toBeHidden();
-    await expect(firstLink).toBeVisible();
-    const target = await firstLink.getAttribute('href');
+    await expect(targetLink).toBeVisible();
+    const target = await targetLink.getAttribute('href');
     expect(target).toMatch(/^#/);
-    await firstLink.click();
+    await targetLink.click();
     await expect(page).toHaveURL(new RegExp(`${target}$`));
     await expect(page.locator(target!)).toBeVisible();
-    await expect(firstLink).toHaveAttribute('aria-current', 'location');
+    await expect
+      .poll(async () => {
+        return page.locator(target!).evaluate((element) => {
+          const scrollPaddingTop = Number.parseFloat(
+            window.getComputedStyle(document.documentElement).scrollPaddingTop,
+          );
+          return Math.abs(element.getBoundingClientRect().top - scrollPaddingTop);
+        });
+      })
+      .toBeLessThanOrEqual(1);
+    await expect(targetLink).toHaveAttribute('aria-current', 'location');
   });
 
   test('mobile documentation exposes the TOC and docs drawer', async ({ page }) => {

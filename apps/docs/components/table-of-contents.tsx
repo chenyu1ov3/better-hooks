@@ -60,8 +60,12 @@ export function TableOfContents({
       .filter((element): element is HTMLElement => element !== null);
     if (!elements.length) return;
 
+    const scrollOffset = Number.parseFloat(
+      window.getComputedStyle(document.documentElement).scrollPaddingTop,
+    );
+    const activationLine = (Number.isFinite(scrollOffset) ? scrollOffset : 0) + 1;
+
     function updateActiveHeading() {
-      const activationLine = Math.min(160, window.innerHeight * 0.25);
       let current = elements[0];
 
       for (const element of elements) {
@@ -80,13 +84,13 @@ export function TableOfContents({
     }
 
     const observer = new IntersectionObserver(updateActiveHeading, {
-      rootMargin: '-96px 0px -65% 0px',
+      rootMargin: `-${Math.max(0, activationLine - 1)}px 0px -65% 0px`,
       threshold: [0, 1],
     });
     elements.forEach((element) => observer.observe(element));
     window.addEventListener('hashchange', syncFromHash);
-    syncFromHash();
     updateActiveHeading();
+    syncFromHash();
 
     return () => {
       observer.disconnect();
