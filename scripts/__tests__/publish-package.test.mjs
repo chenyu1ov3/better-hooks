@@ -2,11 +2,12 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { sha256, sri } from '../package-artifact.mjs';
 import {
   assertReleaseArtifactMetadata,
   assertReleaseRecordsCompatible,
+  readProvenanceDocument,
   readReleaseArtifact,
 } from '../publish-package.mjs';
 
@@ -79,6 +80,64 @@ describe('release recovery guards', () => {
         'latest',
       ),
     ).not.toThrow();
+  });
+});
+
+describe('npm provenance propagation', () => {
+  it('retries a transient 404 until the attestation document is readable', async () => {
+    const document = { attestations: [{ predicateType: 'https://slsa.dev/provenance/v1' }] };
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(null, { status: 404 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(document), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+    const sleep = vi.fn(async () => {});
+
+    await expect(
+      readProvenanceDocument('https://registry.npmjs.org/attestations', {
+        fetchImpl,
+        sleep,
+        maxAttempts: 2,
+        retryDelayMs: 25,
+      }),
+    ).resolves.toEqual(document);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(sleep).toHaveBeenCalledTimes(1);
+    expect(sleep).toHaveBeenCalledWith(25);
+  });
+
+  it('does not retry a permanent attestation response', async () => {
+    const fetchImpl = vi.fn(async () => new Response(null, { status: 403 }));
+    const sleep = vi.fn(async () => {});
+
+    await expect(
+      readProvenanceDocument('https://registry.npmjs.org/attestations', {
+        fetchImpl,
+        sleep,
+      }),
+    ).rejects.toThrow('HTTP 403');
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it('bounds transient attestation retries', async () => {
+    const fetchImpl = vi.fn(async () => new Response(null, { status: 503 }));
+    const sleep = vi.fn(async () => {});
+
+    await expect(
+      readProvenanceDocument('https://registry.npmjs.org/attestations', {
+        fetchImpl,
+        sleep,
+        maxAttempts: 3,
+        retryDelayMs: 1,
+      }),
+    ).rejects.toThrow('HTTP 503');
+    expect(fetchImpl).toHaveBeenCalledTimes(3);
+    expect(sleep).toHaveBeenCalledTimes(2);
   });
 });
 
