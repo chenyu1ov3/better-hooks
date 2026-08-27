@@ -150,7 +150,10 @@ describe('useWebSocket', () => {
     const onMessage = vi.fn();
     const hook = renderHook(
       ({ url, protocols }: { url: string; protocols?: string }) =>
-        useWebSocket(url, { protocols, onMessage }),
+        useWebSocket(url, {
+          ...(protocols === undefined ? {} : { protocols }),
+          onMessage,
+        }),
       { initialProps: { url: 'ws://first.test', protocols: 'a' } },
     );
     const first = socketAt();
@@ -334,8 +337,12 @@ describe('useWebSocket', () => {
     vi.useFakeTimers();
     const hook = renderHook(
       ({ reconnect }: { reconnect: UseWebSocketOptions['reconnect'] }) =>
-        useWebSocket('ws://policy-update.test', { reconnect }),
-      { initialProps: { reconnect: { initialDelay: 10 } } },
+        useWebSocket('ws://policy-update.test', reconnect === undefined ? {} : { reconnect }),
+      {
+        initialProps: {
+          reconnect: { initialDelay: 10 },
+        } as { reconnect: UseWebSocketOptions['reconnect'] },
+      },
     );
     const first = socketAt();
     hook.rerender({ reconnect: { initialDelay: 20, maxAttempts: 2 } });

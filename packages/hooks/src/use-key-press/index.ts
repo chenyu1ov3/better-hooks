@@ -287,7 +287,6 @@ export function useKeyPress(
   const enabled = options?.enabled !== false;
   const capture = options?.capture ?? options?.useCapture ?? false;
   const exactMatch = options?.exactMatch ?? false;
-  const eventsRef = useRef(events);
   const filterRef = useRef(keyFilter);
   const handlerRef = useRef(handler);
   const errorRef = useRef(options?.onError);
@@ -304,7 +303,6 @@ export function useKeyPress(
   >(undefined);
 
   useIsomorphicLayoutEffect(() => {
-    eventsRef.current = events;
     filterRef.current = keyFilter;
     handlerRef.current = handler;
     errorRef.current = options?.onError;
@@ -346,7 +344,7 @@ export function useKeyPress(
     };
     const added: KeyEvent[] = [];
     try {
-      for (const eventName of eventsRef.current) {
+      for (const eventName of events) {
         target.addEventListener(eventName, callback, capture);
         added.push(eventName);
       }

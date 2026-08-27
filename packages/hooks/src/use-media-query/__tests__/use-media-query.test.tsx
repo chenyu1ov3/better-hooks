@@ -1,4 +1,5 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, render, renderHook } from '@testing-library/react';
+import { Suspense } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useMediaQuery } from '../index.js';
 
@@ -53,7 +54,7 @@ describe('useMediaQuery', () => {
     ]);
 
     expect(list.addEventListener).toHaveBeenCalledTimes(1);
-    expect(window.matchMedia).toHaveBeenCalledTimes(1);
+    expect(window.matchMedia).toHaveBeenCalledTimes(2);
     unmount();
     expect(list.removeEventListener).toHaveBeenCalledTimes(1);
   });
@@ -111,6 +112,101 @@ describe('useMediaQuery', () => {
     expect(secondList.addEventListener).toHaveBeenCalledTimes(1);
     hook.unmount();
     expect(secondList.removeEventListener).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not reuse a query created by a render abandoned by Suspense', () => {
+    const pending = new Promise<never>(() => undefined);
+    const matchMedia = vi
+      .fn<(query: string) => MediaQueryList>()
+      .mockReturnValueOnce({ matches: false } as MediaQueryList)
+      .mockReturnValue({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      } as unknown as MediaQueryList);
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: matchMedia,
+    });
+
+    function AbandonedQuery(): never {
+      useMediaQuery('(abandoned)');
+      throw pending;
+    }
+
+    const abandoned = render(
+      <Suspense fallback={null}>
+        <AbandonedQuery />
+      </Suspense>,
+    );
+    const abandonedCalls = matchMedia.mock.calls.length;
+    expect(abandonedCalls).toBeGreaterThan(0);
+    abandoned.unmount();
+
+    const committed = renderHook(() => useMediaQuery('(abandoned)'));
+    expect(committed.result.current).toBe(true);
+    expect(matchMedia.mock.calls.length).toBeGreaterThan(abandonedCalls);
+    committed.unmount();
+  });
+
+  it('reports listener registration failures without replacing the error', () => {
+    const failure = new Error('listener registration failed');
+    const onError = vi.fn();
+    const list = {
+      matches: false,
+      addEventListener: vi.fn(() => {
+        throw failure;
+      }),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList;
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn(() => list),
+    });
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    try {
+      expect(() => renderHook(() => useMediaQuery('(registration-error)', { onError }))).toThrow(
+        failure,
+      );
+      expect(onError).toHaveBeenCalledWith(failure);
+      expect(list.removeEventListener).toHaveBeenCalledTimes(1);
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
+  it('reports listener cleanup failures without leaking the shared entry', () => {
+    const failure = new Error('listener cleanup failed');
+    const onError = vi.fn();
+    const firstList = {
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(() => {
+        throw failure;
+      }),
+    } as unknown as MediaQueryList;
+    const secondList = {
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList;
+    const matchMedia = vi
+      .fn<(query: string) => MediaQueryList>()
+      .mockReturnValueOnce(firstList)
+      .mockReturnValue(secondList);
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: matchMedia,
+    });
+
+    const first = renderHook(() => useMediaQuery('(cleanup-error)', { onError }));
+    expect(() => first.unmount()).toThrow(failure);
+    expect(onError).toHaveBeenCalledWith(failure);
+
+    const second = renderHook(() => useMediaQuery('(cleanup-error)'));
+    expect(second.result.current).toBe(true);
+    second.unmount();
   });
 
   it('works when a MediaQueryList exposes no listener API', () => {

@@ -1,5 +1,5 @@
-import { act, renderHook } from '@testing-library/react';
-import { StrictMode } from 'react';
+import { act, render, renderHook } from '@testing-library/react';
+import { StrictMode, Suspense } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useLocalStorage } from '../index.js';
 import { useSessionStorage } from '../../use-session-storage/index.js';
@@ -69,6 +69,60 @@ describe('useLocalStorage', () => {
     rerender();
     expect(initial).toHaveBeenCalledTimes(1);
     unmount();
+  });
+
+  it('does not retain state from a render abandoned by Suspense', () => {
+    const pending = new Promise<never>(() => undefined);
+    function AbandonedStorage(): never {
+      useLocalStorage('abandoned-storage', 1);
+      throw pending;
+    }
+
+    const abandoned = render(
+      <Suspense fallback={null}>
+        <AbandonedStorage />
+      </Suspense>,
+    );
+    abandoned.unmount();
+
+    const committed = renderHook(() => useLocalStorage('abandoned-storage', 2));
+    expect(committed.result.current.value).toBe(2);
+    committed.unmount();
+  });
+
+  it('projects shared raw storage through each subscriber codec', () => {
+    localStorage.setItem('shared-codecs', '1');
+    const numeric = renderHook(() => useLocalStorage('shared-codecs', 0, { deserialize: Number }));
+    const labelled = renderHook(() =>
+      useLocalStorage('shared-codecs', 'missing', {
+        deserialize: (raw) => `value:${raw}`,
+      }),
+    );
+
+    expect(numeric.result.current.value).toBe(1);
+    expect(labelled.result.current.value).toBe('value:1');
+    act(() => numeric.result.current.setValue(2));
+    expect(numeric.result.current.value).toBe(2);
+    expect(labelled.result.current.value).toBe('value:2');
+    numeric.unmount();
+    labelled.unmount();
+  });
+
+  it('restores each subscriber initial value after shared removal', () => {
+    const first = renderHook(() => useLocalStorage('shared-initials', 1));
+    const second = renderHook(() => useLocalStorage('shared-initials', 2));
+    expect(first.result.current.value).toBe(1);
+    expect(second.result.current.value).toBe(2);
+
+    act(() => first.result.current.setValue(3));
+    expect(first.result.current.value).toBe(3);
+    expect(second.result.current.value).toBe(3);
+
+    act(() => second.result.current.remove());
+    expect(first.result.current.value).toBe(1);
+    expect(second.result.current.value).toBe(2);
+    first.unmount();
+    second.unmount();
   });
 
   it('shares one native storage listener for the same key', () => {
@@ -176,7 +230,7 @@ describe('useLocalStorage', () => {
 
   it('retries the same raw value after the decoder changes', () => {
     localStorage.setItem('decoder-change', 'value:4');
-    const failing = () => {
+    const failing: (raw: string) => number = () => {
       throw new Error('unsupported codec');
     };
     const working = (raw: string) => Number(raw.slice('value:'.length));

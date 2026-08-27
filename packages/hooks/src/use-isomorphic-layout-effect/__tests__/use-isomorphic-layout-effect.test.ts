@@ -21,11 +21,15 @@ describe('useIsomorphicLayoutEffect', () => {
     const { unmount } = renderHook(() => {
       useEffect(() => {
         calls.push('passive');
-        return () => calls.push('passive cleanup');
+        return () => {
+          calls.push('passive cleanup');
+        };
       }, []);
       useIsomorphicLayoutEffect(() => {
         calls.push('layout');
-        return () => calls.push('layout cleanup');
+        return () => {
+          calls.push('layout cleanup');
+        };
       }, []);
     });
 

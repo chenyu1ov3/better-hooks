@@ -38,7 +38,7 @@
     "eslint/no-unused-vars": "error",
     "typescript/no-explicit-any": "error",
     "react/rules-of-hooks": "error",
-    "react/exhaustive-deps": "warn",
+    "react/exhaustive-deps": ["warn", { "additionalHooks": "^(useIsomorphicLayoutEffect)$" }],
     "import/no-duplicates": "error",
     "promise/param-names": "error"
   },

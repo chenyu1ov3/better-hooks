@@ -121,6 +121,26 @@ describe('useKeyPress', () => {
     hook.unmount();
   });
 
+  it('rebinds when the configured event type changes', () => {
+    const target = new EventTarget();
+    const callback = vi.fn();
+    const hook = renderHook(
+      ({ event }: { event: 'keydown' | 'keyup' }) =>
+        useKeyPress('Enter', callback, { target, events: event }),
+      { initialProps: { event: 'keydown' as 'keydown' | 'keyup' } },
+    );
+
+    act(() => target.dispatchEvent(keyEvent('keydown', { key: 'Enter' })));
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    hook.rerender({ event: 'keyup' });
+    act(() => target.dispatchEvent(keyEvent('keydown', { key: 'Enter' })));
+    expect(callback).toHaveBeenCalledTimes(1);
+    act(() => target.dispatchEvent(keyEvent('keyup', { key: 'Enter' })));
+    expect(callback).toHaveBeenCalledTimes(2);
+    hook.unmount();
+  });
+
   it('resolves a ref after its first commit assigns the target', () => {
     const target = new EventTarget();
     const ref: { current: EventTarget | null } = { current: null };
