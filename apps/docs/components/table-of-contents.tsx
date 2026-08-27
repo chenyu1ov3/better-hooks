@@ -83,18 +83,30 @@ export function TableOfContents({
       if (headingIds.includes(hashId)) setActiveId(hashId);
     }
 
-    const observer = new IntersectionObserver(updateActiveHeading, {
+    let animationFrame: number | undefined;
+    function scheduleActiveHeadingUpdate() {
+      if (animationFrame !== undefined) return;
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = undefined;
+        updateActiveHeading();
+      });
+    }
+
+    const observer = new IntersectionObserver(scheduleActiveHeadingUpdate, {
       rootMargin: `-${Math.max(0, activationLine - 1)}px 0px -65% 0px`,
       threshold: [0, 1],
     });
     elements.forEach((element) => observer.observe(element));
     window.addEventListener('hashchange', syncFromHash);
+    window.addEventListener('scroll', scheduleActiveHeadingUpdate, { passive: true });
     updateActiveHeading();
     syncFromHash();
 
     return () => {
       observer.disconnect();
       window.removeEventListener('hashchange', syncFromHash);
+      window.removeEventListener('scroll', scheduleActiveHeadingUpdate);
+      if (animationFrame !== undefined) window.cancelAnimationFrame(animationFrame);
     };
   }, [headings]);
 
