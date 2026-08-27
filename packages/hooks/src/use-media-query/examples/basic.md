@@ -1,6 +1,6 @@
 # use-media-query
 
-`useMediaQuery` subscribes to a CSS media query through a shared external store. A server default keeps rendering deterministic before the browser query is available.
+`useMediaQuery` turns a CSS media query into a reactive boolean through a shared external store. Resize the preview or browser to see the current mode update.
 
 ## Example
 
@@ -10,11 +10,17 @@
 import { useMediaQuery } from 'better-hooks/use-media-query';
 
 export function ResponsiveMode() {
-  const compact = useMediaQuery('(max-width: 48rem)', { defaultMatches: false });
-  return <output>{compact ? 'Compact navigation' : 'Full navigation'}</output>;
+  const compact = useMediaQuery('(max-width: 40rem)', { defaultMatches: false });
+
+  return (
+    <div>
+      <output aria-live="polite">Viewport mode: {compact ? 'Compact' : 'Wide'}</output>
+      <span>{compact ? 'One-column controls' : 'Multi-column controls'}</span>
+    </div>
+  );
 }
 ```
 
 ## Behavior
 
-Subscribers to the same query share one native listener, which is removed after the last subscriber. Browsers with only the legacy `addListener` API remain supported.
+`defaultMatches` supplies the deterministic server and unsupported-browser value. Subscribers to the same query share one native listener per window, and the final unmount removes it. Query changes move the subscription, with legacy `addListener` browsers still supported.

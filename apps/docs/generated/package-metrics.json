@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 1,
+  "package": "better-hooks",
+  "version": "1.1.2",
+  "buildFingerprint": "8aa78ea8bcbe",
+  "measurement": {
+    "format": "ESM",
+    "target": "ES2022",
+    "minified": false,
+    "externals": "react, react-dom",
+    "graph": "Unique reachable built JavaScript modules per export",
+    "gzip": "Node.js zlib default gzip settings",
+    "brotli": "Node.js zlib default Brotli settings"
+  },
+  "budgets": {
+    "defaultRawBytes": 4096,
+    "defaultGzipBytes": 2048
+  },
+  "summary": {
+    "directEntries": 33,
+    "withinBudget": 33,
+    "medianGzipBytes": 1089,
+    "p90GzipBytes": 2172
+  },
+  "root": {
+    "entry": "better-hooks",
+    "modules": 35,
+    "rawBytes": 98856,
+    "gzipBytes": 19481,
+    "brotliBytes": 15675
+  },
+  "entries": [
+    {
+      "entry": "better-hooks/use-async",
+      "modules": 3,
+      "rawBytes": 4368,
+      "gzipBytes": 1331,
+      "brotliBytes": 1130,
+      "rawBudgetBytes": 5120,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-boolean",
+      "modules": 2,
+      "rawBytes": 1551,
+      "gzipBytes": 623,
+      "brotliBytes": 527,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-click-outside",
+      "modules": 3,
+      "rawBytes": 5054,
+      "gzipBytes": 1551,
+      "brotliBytes": 1304,
+      "rawBudgetBytes": 5120,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-controllable-state",
+      "modules": 2,
+      "rawBytes": 2588,
+      "gzipBytes": 923,
+      "brotliBytes": 766,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-debounce",
+      "modules": 2,
+      "rawBytes": 3254,
+      "gzipBytes": 996,
+      "brotliBytes": 856,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-debounce-fn",
+      "modules": 4,
+      "rawBytes": 4588,
+      "gzipBytes": 1441,
+      "brotliBytes": 1262,
+      "rawBudgetBytes": 5120,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-document-visibility",
+      "modules": 1,
+      "rawBytes": 3943,
+      "gzipBytes": 1141,
+      "brotliBytes": 984,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-event-listener",
+      "modules": 3,
+      "rawBytes": 4050,
+      "gzipBytes": 1192,
+      "brotliBytes": 1029,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-hover",
+      "modules": 3,
+      "rawBytes": 5071,
+      "gzipBytes": 1393,
+      "brotliBytes": 1193,
+      "rawBudgetBytes": 6144,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-input",
+      "modules": 2,
+      "rawBytes": 2763,
+      "gzipBytes": 1028,
+      "brotliBytes": 833,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-intersection-observer",
+      "modules": 3,
+      "rawBytes": 7343,
+      "gzipBytes": 1982,
+      "brotliBytes": 1710,
+      "rawBudgetBytes": 8192,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-interval",
+      "modules": 4,
+      "rawBytes": 2140,
+      "gzipBytes": 839,
+      "brotliBytes": 708,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-is-mounted",
+      "modules": 2,
+      "rawBytes": 1267,
+      "gzipBytes": 565,
+      "brotliBytes": 431,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-isomorphic-layout-effect",
+      "modules": 1,
+      "rawBytes": 491,
+      "gzipBytes": 302,
+      "brotliBytes": 235,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-key-press",
+      "modules": 3,
+      "rawBytes": 8591,
+      "gzipBytes": 2676,
+      "brotliBytes": 2327,
+      "rawBudgetBytes": 9216,
+      "gzipBudgetBytes": 3072
+    },
+    {
+      "entry": "better-hooks/use-latest",
+      "modules": 2,
+      "rawBytes": 1272,
+      "gzipBytes": 585,
+      "brotliBytes": 451,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-local-storage",
+      "modules": 2,
+      "rawBytes": 8595,
+      "gzipBytes": 2172,
+      "brotliBytes": 1935,
+      "rawBudgetBytes": 9216,
+      "gzipBudgetBytes": 3072
+    },
+    {
+      "entry": "better-hooks/use-lock-fn",
+      "modules": 3,
+      "rawBytes": 1908,
+      "gzipBytes": 800,
+      "brotliBytes": 657,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-media-query",
+      "modules": 2,
+      "rawBytes": 4164,
+      "gzipBytes": 1281,
+      "brotliBytes": 1117,
+      "rawBudgetBytes": 5120,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-memoized-fn",
+      "modules": 2,
+      "rawBytes": 1525,
+      "gzipBytes": 689,
+      "brotliBytes": 552,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-online",
+      "modules": 1,
+      "rawBytes": 1848,
+      "gzipBytes": 706,
+      "brotliBytes": 587,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-previous",
+      "modules": 1,
+      "rawBytes": 291,
+      "gzipBytes": 211,
+      "brotliBytes": 171,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-reset-state",
+      "modules": 4,
+      "rawBytes": 3393,
+      "gzipBytes": 1189,
+      "brotliBytes": 966,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-resize-observer",
+      "modules": 3,
+      "rawBytes": 6296,
+      "gzipBytes": 1744,
+      "brotliBytes": 1491,
+      "rawBudgetBytes": 7168,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-safe-state",
+      "modules": 2,
+      "rawBytes": 1451,
+      "gzipBytes": 676,
+      "brotliBytes": 530,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-session-storage",
+      "modules": 2,
+      "rawBytes": 8599,
+      "gzipBytes": 2173,
+      "brotliBytes": 1940,
+      "rawBudgetBytes": 9216,
+      "gzipBudgetBytes": 3072
+    },
+    {
+      "entry": "better-hooks/use-throttle",
+      "modules": 3,
+      "rawBytes": 3737,
+      "gzipBytes": 1099,
+      "brotliBytes": 945,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-throttle-fn",
+      "modules": 4,
+      "rawBytes": 4306,
+      "gzipBytes": 1352,
+      "brotliBytes": 1188,
+      "rawBudgetBytes": 5120,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-timeout",
+      "modules": 4,
+      "rawBytes": 3291,
+      "gzipBytes": 1089,
+      "brotliBytes": 926,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-toggle",
+      "modules": 1,
+      "rawBytes": 820,
+      "gzipBytes": 465,
+      "brotliBytes": 360,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-unmounted-ref",
+      "modules": 2,
+      "rawBytes": 1324,
+      "gzipBytes": 617,
+      "brotliBytes": 498,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-websocket",
+      "modules": 3,
+      "rawBytes": 13834,
+      "gzipBytes": 3072,
+      "brotliBytes": 2677,
+      "rawBudgetBytes": 14336,
+      "gzipBudgetBytes": 3072
+    },
+    {
+      "entry": "better-hooks/use-window-size",
+      "modules": 1,
+      "rawBytes": 2132,
+      "gzipBytes": 792,
+      "brotliBytes": 677,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    }
+  ]
+}

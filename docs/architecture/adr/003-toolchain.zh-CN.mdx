@@ -1,6 +1,6 @@
 ---
 title: ADR 003 — 包工具链
-description: ESM exports、pnpm、TypeScript 声明，以及基于 Oxc 的仓库检查。
+description: ESM exports、pnpm、TypeScript 声明、基于 Oxc 的检查，以及自动生成的包证据。
 section: 架构
 order: 22
 ---
@@ -13,12 +13,16 @@ order: 22
 
 ## 背景
 
-小型库需要保持公开接口清晰，并确保仓库检查针对的内容与实际发布产物一致。
+小型库需要保持公开接口清晰，并确保仓库检查针对的内容与实际生成的包一致。只检查源码不能证明 exports、类型声明、client directive 或最终打包文件正确。
 
 ## 决策
 
-发布包仅提供 ESM，包含显式根入口和各 Hook 的独立 exports，生成 TypeScript 声明，并设置 `sideEffects: false`。工作区使用 pnpm；静态分析与格式化分别使用 Oxlint 和 Oxfmt，不引入 ESLint 或 Prettier 配置。
+发布包仅提供 ESM，包含显式根入口和各 Hook 的独立 exports，生成 TypeScript 声明，并设置 `sideEffects: false`。React 与 React DOM 保持为 peer dependency，不进入构建产物。
+
+工作区使用 pnpm。运行时入口通过 tsdown 构建为 ES2022，TypeScript 负责生成声明。静态分析与格式化分别使用 Oxlint 和 Oxfmt，不引入 ESLint 或 Prettier 配置。
+
+包验证直接针对 `dist` 和最终 tarball。独立入口体积预算与文档指标报告共用同一个模块图分析器，因此公开展示值和发布门禁不会采用不同定义。
 
 ## 影响
 
-CommonJS `require` 不属于受支持的包接口。每个新 Hook 都必须提供源码目录、测试、示例、package export 和文档。仓库验证针对打包产物执行，不能把源码导入结果视为实际发布结果。
+CommonJS `require` 不属于受支持的包接口。每个新 Hook 都必须提供源码目录、测试、示例、package export 和双语文档。仓库会导入构建包、编译类型声明、测量可达模块并检查发布内容，而不是假设源码导入结果等同于最终发布结果。

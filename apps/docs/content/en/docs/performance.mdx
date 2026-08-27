@@ -1,30 +1,38 @@
 ---
 title: Performance
-description: Import boundaries, shared browser work, and evidence-based performance guidance.
+description: Measured entry footprints, shared browser work, and the limits of package-level evidence.
 section: Concepts
 order: 6
 ---
 
 # Performance
 
-Performance in a Hook library means keeping the module graph and the amount of live browser work understandable. The package documents facts that can be checked in the published artifact and avoids promises that depend on an unknown application.
+For a Hook library, performance includes the module graph an application requests and the amount of native work that remains alive after commit. Better Hooks publishes current build evidence and names its limits instead of presenting application-independent promises.
 
-## Choose an explicit package entry
+## Current build footprint
 
-Every Hook has a direct ESM entry such as `better-hooks/use-media-query`, alongside the root entry. Direct imports make ownership obvious and let bundlers start with the smallest requested graph. The package has no runtime dependency beyond the React peer dependency and declares `sideEffects: false`.
+<PackageMetrics />
 
-These are package properties, not a claim that every bundler or application produces the same output.
+Raw bytes represent each unminified ES2022 entry and its unique reachable internal modules. gzip and Brotli use Node.js zlib defaults. React and React DOM remain external. The report measures package code before an application's minification, chunking, deduplication, and target transforms, so application output should be measured in the application as well.
+
+## Choose the package boundary you need
+
+Every Hook has a direct ESM entry such as `better-hooks/use-media-query`, alongside the root `better-hooks` entry. A direct import begins with one Hook graph. The root entry exposes the complete API and relies on consumer tree shaking when only part of that graph is used.
+
+The package has no runtime dependency beyond its React peer dependency, uses explicit exports, and declares `sideEffects: false`. These are verifiable package properties, not a claim that every application and bundler produces identical output.
 
 ## Share native work when ownership is clear
 
-External-store Hooks share native work where ownership and cleanup remain explicit. Media-query subscribers share an entry per `Window` and query, online status uses one listener pair per browser realm, and window size uses one resize listener for current subscribers.
+External-store Hooks share native work where ownership and cleanup remain explicit. Media-query subscribers share an entry per `Window` and query. Online status uses one listener pair per browser realm. Window size uses one `resize` listener for current subscribers and skips notifications when dimensions are unchanged.
+
+Storage Hooks share one commit-owned native channel per storage area and key while preserving each subscriber's codec and initial-value semantics. Observer and transport Hooks keep instance ownership when sharing would make cancellation or error boundaries ambiguous.
 
 ## Schedule after commit and clean up first
 
-Timer and listener setup occurs after commit. Cleanup runs when dependencies change or a component unmounts, and stable callback refs avoid rebuilding native listeners for every render.
+Timer, listener, observer, and network setup occurs after commit. Cleanup runs when dependencies change or a component unmounts, and stable callback refs avoid rebuilding native work only because a callback received a new function identity.
 
-Async, timer, and event callbacks also clean up their internal work before an error escapes. An `onError` observer can inspect the failure, but it cannot replace the original throw or rejection; stale or cancelled work may be suppressed according to its Hook contract.
+Async, timer, and event callbacks clean up their internal work before an error escapes. An `onError` observer can inspect failure but cannot replace the original throw or rejection. Stale or cancelled work may be suppressed only where the Hook contract defines it.
 
-## Measure the built artifact
+## Interpret the evidence narrowly
 
-This site does not publish competitor comparisons or synthetic benchmark numbers. Bundle figures belong only when generated from the current build and labelled with the entry, compression method, and version. Unverified numbers remain absent instead of becoming stale placeholders.
+The report does not compare competitors, estimate React's cost, or predict an application's parsed and executed JavaScript. Runtime efficiency is instead supported by ownership rules and focused tests for subscription reuse, equal-snapshot suppression, cancellation, unmount cleanup, and Strict Mode replay.

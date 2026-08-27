@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "brand:generate": "node scripts/generate-brand-assets.mjs",
+    "metrics:generate": "node ../../scripts/generate-package-metrics.mjs",
+    "predev": "pnpm metrics:generate",
     "dev": "next dev --webpack",
+    "prebuild": "pnpm metrics:generate",
     "build": "next build --webpack",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",

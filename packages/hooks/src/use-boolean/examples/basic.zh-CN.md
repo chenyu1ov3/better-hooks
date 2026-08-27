@@ -1,6 +1,6 @@
 # use-boolean
 
-`useBoolean` 为布尔状态提供具名操作。当 `setTrue` 和 `setFalse` 比元组中的更新函数更能表达意图时，可以使用它。
+`useBoolean` 使用具名且引用稳定的操作管理布尔状态。当 `setTrue` 和 `setFalse` 比通用 setter 更能表达意图时，它尤其合适。
 
 ## 示例
 
@@ -9,21 +9,25 @@
 
 import { useBoolean } from 'better-hooks/use-boolean';
 
-export function DetailsToggle() {
-  const details = useBoolean();
+export function NotificationSetting() {
+  const notifications = useBoolean(true);
 
   return (
     <div>
-      <button type="button" onClick={details.setTrue}>
-        显示
+      <button
+        type="button"
+        aria-pressed={notifications.value}
+        onClick={() => notifications.toggle()}
+      >
+        {notifications.value ? '通知已开启' : '通知已关闭'}
       </button>
-      <button type="button" onClick={details.setFalse}>
-        隐藏
+      <button type="button" disabled={notifications.value} onClick={notifications.setTrue}>
+        开启
       </button>
-      <button type="button" onClick={() => details.toggle()}>
-        切换
+      <button type="button" disabled={!notifications.value} onClick={notifications.setFalse}>
+        关闭
       </button>
-      <output>{details.value ? '已显示' : '已隐藏'}</output>
+      <output aria-live="polite">当前值：{String(notifications.boolean)}</output>
     </div>
   );
 }
@@ -31,4 +35,4 @@ export function DetailsToggle() {
 
 ## 行为说明
 
-所有操作函数在重新渲染之间保持稳定。`boolean` 是 `value` 的别名，`toggle` 也接受明确的布尔值或函数式更新。
+`value` 和 `boolean` 暴露同一状态。`setTrue`、`setFalse` 与 `toggle` 的引用保持稳定；调用无参数的 `toggle()` 会反转最新值，也可以传入明确的布尔值或函数式更新器。

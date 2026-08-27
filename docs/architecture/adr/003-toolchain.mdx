@@ -1,6 +1,6 @@
 ---
 title: ADR 003 — Package toolchain
-description: ESM exports, pnpm, TypeScript declarations, and Oxide-based repository checks.
+description: ESM exports, pnpm, TypeScript declarations, Oxide-based checks, and generated package evidence.
 section: Architecture
 order: 22
 ---
@@ -13,12 +13,16 @@ Accepted.
 
 ## Context
 
-A small library should keep its published surface unambiguous and its repository checks consistent with the generated package.
+A small library should keep its published surface unambiguous and its repository checks consistent with the generated package. Source files alone cannot prove that exports, declarations, client directives, or packed files are correct.
 
 ## Decision
 
-The published package is ESM-only, has explicit root and per-Hook exports, emits TypeScript declarations, and declares `sideEffects: false`. The workspace uses pnpm. Static analysis and formatting use Oxlint and Oxfmt; ESLint and Prettier configuration are not part of the toolchain.
+The published package is ESM-only, has explicit root and per-Hook exports, emits TypeScript declarations, and declares `sideEffects: false`. React and React DOM remain peer dependencies and external to the build.
+
+The workspace uses pnpm. Runtime entries are built with tsdown for ES2022, while TypeScript emits declarations. Static analysis and formatting use Oxlint and Oxfmt; ESLint and Prettier configuration are not part of the toolchain.
+
+Package validation operates on `dist` and the packed tarball. Direct-entry size budgets and the documentation metric report use the same module-graph analyzer, so a displayed value and its release gate cannot use different definitions.
 
 ## Consequences
 
-CommonJS `require` is not a supported package interface. Every new Hook needs a source directory, test coverage, an example, a package export, and documentation. Repository validation checks the packed artifact rather than assuming source imports match publication.
+CommonJS `require` is not a supported package interface. Every new Hook needs a source directory, test coverage, an example, a package export, and bilingual documentation. Repository validation imports the built package, compiles its declarations, measures reachable modules, and inspects publication contents instead of assuming source imports match the release.

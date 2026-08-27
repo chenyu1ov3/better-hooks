@@ -29,6 +29,32 @@ export function documentationNavigation(locale: Locale): NavGroup[] {
         { href: localized(locale, '/docs/support-matrix'), label: docs.supportMatrix },
       ],
     },
+    {
+      label: docs.architecture,
+      items: [
+        { href: localized(locale, '/docs/architecture'), label: docs.overview },
+        {
+          href: localized(locale, '/docs/architecture/adr/001-boundaries'),
+          label: docs.runtimeBoundaries,
+        },
+        {
+          href: localized(locale, '/docs/architecture/adr/002-api-semantics'),
+          label: docs.apiSemantics,
+        },
+        {
+          href: localized(locale, '/docs/architecture/adr/003-toolchain'),
+          label: docs.packageToolchain,
+        },
+        {
+          href: localized(locale, '/docs/architecture/adr/004-performance'),
+          label: docs.performanceEvidence,
+        },
+        {
+          href: localized(locale, '/docs/architecture/adr/005-verification'),
+          label: docs.verificationGates,
+        },
+      ],
+    },
     ...hookCategories.map((category) => ({
       label: dictionary.categories[category],
       items: apiEntries

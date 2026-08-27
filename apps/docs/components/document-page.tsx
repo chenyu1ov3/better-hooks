@@ -55,10 +55,6 @@ export async function DocumentPage({ document }: { document: DocumentRecord }) {
   const previous = currentIndex > 0 ? documents[currentIndex - 1] : null;
   const next = currentIndex >= 0 ? documents[currentIndex + 1] : null;
   const jsonLd = JSON.stringify(jsonLdForDocument(document)).replace(/</g, '\\u003c');
-  const contentPath =
-    document.slug.length === 1 && document.slug[0] === 'docs'
-      ? 'docs/index.mdx'
-      : `${document.slug.join('/')}.mdx`;
 
   return (
     <article className="min-w-0">
@@ -83,7 +79,7 @@ export async function DocumentPage({ document }: { document: DocumentRecord }) {
       <div className="mt-12 flex w-full max-w-[72ch] justify-end">
         <a
           className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-          href={`${siteConfig.repositoryUrl}/edit/main/apps/docs/content/${document.locale}/${contentPath}`}
+          href={`${siteConfig.repositoryUrl}/edit/main/${document.sourcePath}`}
           target="_blank"
           rel="noreferrer"
         >
