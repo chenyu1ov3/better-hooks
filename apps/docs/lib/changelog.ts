@@ -1,143 +1,204 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { toString } from 'mdast-util-to-string';
+import remarkParse from 'remark-parse';
+import { unified } from 'unified';
 import packageManifest from 'better-hooks/package.json';
 import type { Locale } from './i18n';
 
 export type ChangelogSection = {
   readonly title: string;
-  readonly description: string;
+  readonly source: string;
 };
 
 export type ChangelogRelease = {
   readonly version: string;
+  readonly sections: readonly ChangelogSection[];
+};
+
+type ChangelogCopy = {
   readonly eyebrow: string;
   readonly description: string;
-  readonly sections: readonly ChangelogSection[];
+  readonly latestRelease: string;
+  readonly previousRelease: string;
   readonly viewNpm: string;
   readonly history: string;
 };
 
-type LocalizedRelease = Record<Locale, Omit<ChangelogRelease, 'version'>>;
+type ChangelogPageData = ChangelogCopy & {
+  readonly currentVersion: string;
+  readonly releases: readonly ChangelogRelease[];
+};
 
-const releaseCatalog: Record<string, LocalizedRelease> = {
-  '0.2.0': {
-    en: {
-      eyebrow: 'Project history',
-      description: 'Published package history, grouped by release impact.',
-      sections: [
-        {
-          title: 'Minor Changes',
-          description:
-            'Added eight Hook primitives: memoized callbacks, safe and resettable state, unmount tracking, document visibility, keyboard shortcuts, hover tracking, and locked async actions. Extended scheduling and browser Hooks with observable error handling and cleanup-before-propagation semantics.',
-        },
-        {
-          title: 'Patch Changes',
-          description:
-            'Hardened Hook behavior across async cancellation, controlled state, scheduling, DOM, browser state, and storage edge cases. Added broader runtime, SSR, type, and per-file coverage checks, plus bilingual Markdown examples for every Hook entry.',
-        },
-      ],
-      viewNpm: 'View this version on npm',
-      history: 'GitHub Release',
-    },
-    'zh-CN': {
-      eyebrow: '项目历史',
-      description: '按发布影响分类记录已发布 npm 包的变更。',
-      sections: [
-        {
-          title: '次版本更新',
-          description:
-            '新增八个 Hook 原语：记忆化回调、安全状态与可重置状态、卸载跟踪、文档可见性、键盘快捷键、悬停跟踪和异步操作锁；同时为调度与浏览器 Hook 补充可观察错误处理，以及先清理再传播的异常语义。',
-        },
-        {
-          title: '补丁更新',
-          description:
-            '强化异步取消、受控状态、调度、DOM、浏览器状态和存储边界行为；补充运行时、SSR、类型与逐文件覆盖检查，并为每个 Hook 入口提供双语 Markdown 示例。',
-        },
-      ],
-      viewNpm: '在 npm 查看此版本',
-      history: 'GitHub Release',
-    },
+type PositionedNode = {
+  readonly position?: {
+    readonly start: { readonly offset?: number };
+    readonly end: { readonly offset?: number };
+  };
+};
+
+type ReleaseDraft = {
+  version: string;
+  sections: ChangelogSection[];
+};
+
+type SectionDraft = {
+  title: string;
+  sources: string[];
+};
+
+const semverPattern =
+  /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+const changelogFooter = 'All notable changes are documented by Changesets before release.';
+
+const workspaceRoot = fs.existsSync(path.join(process.cwd(), 'packages', 'hooks'))
+  ? process.cwd()
+  : path.resolve(process.cwd(), '..', '..');
+const changelogPath = path.join(workspaceRoot, 'packages', 'hooks', 'CHANGELOG.md');
+
+const copy: Record<Locale, ChangelogCopy> = {
+  en: {
+    eyebrow: 'Package history',
+    description:
+      'Every published better-hooks version and its user-facing Changeset notes, newest first.',
+    latestRelease: 'Latest release',
+    previousRelease: 'Previous release',
+    viewNpm: 'View this version on npm',
+    history: 'GitHub Release',
   },
-  '1.0.0': {
-    en: {
-      eyebrow: 'Stable release',
-      description: 'The frozen 1.0.0 public API and its runtime guarantees.',
-      sections: [
-        {
-          title: 'Public API freeze',
-          description:
-            'Stabilized 30 Hooks with explicit ESM exports, typed declarations, predictable cleanup, and documented SSR boundaries.',
-        },
-        {
-          title: 'Behavioral clarifications',
-          description:
-            'Keyboard filter arrays represent independent alternatives; write a string such as `ctrl+s` for a chord. Error observers remain observable without replacing the original thrown error or rejected promise.',
-        },
-      ],
-      viewNpm: 'View this version on npm',
-      history: 'GitHub Release',
-    },
-    'zh-CN': {
-      eyebrow: '稳定版本',
-      description: '冻结 1.0.0 公开 API，并明确运行时保证。',
-      sections: [
-        {
-          title: '冻结公开 API',
-          description:
-            '稳定 30 个 Hook，提供明确的 ESM exports、类型声明、可预测的清理逻辑，以及有文档说明的 SSR 边界。',
-        },
-        {
-          title: '明确行为语义',
-          description:
-            '键盘过滤数组表示彼此独立的候选项；组合快捷键请使用 `ctrl+s` 这样的字符串。错误观察器保持可观察，但不会替换原始抛出或 Promise 拒绝。',
-        },
-      ],
-      viewNpm: '在 npm 查看此版本',
-      history: 'GitHub Release',
-    },
+  'zh-CN': {
+    eyebrow: '版本历史',
+    description: '按时间倒序展示 better-hooks 的全部已发布版本及其 Changeset 变更内容。',
+    latestRelease: '最新版本',
+    previousRelease: '历史版本',
+    viewNpm: '在 npm 查看此版本',
+    history: 'GitHub Release',
   },
 };
 
-function fallbackRelease(version: string): LocalizedRelease {
-  const prerelease = version.includes('-');
-  return {
-    en: {
-      eyebrow: prerelease ? 'Release candidate' : 'Stable release',
-      description: `Release notes for better-hooks ${version}, verified from the package artifact.`,
-      sections: [
-        {
-          title: 'Release notes',
-          description:
-            'See the package CHANGELOG and the linked GitHub Release for the complete user-facing changes.',
-        },
-        {
-          title: 'Verification',
-          description:
-            'The published artifact is checked for its ESM exports, declarations, runtime imports, and provenance.',
-        },
-      ],
-      viewNpm: 'View this version on npm',
-      history: 'GitHub Release',
-    },
-    'zh-CN': {
-      eyebrow: prerelease ? '候选版本' : '稳定版本',
-      description: `better-hooks ${version} 的发布说明，内容来自已验证的包产物。`,
-      sections: [
-        {
-          title: '发布说明',
-          description: '完整的面向用户变更请查看包 CHANGELOG 以及下方链接的 GitHub Release。',
-        },
-        {
-          title: '发布校验',
-          description: '发布产物会校验 ESM 导出、类型声明、运行时导入和 provenance。',
-        },
-      ],
-      viewNpm: '在 npm 查看此版本',
-      history: 'GitHub Release',
-    },
-  };
+const chineseSectionTitles: Readonly<Record<string, string>> = {
+  'Major Changes': '主版本更新',
+  'Minor Changes': '次版本更新',
+  'Patch Changes': '补丁更新',
+};
+
+function sourceForNode(source: string, node: PositionedNode): string {
+  const start = node.position?.start.offset;
+  const end = node.position?.end.offset;
+  if (start === undefined || end === undefined) {
+    throw new Error('CHANGELOG nodes must include source offsets.');
+  }
+  return source.slice(start, end);
 }
 
-export function changelogFor(locale: Locale): ChangelogRelease {
-  const version = packageManifest.version;
-  const localized = (releaseCatalog[version] ?? fallbackRelease(version))[locale];
-  return { version, ...localized };
+export function parseChangelog(source: string): ChangelogRelease[] {
+  const tree = unified().use(remarkParse).parse(source);
+  const releases: ChangelogRelease[] = [];
+  const seenVersions = new Set<string>();
+  let release: ReleaseDraft | undefined;
+  let section: SectionDraft | undefined;
+
+  const finishSection = () => {
+    if (!section) return;
+    if (!release) throw new Error(`CHANGELOG section "${section.title}" has no release.`);
+    if (!section.sources.length) {
+      throw new Error(
+        `CHANGELOG section "${section.title}" for ${release.version} has no change list.`,
+      );
+    }
+    release.sections.push({
+      title: section.title,
+      source: section.sources.join('\n\n'),
+    });
+    section = undefined;
+  };
+
+  const finishRelease = () => {
+    finishSection();
+    if (!release) return;
+    if (!release.sections.length) {
+      throw new Error(`CHANGELOG release ${release.version} has no change sections.`);
+    }
+    releases.push({ version: release.version, sections: release.sections });
+    release = undefined;
+  };
+
+  for (const node of tree.children) {
+    if (node.type === 'heading' && node.depth === 2) {
+      finishRelease();
+      const version = toString(node).trim();
+      if (!semverPattern.test(version)) {
+        throw new Error(`Invalid CHANGELOG release heading: "${version}".`);
+      }
+      if (seenVersions.has(version)) {
+        throw new Error(`Duplicate CHANGELOG release heading: ${version}.`);
+      }
+      seenVersions.add(version);
+      release = { version, sections: [] };
+      continue;
+    }
+
+    if (node.type === 'heading' && node.depth === 3) {
+      finishSection();
+      if (!release) {
+        throw new Error(`CHANGELOG section "${toString(node).trim()}" has no release.`);
+      }
+      const title = toString(node).trim();
+      if (!title)
+        throw new Error(`CHANGELOG release ${release.version} has an empty section title.`);
+      section = { title, sources: [] };
+      continue;
+    }
+
+    if (node.type === 'list') {
+      if (!release || !section) {
+        throw new Error(
+          'CHANGELOG change lists must be nested under release and section headings.',
+        );
+      }
+      section.sources.push(sourceForNode(source, node));
+      continue;
+    }
+
+    if (section) {
+      const text = toString(node).trim();
+      if (text && text !== changelogFooter) {
+        throw new Error(
+          `Unsupported CHANGELOG content in ${release?.version ?? 'an unknown release'} / ${section.title}: "${text}".`,
+        );
+      }
+    }
+  }
+
+  finishRelease();
+  if (!releases.length) throw new Error('CHANGELOG must contain at least one release.');
+  return releases;
+}
+
+export function readChangelog(): ChangelogRelease[] {
+  return parseChangelog(fs.readFileSync(changelogPath, 'utf8'));
+}
+
+export function changelogFor(locale: Locale): ChangelogPageData {
+  const releases = readChangelog();
+  const currentVersion = packageManifest.version;
+  if (releases[0]?.version !== currentVersion) {
+    throw new Error(
+      `Package version ${currentVersion} must be the first release in packages/hooks/CHANGELOG.md.`,
+    );
+  }
+  return {
+    ...copy[locale],
+    currentVersion,
+    releases: releases.map((release) => ({
+      ...release,
+      sections: release.sections.map((section) => ({
+        ...section,
+        title:
+          locale === 'zh-CN'
+            ? (chineseSectionTitles[section.title] ?? section.title)
+            : section.title,
+      })),
+    })),
+  };
 }

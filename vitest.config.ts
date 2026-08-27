@@ -7,6 +7,7 @@ export default defineConfig({
         test: {
           name: 'node',
           include: [
+            'apps/docs/lib/__tests__/**/*.node.test.ts',
             'packages/**/__tests__/**/*.node.test.{ts,tsx}',
             'packages/**/__tests__/**/*.ssr.test.{ts,tsx}',
             'scripts/__tests__/**/*.test.mjs',

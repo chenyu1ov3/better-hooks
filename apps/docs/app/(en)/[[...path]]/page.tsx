@@ -28,7 +28,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
       changelog: {
         title: 'Changelog',
-        description: 'Published package history, grouped by release impact.',
+        description:
+          'Complete better-hooks release history with the Changeset notes for every version.',
       },
     } as const;
     return metadataForPage({ locale: 'en', pathname: `/${path[0]}`, ...metadata[path[0]] });

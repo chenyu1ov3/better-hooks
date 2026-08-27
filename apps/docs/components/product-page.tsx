@@ -1,4 +1,7 @@
 import { GitFork, PackageOpen } from 'lucide-react';
+import { compileMDX } from 'next-mdx-remote/rsc';
+import remarkGfm from 'remark-gfm';
+import type { ComponentProps } from 'react';
 import { Button } from '@/components/ui/button';
 import { hooks } from '../lib/hooks';
 import { changelogFor } from '../lib/changelog';
@@ -69,57 +72,115 @@ export function PlaygroundPage({ locale }: { locale: Locale }) {
   );
 }
 
-export function ChangelogPage({ locale }: { locale: Locale }) {
+const changelogMdxComponents = {
+  a: ({ children, className, ...props }: ComponentProps<'a'>) => (
+    <a
+      className={`font-semibold text-foreground underline decoration-foreground/30 underline-offset-4 hover:decoration-current ${className ?? ''}`}
+      {...props}
+    >
+      {children}
+    </a>
+  ),
+  code: ({ className, ...props }: ComponentProps<'code'>) => (
+    <code
+      className={`rounded-sm border border-border bg-muted px-1 py-0.5 font-mono text-[0.875em] text-foreground ${className ?? ''}`}
+      {...props}
+    />
+  ),
+  li: ({ className, ...props }: ComponentProps<'li'>) => (
+    <li
+      className={`pl-1 text-sm leading-6 text-muted-foreground marker:text-muted-foreground ${className ?? ''}`}
+      {...props}
+    />
+  ),
+  ol: ({ className, ...props }: ComponentProps<'ol'>) => (
+    <ol className={`m-0 grid list-decimal gap-3 pl-5 ${className ?? ''}`} {...props} />
+  ),
+  p: ({ className, ...props }: ComponentProps<'p'>) => (
+    <p className={`m-0 text-sm leading-6 text-muted-foreground ${className ?? ''}`} {...props} />
+  ),
+  ul: ({ className, ...props }: ComponentProps<'ul'>) => (
+    <ul className={`m-0 grid list-disc gap-3 pl-5 ${className ?? ''}`} {...props} />
+  ),
+};
+
+async function ChangelogNotes({ source }: { source: string }) {
+  const { content } = await compileMDX({
+    source,
+    options: { mdxOptions: { remarkPlugins: [remarkGfm] } },
+    components: changelogMdxComponents,
+  });
+  return content;
+}
+
+export async function ChangelogPage({ locale }: { locale: Locale }) {
   const dictionary = dictionaryFor(locale);
-  const release = changelogFor(locale);
-  const releaseId = `release-${release.version.replaceAll(/[^a-zA-Z0-9]+/g, '-')}`;
+  const changelog = changelogFor(locale);
   return (
     <div className="page-container pt-10 pb-24 md:pt-14 md:pb-28">
       <PageIntro
-        eyebrow={release.eyebrow}
+        eyebrow={changelog.eyebrow}
         title={dictionary.navigation.changelog}
-        description={release.description}
+        description={changelog.description}
       />
-      <article
-        className="mt-10 grid gap-6 border-y border-border py-7 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-10 md:py-9"
-        aria-labelledby={releaseId}
-      >
-        <header className="min-w-0">
-          <span className="font-mono text-xs text-brand">npm</span>
-          <h2 className="mt-2 font-mono text-2xl font-semibold text-foreground" id={releaseId}>
-            {release.version}
-          </h2>
-        </header>
-        <div className="grid gap-6">
-          {release.sections.map((section) => (
-            <section
-              className="border-b border-border pb-6 last:border-0 last:pb-0"
-              key={section.title}
-            >
-              <h3 className="text-base font-semibold text-foreground">{section.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{section.description}</p>
-            </section>
-          ))}
-        </div>
-      </article>
-      <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <Button asChild variant="outline" className="min-h-11">
-          <a href={`${siteConfig.npmUrl}/v/${release.version}`} target="_blank" rel="noreferrer">
-            <PackageOpen aria-hidden="true" size={16} />
-            {release.viewNpm}: {release.version}
-          </a>
-        </Button>
-        <Button asChild variant="outline" className="min-h-11">
-          <a
-            href={`${siteConfig.repositoryUrl}/releases/tag/better-hooks@${release.version}`}
-            target="_blank"
-            rel="noreferrer"
+      {changelog.releases.map((release, index) => {
+        const releaseId = `release-${release.version.replaceAll(/[^a-zA-Z0-9]+/g, '-')}`;
+        const isLatest = release.version === changelog.currentVersion;
+        return (
+          <article
+            className={`grid gap-6 border-b border-border py-7 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-10 md:py-9 ${index === 0 ? 'mt-10 border-t' : ''}`}
+            aria-labelledby={releaseId}
+            data-release-version={release.version}
+            key={release.version}
           >
-            <GitFork aria-hidden="true" size={16} />
-            {release.history}
-          </a>
-        </Button>
-      </div>
+            <header className="min-w-0">
+              <span className="text-xs font-semibold text-brand">
+                {isLatest ? changelog.latestRelease : changelog.previousRelease}
+              </span>
+              <h2 className="mt-2 font-mono text-2xl font-semibold text-foreground" id={releaseId}>
+                {release.version}
+              </h2>
+            </header>
+            <div className="min-w-0">
+              <div className="grid gap-6">
+                {release.sections.map((section) => (
+                  <section
+                    className="border-b border-border pb-6 last:border-0 last:pb-0"
+                    key={section.title}
+                  >
+                    <h3 className="text-base font-semibold text-foreground">{section.title}</h3>
+                    <div className="mt-2">
+                      <ChangelogNotes source={section.source} />
+                    </div>
+                  </section>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <Button asChild variant="outline" className="min-h-11">
+                  <a
+                    href={`${siteConfig.npmUrl}/v/${release.version}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <PackageOpen aria-hidden="true" size={16} />
+                    {changelog.viewNpm}: {release.version}
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="min-h-11">
+                  <a
+                    href={`${siteConfig.repositoryUrl}/releases/tag/better-hooks@${release.version}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <GitFork aria-hidden="true" size={16} />
+                    {changelog.history}: {release.version}
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }

@@ -167,7 +167,7 @@ async function expectCompactProductSpacing(page: Page, path: 'hooks' | 'playgrou
       ? productPage.getByRole('searchbox').locator('..')
       : path === 'playground'
         ? productPage.locator('.playground-workbench')
-        : productPage.locator(':scope > article');
+        : productPage.locator(':scope > article').first();
   const [pageBounds, introBounds, contentBounds, paddingTop] = await Promise.all([
     productPage.boundingBox(),
     intro.boundingBox(),
@@ -1092,34 +1092,57 @@ test.describe('documentation navigation', () => {
     await expect(page.locator('main article')).toContainText("'ctrl+s'");
   });
 
-  test('Changelog renders the package version and release data in both languages', async ({
-    page,
-  }) => {
+  test('Changelog preserves every package version and its Changeset content', async ({ page }) => {
     await openPage(page, 'changelog');
-    const versionHeading = page.getByRole('heading', { level: 2 });
-    await expect(versionHeading).toHaveText(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
-    const version = (await versionHeading.textContent())?.trim();
-    expect(version).toBeTruthy();
-    await expect(page.locator('main article').getByRole('heading', { level: 3 })).toHaveCount(2);
+    const releaseHeadings = page.locator('main article').getByRole('heading', { level: 2 });
+    const versions = (await releaseHeadings.allTextContents()).map((version) => version.trim());
+    expect(versions.length).toBeGreaterThanOrEqual(4);
+    expect(versions).toEqual(expect.arrayContaining(['1.1.1', '1.1.0', '1.0.0', '0.2.0']));
+    for (const version of versions) {
+      expect(version).toMatch(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
+    }
+
+    const latestVersion = versions[0]!;
     await expect(
-      page.getByRole('link', { name: new RegExp(`View this version on npm: ${version}`) }),
-    ).toHaveAttribute('href', `https://www.npmjs.com/package/better-hooks/v/${version}`);
-    await expect(page.getByRole('link', { name: 'GitHub Release' })).toHaveAttribute(
+      page.getByRole('link', { name: `View this version on npm: ${latestVersion}`, exact: true }),
+    ).toHaveAttribute('href', `https://www.npmjs.com/package/better-hooks/v/${latestVersion}`);
+    await expect(
+      page.getByRole('link', { name: `GitHub Release: ${latestVersion}`, exact: true }),
+    ).toHaveAttribute(
       'href',
-      `https://github.com/chenyu1ov3/better-hooks/releases/tag/better-hooks@${version}`,
+      `https://github.com/chenyu1ov3/better-hooks/releases/tag/better-hooks@${latestVersion}`,
+    );
+
+    const stableRelease = page.locator('article[data-release-version="1.0.0"]');
+    await expect(
+      stableRelease.getByRole('heading', { level: 3, name: 'Major Changes' }),
+    ).toBeVisible();
+    await expect(stableRelease).toContainText(
+      'Freeze the 1.0 public API around 30 direct Hook entries',
+    );
+    await expect(page.locator('article[data-release-version="1.1.1"]')).toContainText(
+      'tombstoned in the registry',
     );
     await expect(page.getByText('Not yet published on npm', { exact: true })).toHaveCount(0);
 
     await page.getByRole('link', { name: '中文', exact: true }).click();
     await expect(page).toHaveURL(/\/zh\/changelog\/$/);
-    await expect(page.getByRole('heading', { level: 2, name: version! })).toBeVisible();
-    await expect(page.locator('main article').getByRole('heading', { level: 3 })).toHaveCount(2);
+    await expect(page.locator('main article').getByRole('heading', { level: 2 })).toHaveText(
+      versions,
+    );
     await expect(
-      page.getByRole('link', { name: new RegExp(`在 npm 查看此版本: ${version}`) }),
-    ).toHaveAttribute('href', `https://www.npmjs.com/package/better-hooks/v/${version}`);
-    await expect(page.getByRole('link', { name: 'GitHub Release' })).toHaveAttribute(
+      page
+        .locator('article[data-release-version="1.0.0"]')
+        .getByRole('heading', { level: 3, name: '主版本更新' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: `在 npm 查看此版本: ${latestVersion}`, exact: true }),
+    ).toHaveAttribute('href', `https://www.npmjs.com/package/better-hooks/v/${latestVersion}`);
+    await expect(
+      page.getByRole('link', { name: `GitHub Release: ${latestVersion}`, exact: true }),
+    ).toHaveAttribute(
       'href',
-      `https://github.com/chenyu1ov3/better-hooks/releases/tag/better-hooks@${version}`,
+      `https://github.com/chenyu1ov3/better-hooks/releases/tag/better-hooks@${latestVersion}`,
     );
   });
 
