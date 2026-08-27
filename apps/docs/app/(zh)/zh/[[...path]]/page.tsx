@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
       changelog: {
         title: '更新日志',
-        description: '按发布影响分类记录已发布 npm 包的变更。',
+        description: '保留 better-hooks 的完整版本历史及每个版本的 Changeset 变更内容。',
       },
     } as const;
     return metadataForPage({ locale: 'zh-CN', pathname: `/${path[0]}`, ...metadata[path[0]] });
