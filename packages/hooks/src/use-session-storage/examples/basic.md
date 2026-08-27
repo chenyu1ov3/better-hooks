@@ -1,6 +1,6 @@
 # use-session-storage
 
-`useSessionStorage` keeps a typed value in storage scoped to the current browser tab. It is suited to temporary drafts and workflow state that should not survive a new session.
+`useSessionStorage` synchronizes a typed value with storage scoped to the current browser tab. It is useful for drafts and temporary workflow state.
 
 ## Example
 
@@ -9,26 +9,19 @@
 
 import { useSessionStorage } from 'better-hooks/use-session-storage';
 
-export function SessionDraft() {
-  const draft = useSessionStorage('better-hooks:draft-example', '');
+export function DraftField() {
+  const draft = useSessionStorage('draft:v1', '');
 
   return (
     <div>
-      <label>
-        Session draft
-        <textarea
-          value={draft.value}
-          onChange={(event) => draft.setValue(event.currentTarget.value)}
-        />
-      </label>
-      <button type="button" disabled={!draft.value} onClick={draft.remove}>
-        Discard draft
+      <textarea
+        value={draft.value}
+        onChange={(event) => draft.setValue(event.currentTarget.value)}
+      />
+      <button type="button" onClick={draft.remove}>
+        Discard
       </button>
-      <output aria-live="polite">
-        {draft.error === undefined
-          ? `${draft.value.length} characters stored in this tab`
-          : 'Draft could not be stored'}
-      </output>
+      {draft.error ? <output>Draft could not be saved</output> : null}
     </div>
   );
 }
@@ -36,4 +29,4 @@ export function SessionDraft() {
 
 ## Behavior
 
-The API matches `useLocalStorage`, including functional updates, custom codecs, same-key synchronization, and recoverable errors. The difference is browser scope: sessionStorage is isolated to the current tab. SSR and removal return the captured initial value.
+The API matches `useLocalStorage`, but data is isolated to sessionStorage. Removing a key restores the initial value, and server rendering uses that initial snapshot.

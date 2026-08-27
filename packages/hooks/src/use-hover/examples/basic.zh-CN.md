@@ -1,42 +1,26 @@
 # use-hover
 
-`useHover` 根据原生 `mouseenter` 和 `mouseleave` 事件报告目标是否处于悬停状态，并可通过最新回调观察每次状态转换。
+`useHover` 返回目标当前是否处于悬停状态；当 ref 的 `current` 元素变化时，
+监听也会跟随迁移。
 
 ## 示例
 
 ```tsx
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useHover } from 'better-hooks/use-hover';
 
-export function HoverTarget() {
-  const targetRef = useRef<HTMLDivElement>(null);
-  const [transitions, setTransitions] = useState(0);
-  const hovering = useHover(targetRef, {
-    onChange: () => setTransitions((value) => value + 1),
-  });
-
-  return (
-    <div>
-      <div
-        ref={targetRef}
-        style={{
-          minHeight: 120,
-          minWidth: 220,
-          border: '1px solid currentColor',
-          display: 'grid',
-          placeItems: 'center',
-        }}
-      >
-        {hovering ? '指针位于内部' : '指针位于外部'}
-      </div>
-      <output aria-live="polite">悬停状态变化：{transitions}</output>
-    </div>
-  );
+export function HoverCard() {
+  const ref = useRef<HTMLDivElement>(null);
+  const hovering = useHover(ref, { onChange: (value) => console.log(value) });
+  return <div ref={ref}>{hovering ? '悬停中' : '移到这里'}</div>;
 }
 ```
 
 ## 行为说明
 
-ref 当前目标变化时，Hook 会跟随新目标、移除旧目标监听器，并将状态重置为 `false`。`enabled: false` 会暂停观察；`onEnter`、`onLeave` 和 `onChange` 始终使用最近提交的实现。
+当 ref 的 `current` 目标变化时，监听器会迁移到新目标，并将悬停状态重置为 `false`。
+
+将 `enabled` 设为 `false` 可以暂停监听。通过 `onError` 观察回调异常时，
+原始异常仍会继续抛出。

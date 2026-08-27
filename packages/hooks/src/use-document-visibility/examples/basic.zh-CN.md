@@ -1,34 +1,23 @@
 # use-document-visibility
 
-`useDocumentVisibility` 通过共享原生订阅跟踪当前 document 的可见性。页面隐藏时，下面的可见时长计数会暂停。
+`useDocumentVisibility` 跟踪文档是否可见，并在最后一个组件卸载后移除原生监听器。
 
 ## 示例
 
 ```tsx
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useDocumentVisibility } from 'better-hooks/use-document-visibility';
 
-export function VisibilityTimer() {
+export function VisibilityStatus() {
   const visibility = useDocumentVisibility();
-  const [activeSeconds, setActiveSeconds] = useState(0);
-
-  useEffect(() => {
-    if (visibility !== 'visible') return;
-    const timer = window.setInterval(() => setActiveSeconds((value) => value + 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [visibility]);
-
-  return (
-    <div>
-      <output aria-live="polite">文档状态：{visibility}</output>
-      <output>可见时长：{activeSeconds} 秒</output>
-    </div>
-  );
+  return <output>{visibility}</output>;
 }
 ```
 
 ## 行为说明
 
-默认目标是浏览器 document，同时也支持直接、惰性和 ref 形式的 document 目标。订阅按 document 与捕获模式共享。禁用、目标不可用和服务端渲染时都会确定地返回 `visible`。
+同一文档和捕获模式会共享订阅；最后一个消费者卸载或禁用 Hook 后，原生监听器会被移除。
+
+服务端始终返回 `visible`。可以传入 `{ enabled: false }` 暂停更新，或传入
+`{ target: documentRef }` 观察其他文档。

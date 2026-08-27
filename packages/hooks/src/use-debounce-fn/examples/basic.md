@@ -1,6 +1,6 @@
 # use-debounce-fn
 
-`useDebounceFn` queues the latest function call until activity has stopped. Its controls expose whether real trailing work is pending and let the caller flush or discard it.
+`useDebounceFn` schedules a function after calls stop for a configured delay. It also exposes explicit cancellation, flushing, and pending state.
 
 ## Example
 
@@ -11,28 +11,19 @@ import { useState } from 'react';
 import { useDebounceFn } from 'better-hooks/use-debounce-fn';
 
 export function DraftSaver() {
-  const [draft, setDraft] = useState('');
-  const [saved, setSaved] = useState('Nothing saved');
-  const save = useDebounceFn((value: string) => setSaved(value || 'Empty draft'), { delay: 800 });
-
-  const updateDraft = (value: string) => {
-    setDraft(value);
-    save.run(value);
-  };
+  const [saved, setSaved] = useState('');
+  const save = useDebounceFn((value: string) => setSaved(value), { delay: 500 });
 
   return (
     <div>
-      <label>
-        Draft
-        <textarea value={draft} onChange={(event) => updateDraft(event.currentTarget.value)} />
-      </label>
-      <button type="button" disabled={!save.pending} onClick={save.flush}>
+      <input aria-label="Draft" onChange={(event) => save.run(event.currentTarget.value)} />
+      <button type="button" onClick={save.flush}>
         Save now
       </button>
-      <button type="button" disabled={!save.pending} onClick={save.cancel}>
-        Cancel queued save
+      <button type="button" onClick={save.cancel}>
+        Cancel
       </button>
-      <output aria-live="polite">{save.pending ? 'Save queued' : `Saved: ${saved}`}</output>
+      <output>{save.pending ? 'Waiting' : saved}</output>
     </div>
   );
 }
@@ -40,4 +31,4 @@ export function DraftSaver() {
 
 ## Behavior
 
-`run` retains only the latest arguments. `pending` is true only when a trailing invocation is queued; `flush` runs it immediately and returns the callback result, while `cancel` discards it. Option changes reschedule active work, and unmounting clears every timer.
+`pending` means an invocation is actually queued. `flush` runs that invocation immediately, `cancel` discards it, and unmounting clears all timers.

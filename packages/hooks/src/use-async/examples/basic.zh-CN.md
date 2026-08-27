@@ -1,6 +1,6 @@
 # use-async
 
-`useAsync` 运行可感知中止信号的任务，并提供状态、保留数据、错误和稳定控制。下面使用本地延迟任务，因此不依赖应用后端接口。
+`useAsync` 用于执行同步或异步任务，并提供状态、结果和错误信息。下面的本地模拟任务无需依赖接口，也能演示取消与过期结果保护。
 
 ## 示例
 
@@ -10,15 +10,15 @@
 import { useAsync } from 'better-hooks/use-async';
 
 function loadProfile(signal: AbortSignal) {
-  return new Promise<{ name: string; role: string }>((resolve, reject) => {
-    const abort = () => {
-      window.clearTimeout(timer);
-      reject(new DOMException('资料加载已取消', 'AbortError'));
-    };
-    const timer = window.setTimeout(() => {
+  return new Promise<{ name: string }>((resolve, reject) => {
+    const timeout = window.setTimeout(() => {
       signal.removeEventListener('abort', abort);
-      resolve({ name: '艾达·洛芙莱斯', role: '数学家' });
-    }, 1200);
+      resolve({ name: 'Ada Lovelace' });
+    }, 900);
+    const abort = () => {
+      window.clearTimeout(timeout);
+      reject(new Error('已取消加载个人资料'));
+    };
 
     if (signal.aborted) abort();
     else signal.addEventListener('abort', abort, { once: true });
@@ -27,33 +27,20 @@ function loadProfile(signal: AbortSignal) {
 
 export function ProfileLoader() {
   const request = useAsync(loadProfile);
-
-  const run = () => {
+  const handleLoad = () => {
     void request.run().catch(() => undefined);
   };
 
   return (
     <div>
-      <button type="button" onClick={run}>
-        {request.status === 'pending' ? '重新加载' : '加载资料'}
+      <button type="button" disabled={request.status === 'pending'} onClick={handleLoad}>
+        加载
       </button>
       <button type="button" disabled={request.status !== 'pending'} onClick={request.cancel}>
         取消
       </button>
-      <button
-        type="button"
-        disabled={request.status === 'idle' && !request.data}
-        onClick={request.reset}
-      >
-        重置
-      </button>
-      <output aria-live="polite">状态：{request.status}</output>
       <output>
-        {request.data
-          ? `${request.data.name} · ${request.data.role}`
-          : request.error instanceof Error
-            ? request.error.message
-            : '尚未加载资料'}
+        {request.data?.name ?? (request.status === 'pending' ? '加载中…' : '准备就绪')}
       </output>
     </div>
   );
@@ -62,4 +49,4 @@ export function ProfileLoader() {
 
 ## 行为说明
 
-每次 `run` 都会中止前一个控制器并忽略过期状态更新，同时保留返回 Promise 原本的结果或拒绝。`cancel` 保留已有数据并回到 idle；`reset` 还会清除数据与错误。预期内的取消错误不会通过 `onError` 上报。
+开始新任务时会中止上一个任务，过期结果不会覆盖较新的状态。`cancel` 会回到空闲状态并保留现有数据，`reset` 还会清除数据和错误。

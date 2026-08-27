@@ -1,6 +1,6 @@
 # use-boolean
 
-`useBoolean` manages boolean state with named, stable actions. It is useful when `setTrue` and `setFalse` communicate intent more clearly than a generic setter.
+`useBoolean` provides named actions for boolean state. Use it when `setTrue` and `setFalse` make intent clearer than a tuple setter.
 
 ## Example
 
@@ -9,25 +9,21 @@
 
 import { useBoolean } from 'better-hooks/use-boolean';
 
-export function NotificationSetting() {
-  const notifications = useBoolean(true);
+export function DetailsToggle() {
+  const details = useBoolean();
 
   return (
     <div>
-      <button
-        type="button"
-        aria-pressed={notifications.value}
-        onClick={() => notifications.toggle()}
-      >
-        {notifications.value ? 'Notifications on' : 'Notifications off'}
+      <button type="button" onClick={details.setTrue}>
+        Show
       </button>
-      <button type="button" disabled={notifications.value} onClick={notifications.setTrue}>
-        Enable
+      <button type="button" onClick={details.setFalse}>
+        Hide
       </button>
-      <button type="button" disabled={!notifications.value} onClick={notifications.setFalse}>
-        Disable
+      <button type="button" onClick={() => details.toggle()}>
+        Toggle
       </button>
-      <output aria-live="polite">Current value: {String(notifications.boolean)}</output>
+      <output>{details.value ? 'Visible' : 'Hidden'}</output>
     </div>
   );
 }
@@ -35,4 +31,4 @@ export function NotificationSetting() {
 
 ## Behavior
 
-`value` and `boolean` expose the same state. `setTrue`, `setFalse`, and `toggle` keep stable identities; call `toggle()` with no argument to invert the latest value, or pass an explicit boolean or functional updater.
+All actions are stable across renders. `boolean` is an alias of `value`, and `toggle` accepts an explicit boolean or functional updater.

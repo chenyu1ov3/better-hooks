@@ -1,6 +1,6 @@
 # use-input
 
-`useInput` provides value, change, clear, and reset behavior for text inputs and textareas. It accepts both native change events and direct string updates.
+`useInput` supplies value, change, clear, and reset behavior for text inputs and textareas. It can manage its own string value or request updates from a controlled owner.
 
 ## Example
 
@@ -9,25 +9,21 @@
 
 import { useInput } from 'better-hooks/use-input';
 
-export function DisplayNameField() {
-  const name = useInput({ initialValue: 'Ada Lovelace' });
+export function NameField() {
+  const name = useInput({ initialValue: 'Ada' });
 
   return (
     <div>
       <label>
-        Display name
-        <input value={name.value} onChange={name.onChange} />
+        Name <input value={name.value} onChange={name.onChange} />
       </label>
-      <button type="button" onClick={() => name.onChange('Grace Hopper')}>
-        Use example
-      </button>
-      <button type="button" disabled={!name.value} onClick={name.clear}>
+      <button type="button" onClick={name.clear}>
         Clear
       </button>
       <button type="button" onClick={name.reset}>
         Reset
       </button>
-      <output aria-live="polite">{name.value.length} characters</output>
+      <output>{name.value}</output>
     </div>
   );
 }
@@ -35,4 +31,4 @@ export function DisplayNameField() {
 
 ## Behavior
 
-The initial value and controlled/uncontrolled mode are captured on the first render. In uncontrolled mode the Hook updates its own value; in controlled mode every action requests a change through `onChange`. Switching modes produces a development warning.
+The initial value is captured once. Controlled or uncontrolled mode is fixed by the first render, and changing modes produces a development warning.
