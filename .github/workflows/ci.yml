@@ -121,15 +121,12 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version-script: pnpm version-packages
           pr-title: ${{ steps.release-plan.outputs.title }}
-      # Pull-request runs created by github-actions[bot] require contributor
-      # approval. Dispatching is the trusted, non-duplicative check path unless
-      # that separate bot run is manually approved.
-      - name: Dispatch checks for the Version PR
+      # Pull-request runs created by github-actions[bot] wait for contributor
+      # approval. The helper validates the exact same-repository bot PR and head
+      # SHA before approving its native CI and Documentation runs.
+      - name: Approve checks for the Version PR
         if: steps.changesets.outputs.pr-number != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.changesets.outputs.pr-number }}
-        run: |
-          head_ref="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefName --jq '.headRefName')"
-          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$head_ref"
-          gh workflow run docs.yml --repo "$GITHUB_REPOSITORY" --ref "$head_ref"
+        run: node scripts/approve-version-pr-runs.mjs "$PR_NUMBER"
