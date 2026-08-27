@@ -28,6 +28,7 @@ export type DocumentRecord = DocumentMeta & {
   locale: Locale;
   slug: string[];
   source: string;
+  sourcePath: string;
   headings: Heading[];
 };
 
@@ -44,6 +45,8 @@ const workspaceRoot = fs.existsSync(path.join(process.cwd(), 'apps', 'docs'))
   ? process.cwd()
   : path.resolve(process.cwd(), '..', '..');
 const contentRoot = path.join(workspaceRoot, 'apps', 'docs', 'content');
+const architectureRoot = path.join(workspaceRoot, 'docs', 'architecture');
+const architecturePrefix = ['docs', 'architecture'] as const;
 
 function localeDirectory(locale: Locale) {
   return path.join(contentRoot, locale);
@@ -75,7 +78,21 @@ export function extractHeadings(source: string): Heading[] {
   return headings;
 }
 
-function fileFor(locale: Locale, slug: string[]) {
+type DocumentSource = { file: string; sourcePath: string };
+
+function isInside(root: string, file: string) {
+  const relative = path.relative(root, file);
+  return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
+}
+
+function documentSource(file: string): DocumentSource {
+  return {
+    file,
+    sourcePath: path.relative(workspaceRoot, file).replaceAll(path.sep, '/'),
+  };
+}
+
+function contentSourceFor(locale: Locale, slug: string[]) {
   const root = path.resolve(localeDirectory(locale));
   const candidates = slug.length
     ? [`${path.join(...slug)}.mdx`, path.join(...slug, 'index.mdx')]
@@ -83,28 +100,44 @@ function fileFor(locale: Locale, slug: string[]) {
 
   for (const relative of candidates) {
     const file = path.resolve(root, relative);
-    const fromRoot = path.relative(root, file);
-    if (fromRoot.startsWith('..') || path.isAbsolute(fromRoot)) continue;
-    if (fs.existsSync(file)) return file;
+    if (!isInside(root, file)) continue;
+    if (fs.existsSync(file)) return documentSource(file);
   }
   return null;
 }
 
+function architectureSourceFor(locale: Locale, slug: string[]) {
+  if (slug[0] !== architecturePrefix[0] || slug[1] !== architecturePrefix[1]) return null;
+
+  const relativeSlug = slug.slice(architecturePrefix.length);
+  const localeSuffix = locale === 'zh-CN' ? '.zh-CN' : '';
+  const relative = relativeSlug.length
+    ? path.join(...relativeSlug.slice(0, -1), `${relativeSlug.at(-1)}${localeSuffix}.mdx`)
+    : `README${localeSuffix}.md`;
+  const root = path.resolve(architectureRoot);
+  const file = path.resolve(root, relative);
+  if (!isInside(root, file)) return null;
+  return fs.existsSync(file) ? documentSource(file) : null;
+}
+
+function sourceFor(locale: Locale, slug: string[]) {
+  return contentSourceFor(locale, slug) ?? architectureSourceFor(locale, slug);
+}
+
 export function readDocument(locale: Locale, slug: string[]): DocumentRecord | null {
-  const file = fileFor(locale, slug);
-  if (!file) return null;
-  const parsed = matter(fs.readFileSync(file, 'utf8'));
+  const source = sourceFor(locale, slug);
+  if (!source) return null;
+  const parsed = matter(fs.readFileSync(source.file, 'utf8'));
   const result = documentMetaSchema.safeParse(parsed.data);
   if (!result.success) {
-    throw new Error(
-      `Invalid frontmatter in ${path.relative(workspaceRoot, file)}: ${result.error.message}`,
-    );
+    throw new Error(`Invalid frontmatter in ${source.sourcePath}: ${result.error.message}`);
   }
   return {
     ...result.data,
     locale,
     slug,
     source: parsed.content,
+    sourcePath: source.sourcePath,
     headings: extractHeadings(parsed.content),
   };
 }
@@ -125,10 +158,43 @@ function walk(directory: string, prefix: string[] = []): string[][] {
   return slugs;
 }
 
+function architectureSlugs(locale: Locale) {
+  const localeSuffix = locale === 'zh-CN' ? '.zh-CN' : '';
+  const slugs: string[][] = [];
+  if (fs.existsSync(path.join(architectureRoot, `README${localeSuffix}.md`))) {
+    slugs.push([...architecturePrefix]);
+  }
+
+  function collect(directory: string, prefix: string[] = []) {
+    if (!fs.existsSync(directory)) return;
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      if (entry.name.startsWith('.')) continue;
+      const full = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        collect(full, [...prefix, entry.name]);
+        continue;
+      }
+
+      const suffix = locale === 'zh-CN' ? '.zh-CN.mdx' : '.mdx';
+      if (!entry.name.endsWith(suffix)) continue;
+      if (locale === 'en' && entry.name.endsWith('.zh-CN.mdx')) continue;
+      const name = entry.name.slice(0, -suffix.length);
+      slugs.push([...architecturePrefix, ...prefix, ...(name === 'index' ? [] : [name])]);
+    }
+  }
+
+  collect(architectureRoot);
+  return slugs;
+}
+
 export function listDocuments(locale?: Locale) {
   const localeList: Locale[] = locale ? [locale] : ['en', 'zh-CN'];
   return localeList
-    .flatMap((current) => walk(localeDirectory(current)).map((slug) => readDocument(current, slug)))
+    .flatMap((current) => {
+      const slugs = [...walk(localeDirectory(current)), ...architectureSlugs(current)];
+      const uniqueSlugs = new Map(slugs.map((slug) => [slug.join('/'), slug]));
+      return [...uniqueSlugs.values()].map((slug) => readDocument(current, slug));
+    })
     .filter((document): document is DocumentRecord => document !== null)
     .sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || a.title.localeCompare(b.title));
 }

@@ -1,0 +1,33 @@
+---
+title: ADR 005 — Verification and release gates
+description: How source behavior, package artifacts, documentation, and release inputs are verified together.
+section: Architecture
+order: 24
+---
+
+# ADR 005 — Verification and release gates
+
+## Status
+
+Accepted.
+
+## Context
+
+A Hook can pass an isolated runtime test while its declaration entry is missing, its server snapshot is unsafe, its example has drifted, or the packed npm artifact differs from the workspace source. Verifying only one layer leaves the published contract incomplete.
+
+## Decision
+
+Repository validation follows the public contract from source to packed artifact:
+
+- Unit and Strict Mode tests cover behavior, cleanup, cancellation, shared subscriptions, and error propagation.
+- Server-rendering tests evaluate browser-facing Hooks without browser globals and assert deterministic snapshots.
+- Type tests compile both root and direct package imports against the exported declarations.
+- Package checks import every built ESM entry, preserve required `"use client"` directives, enforce per-entry size budgets, and inspect the packed tarball.
+- Example and locale checks keep source-backed examples and bilingual documents paired.
+- The static documentation build validates every route; Playwright covers browser workflows, responsive overflow, and accessibility.
+
+`pnpm check` is the repository gate for source and documentation integrity. Documentation interface changes additionally run `pnpm test:e2e`.
+
+## Consequences
+
+A new Hook is incomplete until runtime code, types, exports, tests, examples, and both documentation locales agree. Generated performance evidence is checked like code, so a changed build graph cannot silently leave stale public numbers. Release automation consumes the already-validated package artifact instead of rebuilding an unverified variant.

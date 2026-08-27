@@ -1,6 +1,6 @@
 ---
 title: ADR 004 — Performance evidence
-description: How Better Hooks reports size and performance without unsupported benchmark claims.
+description: How Better Hooks reports size and runtime efficiency without unsupported benchmark claims.
 section: Architecture
 order: 23
 ---
@@ -13,14 +13,20 @@ Accepted.
 
 ## Context
 
-Unqualified bundle sizes and competitor charts quickly become stale. A Hook can also be small in isolation while causing unnecessary subscriptions or client hydration.
+Unqualified bundle sizes and competitor charts quickly become stale. A Hook can also be small in isolation while causing unnecessary subscriptions, repeated listener setup, or avoidable client hydration.
 
 ## Decision
 
-Size claims must come from the current built entry and identify the measurement. The website may report manifest facts such as zero runtime dependencies, explicit exports, and `sideEffects: false`. It does not invent competitor benchmarks, download counts, or coverage percentages.
+Size claims come from the current built export and identify the measurement. The analyzer follows each direct ESM entry through unique relative imports, concatenates the reachable JavaScript modules once, keeps React external, and records raw, gzip, and Brotli bytes. Every direct entry has an explicit raw and gzip budget.
 
-Runtime implementations share native subscriptions when ownership and cleanup remain clear. Documentation and examples hydrate only where interaction is required.
+The generated report is committed for review, refreshed before documentation builds, and checked for drift by `pnpm check`. The website may also report manifest facts such as explicit exports and `sideEffects: false`. It does not invent competitor benchmarks, download counts, or coverage percentages.
+
+Runtime implementations share native subscriptions only when ownership and cleanup remain clear. Documentation and examples hydrate only where interaction is required; this report itself renders as static HTML.
+
+## Current build evidence
+
+<PackageMetrics />
 
 ## Consequences
 
-Performance sections may contain fewer numbers than marketing sites. That is intentional: evidence is refreshed by build tooling, and unverified figures remain absent rather than becoming placeholders that look authoritative.
+The root entry and a direct entry answer different questions and are shown separately. These values describe the package's unminified ES2022 module graphs before an application's own transforms; they are not a promise for every bundler. Build changes that exceed a budget fail validation, while unverified runtime timings remain absent rather than becoming authoritative-looking placeholders.

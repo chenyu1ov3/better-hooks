@@ -42,42 +42,44 @@ const keyPageRoutes = [
   { name: 'Hooks explorer', path: 'hooks' },
   { name: 'Playground', path: 'playground' },
   { name: 'Hook reference', path: 'hooks/use-debounce' },
+  { name: 'Architecture', path: 'docs/architecture' },
+  { name: 'Performance evidence', path: 'docs/performance' },
 ] as const;
 
 const defaultExampleText = {
-  'use-toggle': 'Show details',
-  'use-boolean': 'Hidden',
-  'use-controllable-state': '0',
-  'use-previous': '0 to 0',
-  'use-latest': 'Report later',
+  'use-toggle': 'Show shipping details',
+  'use-boolean': 'Notifications on',
+  'use-controllable-state': 'Uncontrolled',
+  'use-previous': 'No previous value',
+  'use-latest': 'No report scheduled',
   'use-debounce': 'Search',
-  'use-throttle': 'Value',
-  'use-debounce-fn': 'Save now',
-  'use-throttle-fn': 'Move the pointer here.',
-  'use-document-visibility': 'visible',
-  'use-timeout': 'Saved successfully',
-  'use-interval': /Pause at \d+/,
-  'use-async': 'Ready',
-  'use-event-listener': /\d+px/,
-  'use-click-outside': 'Account settings',
-  'use-hover': /Hovered|Move here/,
-  'use-intersection-observer': /Visible|Waiting/,
-  'use-key-press': null,
-  'use-lock-fn': 'Save',
-  'use-memoized-fn': 'Greet',
-  'use-media-query': /(?:Compact|Full) navigation/,
+  'use-throttle': 'Volume',
+  'use-debounce-fn': 'Nothing saved',
+  'use-throttle-fn': 'Pointer tracking area',
+  'use-document-visibility': 'Document: visible',
+  'use-timeout': /Settings saved|Show notice again/,
+  'use-interval': /Elapsed: \d+s/,
+  'use-async': 'No profile loaded',
+  'use-event-listener': 'Native clicks: 0',
+  'use-click-outside': 'Account panel',
+  'use-hover': /Pointer is (?:inside|outside)/,
+  'use-intersection-observer': /Target: (?:Intersecting|Outside)/,
+  'use-key-press': 'No shortcut used',
+  'use-lock-fn': 'Ready to save',
+  'use-memoized-fn': 'No greeting yet',
+  'use-media-query': /Viewport mode: (?:Compact|Wide)/,
   'use-window-size': /\d+ x \d+/,
-  'use-online': /Online|Offline/,
-  'use-input': 'Ada',
-  'use-local-storage': 'System',
-  'use-session-storage': 'Discard',
-  'use-is-mounted': 'idle',
+  'use-online': /Connection: (?:Online|Offline)/,
+  'use-input': '12 characters',
+  'use-local-storage': 'Stored preference:',
+  'use-session-storage': 'characters stored in this tab',
+  'use-is-mounted': 'No task started',
   'use-isomorphic-layout-effect': /Measured width: \d+px/,
-  'use-reset-state': 'Reset',
-  'use-resize-observer': /\d+ x \d+/,
-  'use-safe-state': /Count: 0/,
-  'use-unmounted-ref': 'Waiting',
-  'use-websocket': 'No messages yet',
+  'use-reset-state': 'Release notes',
+  'use-resize-observer': /Waiting for first measurement|\d+ x \d+/,
+  'use-safe-state': 'Delayed callbacks completed: 0',
+  'use-unmounted-ref': 'No upload started',
+  'use-websocket': 'No message received',
 } as const;
 
 function appRoute(path = '') {
@@ -610,8 +612,28 @@ test.describe('core interactions', () => {
       playground.getByRole('combobox', { name: 'Example' }),
       'useAsync',
     );
-    await expect(preview.getByText('Ready', { exact: true })).toBeVisible();
+    await expect(preview.getByText('No profile loaded', { exact: true })).toBeVisible();
     expect([...requestedHookChunks]).toEqual(['better-hooks-use-async']);
+  });
+
+  test('WebSocket example connects, echoes a message, and disconnects', async ({ page }) => {
+    await page.routeWebSocket('wss://ws.postman-echo.com/raw', (socket) => {
+      socket.onMessage((message) => socket.send(message));
+    });
+    await openPage(page, 'playground?hook=use-websocket');
+    const preview = page.locator('.playground-workbench .live-code-preview__canvas');
+
+    await expect(preview.getByText('Status: closed', { exact: true })).toBeVisible();
+    await preview.getByRole('button', { name: 'Connect', exact: true }).click();
+    await expect(preview.getByText('Status: open', { exact: true })).toBeVisible();
+
+    const message = 'verified WebSocket echo';
+    await preview.getByRole('textbox', { name: 'Message', exact: true }).fill(message);
+    await preview.getByRole('button', { name: 'Send', exact: true }).click();
+    await expect(preview.getByText(`Echo: ${message}`, { exact: true })).toBeVisible();
+
+    await preview.getByRole('button', { name: 'Disconnect', exact: true }).click();
+    await expect(preview.getByText('Status: closed', { exact: true })).toBeVisible();
   });
 
   test('Playground reports a Hook chunk failure without discarding the editor', async ({
@@ -634,7 +656,9 @@ test.describe('core interactions', () => {
     await page.unroute('**/better-hooks-use-async.*.js');
     await choosePlaygroundExample(page, selector, 'useDebounce');
     await choosePlaygroundExample(page, selector, 'useAsync');
-    await expect(playground.locator('.live-code-preview__canvas')).toContainText('Ready');
+    await expect(playground.locator('.live-code-preview__canvas')).toContainText(
+      'No profile loaded',
+    );
     await expect(playground.getByRole('alert')).toHaveCount(0);
   });
 
@@ -875,45 +899,71 @@ test.describe('documentation navigation', () => {
     expect(await sitemapResponse.text()).not.toContain('/examples/');
   });
 
-  test('Architecture decision records are archived outside the public docs', async ({
+  test('Architecture records are public, bilingual, and backed by generated metrics', async ({
     page,
     request,
   }) => {
-    await openPage(page, 'docs');
+    await openPage(page, 'docs/architecture');
     const docsNavigation = page.getByRole('navigation', { name: 'Docs' }).filter({ visible: true });
-    const navigationText = (await docsNavigation.allTextContents()).join(' ');
-    expect(navigationText).not.toContain('Architecture decisions');
-    expect(navigationText).not.toContain('架构决策记录');
+    await expect(docsNavigation.getByText('Architecture', { exact: true })).toBeVisible();
+    await expect(docsNavigation.getByRole('link', { name: 'Verification gates' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Architecture' })).toBeVisible();
+    await expect(page.locator('[data-architecture-map]')).toBeVisible();
+    await expect(page.locator('[data-architecture-decisions]')).toBeVisible();
+
+    const metrics = page.locator('[data-package-metrics]');
+    await expect(metrics).toBeVisible();
+    await expect(metrics).toHaveAttribute('data-package-version', /^\d+\.\d+\.\d+/);
+    await expect(metrics.getByText('33 / 33', { exact: true })).toBeVisible();
+
+    await openPage(page, 'docs/performance');
+    const fullMetrics = page.locator('[data-package-metrics]');
+    await fullMetrics.getByText('View all 33 direct entries', { exact: true }).click();
+    await expect(fullMetrics.locator('tbody tr')).toHaveCount(33);
+    await expect(fullMetrics.getByRole('row', { name: /use-websocket/ })).toContainText('3.07 kB');
 
     await page.keyboard.press('Control+K');
     const searchDialog = page.getByRole('dialog', { name: 'Search documentation' });
     const searchbox = searchDialog.getByRole('combobox', { name: 'Search documentation' });
     await searchbox.fill('ADR 001');
-    await expect(searchDialog.getByText('No results found.', { exact: true })).toBeVisible();
+    await expect(
+      searchDialog.getByText('ADR 001 — Runtime boundaries', { exact: true }),
+    ).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(searchDialog).toBeHidden();
 
     for (const path of [
+      'docs/architecture',
       'docs/architecture/adr/001-boundaries',
+      'docs/architecture/adr/005-verification',
+      'zh/docs/architecture',
       'zh/docs/architecture/adr/001-boundaries',
+      'zh/docs/architecture/adr/005-verification',
     ]) {
       const response = await request.get(appRoute(path));
-      expect(response.status(), `Expected /${path}/ to return 404`).toBe(404);
+      expect(response.ok(), `Expected /${path}/ to be public`).toBe(true);
     }
 
     const sitemapResponse = await request.get('./sitemap.xml');
     expect(sitemapResponse.ok()).toBe(true);
     const sitemap = await sitemapResponse.text();
-    expect(sitemap).not.toContain('/docs/architecture/adr/');
-    expect(sitemap).not.toContain('/zh/docs/architecture/adr/');
+    expect(sitemap).toContain('/docs/architecture/');
+    expect(sitemap).toContain('/docs/architecture/adr/005-verification/');
+    expect(sitemap).toContain('/zh/docs/architecture/');
+    expect(sitemap).toContain('/zh/docs/architecture/adr/005-verification/');
 
+    await openPage(page, 'docs/architecture');
     await page.getByRole('link', { name: '中文', exact: true }).click();
-    await expect(page).toHaveURL(/\/zh\/docs\/$/);
+    await expect(page).toHaveURL(/\/zh\/docs\/architecture\/$/);
+    await expect(page.getByRole('heading', { level: 1, name: '架构' })).toBeVisible();
+    await expect(page.getByText('better-hooks 构建报告', { exact: true })).toBeVisible();
     await page.keyboard.press('Control+K');
     const chineseSearch = page.getByRole('dialog', { name: '搜索文档' });
     const chineseSearchbox = chineseSearch.getByRole('combobox', { name: '搜索文档' });
-    await chineseSearchbox.fill('架构决策');
-    await expect(chineseSearch.getByText('没有找到匹配内容。', { exact: true })).toBeVisible();
+    await chineseSearchbox.fill('ADR 005');
+    await expect(
+      chineseSearch.getByText('ADR 005 — 验证与发布门禁', { exact: true }),
+    ).toBeVisible();
   });
 
   test('Code and terminal frames expose the right gutter and copy clean source', async ({
@@ -1193,6 +1243,8 @@ test.describe('WCAG A/AA', () => {
     { path: 'hooks', name: 'Hooks explorer' },
     { path: 'playground', name: 'Playground' },
     { path: 'docs/getting-started', name: 'documentation' },
+    { path: 'docs/architecture', name: 'architecture' },
+    { path: 'docs/performance', name: 'performance evidence' },
   ] as const;
 
   for (const colorScheme of ['light', 'dark'] as const) {

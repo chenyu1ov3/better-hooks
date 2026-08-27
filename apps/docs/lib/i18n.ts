@@ -70,6 +70,12 @@ export type UiDictionary = {
     react19: string;
     performance: string;
     supportMatrix: string;
+    architecture: string;
+    runtimeBoundaries: string;
+    apiSemantics: string;
+    packageToolchain: string;
+    performanceEvidence: string;
+    verificationGates: string;
     onThisPage: string;
     previous: string;
     next: string;
@@ -160,6 +166,12 @@ export const dictionaries = {
       react19: 'React 19',
       performance: 'Performance',
       supportMatrix: 'Support matrix',
+      architecture: 'Architecture',
+      runtimeBoundaries: 'Runtime boundaries',
+      apiSemantics: 'API semantics',
+      packageToolchain: 'Package toolchain',
+      performanceEvidence: 'Performance evidence',
+      verificationGates: 'Verification gates',
       onThisPage: 'On this page',
       previous: 'Previous',
       next: 'Next',
@@ -248,6 +260,12 @@ export const dictionaries = {
       react19: 'React 19',
       performance: '性能',
       supportMatrix: '支持矩阵',
+      architecture: '架构',
+      runtimeBoundaries: '运行时边界',
+      apiSemantics: 'API 语义',
+      packageToolchain: '包工具链',
+      performanceEvidence: '性能证据',
+      verificationGates: '验证与发布门禁',
       onThisPage: '本页内容',
       previous: '上一篇',
       next: '下一篇',

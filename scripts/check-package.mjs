@@ -1,4 +1,3 @@
-import { Buffer } from 'node:buffer';
 import { execFileSync } from 'node:child_process';
 import { constants } from 'node:fs';
 import { access, mkdtemp, readFile, rm } from 'node:fs/promises';
@@ -6,9 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
-import { brotliCompressSync, gzipSync } from 'node:zlib';
-import ts from 'typescript';
 import { canonicalJson, readTarGzip } from './package-artifact.mjs';
+import { measureDirectEntries } from './package-size.mjs';
 
 const packageDirectory = path.resolve(process.argv[2] ?? 'packages/hooks');
 const manifestPath = path.join(packageDirectory, 'package.json');
@@ -103,69 +101,17 @@ console.log(
   `Validated ${Object.keys(packageExports).length} exports, ${importCount} ESM imports, and ${clientEntryCount} client entries.`,
 );
 
-const configuredRawLimit = process.env.BETTER_HOOKS_MAX_ENTRY_BYTES;
-const defaultRawLimit = readPositiveNumber(configuredRawLimit ?? '4096', 'raw byte limit');
-const gzipLimit = readPositiveNumber(
-  process.env.BETTER_HOOKS_MAX_ENTRY_GZIP_BYTES ?? '2048',
-  'gzip byte limit',
-);
-const rawLimitOverrides = new Map([
-  // Per-subscriber projections keep initial values and codecs isolated while
-  // sharing one commit-owned raw storage channel and native listener.
-  ['./use-local-storage', 9216],
-  ['./use-session-storage', 9216],
-  // Error observers and cleanup guards add a small, intentional amount of
-  // runtime code to these callback-oriented entries.
-  ['./use-async', 5120],
-  ['./use-click-outside', 5120],
-  ['./use-debounce-fn', 5120],
-  ['./use-hover', 6144],
-  // Browser observer setup, stale-generation guards, and error propagation
-  // intentionally keep these entries self-contained.
-  ['./use-intersection-observer', 8192],
-  ['./use-key-press', 9216],
-  // Commit-owned query entries and symmetric listener error cleanup keep
-  // abandoned renders out of the shared registry.
-  ['./use-media-query', 5120],
-  ['./use-resize-observer', 7168],
-  ['./use-throttle-fn', 5120],
-  // Stable actions, bounded reconnect cleanup, and callback error isolation
-  // intentionally keep this transport entry self-contained.
-  ['./use-websocket', 14336],
-]);
-const gzipLimitOverrides = new Map([
-  ['./use-local-storage', 3072],
-  ['./use-session-storage', 3072],
-  ['./use-key-press', 3072],
-  ['./use-websocket', 3072],
-]);
-const rows = [];
+const { defaultGzipLimit: gzipLimit, rows } = await measureDirectEntries({
+  packageDirectory,
+  packageExports,
+  configuredRawLimit: process.env.BETTER_HOOKS_MAX_ENTRY_BYTES,
+  configuredGzipLimit: process.env.BETTER_HOOKS_MAX_ENTRY_GZIP_BYTES,
+});
 
-for (const [subpath, descriptor] of Object.entries(packageExports)) {
-  if (!subpath.startsWith('./use-')) continue;
-  const target = typeof descriptor === 'string' ? descriptor : descriptor?.import;
-  if (typeof target !== 'string') continue;
-
-  const graph = await readModuleGraph(path.resolve(packageDirectory, target));
-  const rawLimit = configuredRawLimit
-    ? defaultRawLimit
-    : (rawLimitOverrides.get(subpath) ?? defaultRawLimit);
-  const entryGzipLimit = configuredRawLimit
-    ? gzipLimit
-    : (gzipLimitOverrides.get(subpath) ?? gzipLimit);
-  const row = {
-    entry: subpath,
-    modules: graph.modules,
-    bytes: graph.contents.byteLength,
-    gzip: gzipSync(graph.contents).byteLength,
-    brotli: brotliCompressSync(graph.contents).byteLength,
-    rawLimit,
-    gzipLimit: entryGzipLimit,
-  };
-  rows.push(row);
-  if (row.bytes > rawLimit || row.gzip > entryGzipLimit) {
+for (const row of rows) {
+  if (row.bytes > row.rawLimit || row.gzip > row.gzipLimit) {
     failures.push(
-      `${subpath}: ${row.bytes}/${rawLimit} raw bytes, ${row.gzip}/${entryGzipLimit} gzip bytes`,
+      `${row.entry}: ${row.bytes}/${row.rawLimit} raw bytes, ${row.gzip}/${row.gzipLimit} gzip bytes`,
     );
   }
 }
@@ -398,50 +344,6 @@ async function checkClientDirective(subpath, target) {
   if (!/^(?:'use client'|"use client");?/.test(withoutLeadingComments)) {
     failures.push(`${subpath} -> ${target} is missing a preserved "use client" directive`);
   }
-}
-
-async function readModuleGraph(entry) {
-  const visited = new Set();
-  const chunks = [];
-
-  async function visit(file) {
-    const resolved = path.resolve(file);
-    if (visited.has(resolved)) return;
-    visited.add(resolved);
-
-    const contents = await readFile(resolved);
-    chunks.push(contents, Buffer.from('\n'));
-    const source = ts.createSourceFile(
-      resolved,
-      contents.toString('utf8'),
-      ts.ScriptTarget.Latest,
-      false,
-      ts.ScriptKind.JS,
-    );
-    const dependencies = [];
-    for (const statement of source.statements) {
-      if (
-        (ts.isImportDeclaration(statement) || ts.isExportDeclaration(statement)) &&
-        statement.moduleSpecifier &&
-        ts.isStringLiteral(statement.moduleSpecifier) &&
-        statement.moduleSpecifier.text.startsWith('.')
-      ) {
-        dependencies.push(path.resolve(path.dirname(resolved), statement.moduleSpecifier.text));
-      }
-    }
-    for (const dependency of dependencies) await visit(dependency);
-  }
-
-  await visit(entry);
-  return { contents: Buffer.concat(chunks), modules: visited.size };
-}
-
-function readPositiveNumber(value, label) {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    throw new TypeError(`The ${label} must be a positive number.`);
-  }
-  return parsed;
 }
 
 function runPnpm(args, options = {}) {
