@@ -12,7 +12,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "baseUrl": ".",
     "paths": {
@@ -30,7 +30,8 @@
     "../../packages/hooks/src/jsx.d.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-dev/types/**/*.ts"
+    ".next-dev/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

@@ -12,6 +12,7 @@
     "**/.next-dev/**",
     "**/out/**",
     "**/doc_build/**",
+    "**/next-env.d.ts",
     "**/*.tsbuildinfo"
   ]
 }
