@@ -1,6 +1,6 @@
 # use-previous
 
-`usePrevious` 会返回上一次成功提交时的值，适合做比较、展示转换标签或在渲染中检测变化。
+`usePrevious` 返回上一次成功提交的值，适合在不增加重复状态的情况下渲染前后对比。
 
 ## 示例
 
@@ -10,18 +10,25 @@
 import { useState } from 'react';
 import { usePrevious } from 'better-hooks/use-previous';
 
-export function CountHistory() {
-  const [count, setCount] = useState(0);
-  const previous = usePrevious(count, count);
+export function PriceChange() {
+  const [price, setPrice] = useState(24);
+  const previousPrice = usePrevious(price);
+  const direction = previousPrice === undefined ? '暂无前值' : `${previousPrice} 变为 ${price}`;
 
   return (
-    <button type="button" onClick={() => setCount((value) => value + 1)}>
-      从 {previous} 变为 {count}
-    </button>
+    <div>
+      <button type="button" onClick={() => setPrice((value) => value - 1)}>
+        降低
+      </button>
+      <button type="button" onClick={() => setPrice((value) => value + 1)}>
+        提高
+      </button>
+      <output aria-live="polite">{direction}</output>
+    </div>
   );
 }
 ```
 
 ## 行为说明
 
-未提供初始值时，第一次渲染返回 `undefined`。值在提交后更新，因此被放弃的并发渲染不会成为“上一次”的值。
+未提供初始回退值时，首次渲染返回 `undefined`。内部 ref 只会在成功提交后更新，因此被并发渲染放弃的值不会成为前值。

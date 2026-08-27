@@ -1,6 +1,6 @@
 # use-click-outside
 
-`useClickOutside` 会在指针按到目标元素外部时调用回调，适用于弹出层、菜单和可关闭面板。
+`useClickOutside` 处理引用元素之外捕获到的指针按下事件。下面分别提供内部和外部控件，使边界清晰可见。
 
 ## 示例
 
@@ -13,23 +13,42 @@ import { useClickOutside } from 'better-hooks/use-click-outside';
 export function DismissiblePanel() {
   const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(true);
-  useClickOutside(panelRef, () => setOpen(false), open);
+  const [insideActions, setInsideActions] = useState(0);
+  const [dismissals, setDismissals] = useState(0);
 
-  return open ? (
-    <div ref={panelRef}>
-      <p>账户设置</p>
-      <button type="button" onClick={() => setOpen(false)}>
-        关闭
+  useClickOutside(
+    panelRef,
+    () => {
+      setOpen(false);
+      setDismissals((value) => value + 1);
+    },
+    { enabled: open },
+  );
+
+  return (
+    <div>
+      {open ? (
+        <div ref={panelRef}>
+          <span>账户面板</span>
+          <button type="button" onClick={() => setInsideActions((value) => value + 1)}>
+            内部操作
+          </button>
+        </div>
+      ) : (
+        <span>面板已关闭</span>
+      )}
+      <button type="button" disabled={open} onClick={() => setOpen(true)}>
+        打开面板
       </button>
+      <button type="button">外部目标</button>
+      <output>
+        内部操作：{insideActions}；外部关闭：{dismissals}
+      </output>
     </div>
-  ) : (
-    <button type="button" onClick={() => setOpen(true)}>
-      打开面板
-    </button>
   );
 }
 ```
 
 ## 行为说明
 
-监听器挂载到元素所属的 `document`，并在捕获阶段运行，因此事件即使停止冒泡也不会漏掉外部点击。Shadow DOM 内的事件则通过 composed path 判断。
+监听器使用元素所属 document 和捕获阶段，因此停止冒泡也无法隐藏外部按下事件。每个事件都会检查 ref 的当前目标；禁用模式会移除绑定，组合路径则保证跨 Shadow DOM 时仍能正确判断内外部。

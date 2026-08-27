@@ -1,25 +1,36 @@
 # use-memoized-fn
 
-`useMemoizedFn` 保持回调引用稳定，同时让每次调用都使用最近一次已提交的实现。
+`useMemoizedFn` 保持函数引用稳定，同时让每次调用使用最近提交的实现。这样，长期存在的订阅无需重建也能读取最新状态。
 
 ## 示例
 
 ```tsx
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMemoizedFn } from 'better-hooks/use-memoized-fn';
 
-export function MemoizedGreeting() {
-  const [name, setName] = useState('Ada');
-  const greet = useMemoizedFn(() => window.alert(`你好，${name}`));
+export function StableGreetingSubscription() {
+  const [name, setName] = useState('艾达');
+  const [message, setMessage] = useState('尚未问候');
+  const [events] = useState(() => new EventTarget());
+  const greet = useMemoizedFn(() => setMessage(`你好，${name}`));
+
+  useEffect(() => {
+    events.addEventListener('greet', greet);
+    return () => events.removeEventListener('greet', greet);
+  }, [events, greet]);
 
   return (
     <div>
-      <input value={name} onChange={(event) => setName(event.target.value)} />
-      <button type="button" onClick={greet}>
-        打招呼
+      <label>
+        姓名
+        <input value={name} onChange={(event) => setName(event.currentTarget.value)} />
+      </label>
+      <button type="button" onClick={() => events.dispatchEvent(new Event('greet'))}>
+        触发问候事件
       </button>
+      <output aria-live="polite">{message}</output>
     </div>
   );
 }
@@ -27,4 +38,4 @@ export function MemoizedGreeting() {
 
 ## 行为说明
 
-返回的函数在多次渲染之间保持同一引用。回调会在提交后替换，因此被放弃的并发渲染不会改变它实际调用的函数。
+返回函数的引用始终不变，因此上面的 Effect 只需订阅一次。每次成功提交后，内部实现都会替换为最新版本，事件总能读取最新姓名，同时不会暴露被放弃渲染中的回调。

@@ -1,6 +1,6 @@
 # use-reset-state
 
-`useResetState` 增加一个稳定的 reset action，将状态恢复为首次初始化时捕获的值。
+`useResetState` 返回普通状态以及一个引用稳定的操作，用于恢复首次初始化时解析出的值。
 
 ## 示例
 
@@ -9,18 +9,38 @@
 
 import { useResetState } from 'better-hooks/use-reset-state';
 
-export function ResettableCounter() {
-  const [count, setCount, resetCount] = useResetState(0);
+export function ResettableDraft() {
+  const [draft, setDraft, resetDraft] = useResetState({ title: '发布说明', priority: 1 });
 
   return (
     <div>
-      <output>{count}</output>
-      <button type="button" onClick={() => setCount((value) => value + 1)}>
-        增加
+      <label>
+        标题
+        <input
+          value={draft.title}
+          onChange={(event) =>
+            setDraft((value) => ({ ...value, title: event.currentTarget.value }))
+          }
+        />
+      </label>
+      <label>
+        优先级
+        <input
+          type="range"
+          min="1"
+          max="5"
+          value={draft.priority}
+          onChange={(event) =>
+            setDraft((value) => ({ ...value, priority: event.currentTarget.valueAsNumber }))
+          }
+        />
+      </label>
+      <button type="button" onClick={resetDraft}>
+        重置草稿
       </button>
-      <button type="button" onClick={resetCount}>
-        重置
-      </button>
+      <output>
+        {draft.title || '无标题'} · P{draft.priority}
+      </output>
     </div>
   );
 }
@@ -28,4 +48,4 @@ export function ResettableCounter() {
 
 ## 行为说明
 
-`resetCount` 引用稳定，并恢复首次解析出的初始值，即使后续渲染传入了不同的 initializer 也不会改变 reset 目标。
+初始化器只解析一次；即使后续渲染收到不同的初始化器，重置操作仍会恢复首次快照。重置函数和受卸载保护的状态 setter 在渲染之间都保持稳定。
