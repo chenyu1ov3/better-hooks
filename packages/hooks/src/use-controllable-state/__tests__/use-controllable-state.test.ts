@@ -150,7 +150,7 @@ describe('useControllableState', () => {
         const state = useControllableState({ value, onChange });
         const setValue = state[1];
         useLayoutEffect(() => {
-          if (layoutUpdate) setValue((current) => current + 1);
+          if (layoutUpdate) setValue((current) => (current ?? 0) + 1);
         }, [onChange, setValue, value]);
         return state;
       },

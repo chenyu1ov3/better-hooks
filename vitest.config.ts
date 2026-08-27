@@ -33,7 +33,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       reportsDirectory: 'node_modules/.cache/vitest/coverage',
-      include: ['packages/hooks/src/use-*/index.ts'],
+      include: ['packages/hooks/src/use-*/index.ts', 'packages/hooks/src/utils/*.ts'],
       thresholds: { statements: 90, functions: 90, lines: 90, branches: 85, perFile: true },
     },
   },

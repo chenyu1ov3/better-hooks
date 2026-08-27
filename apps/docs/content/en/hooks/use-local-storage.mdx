@@ -31,7 +31,7 @@ The current `value`, the latest access or codec `error`, a functional `setValue`
 
 ## Behavior
 
-Failed reads keep the current value and report the error. Failed writes do not replace the current value. `remove` restores the captured initial value. Subscribers for a key share a store.
+Failed reads keep the current value and report the error. Failed writes do not replace the current value. `remove` restores the captured initial value. Subscribers for a key share the raw storage channel and native listener while applying their own captured initial value and decoder.
 
 ## SSR / RSC
 

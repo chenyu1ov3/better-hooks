@@ -219,6 +219,8 @@ export function useWebSocket(
   const managerRef = useRef<SocketManager | undefined>(undefined);
   const socketRef = useRef<WebSocket | undefined>(undefined);
 
+  // Keys and primitive fields track the semantic contents of normalized options.
+  // oxlint-disable react-hooks/exhaustive-deps
   useIsomorphicLayoutEffect(() => {
     protocolsValueRef.current = normalizedProtocols.value;
   }, [normalizedProtocols.key]);
@@ -240,6 +242,7 @@ export function useWebSocket(
     reconnectOptions.maxAttempts,
     reconnectOptions.maxDelay,
   ]);
+  // oxlint-enable react-hooks/exhaustive-deps
 
   useIsomorphicLayoutEffect(() => {
     connectionConfigRef.current = { enabled, url: normalizedUrl };

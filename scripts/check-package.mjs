@@ -109,8 +109,10 @@ const gzipLimit = readPositiveNumber(
   'gzip byte limit',
 );
 const rawLimitOverrides = new Map([
-  ['./use-local-storage', 6144],
-  ['./use-session-storage', 6144],
+  // Per-subscriber projections keep initial values and codecs isolated while
+  // sharing one commit-owned raw storage channel and native listener.
+  ['./use-local-storage', 9216],
+  ['./use-session-storage', 9216],
   // Error observers and cleanup guards add a small, intentional amount of
   // runtime code to these callback-oriented entries.
   ['./use-async', 5120],
@@ -121,6 +123,9 @@ const rawLimitOverrides = new Map([
   // intentionally keep these entries self-contained.
   ['./use-intersection-observer', 8192],
   ['./use-key-press', 9216],
+  // Commit-owned query entries and symmetric listener error cleanup keep
+  // abandoned renders out of the shared registry.
+  ['./use-media-query', 5120],
   ['./use-resize-observer', 7168],
   ['./use-throttle-fn', 5120],
   // Stable actions, bounded reconnect cleanup, and callback error isolation
@@ -128,6 +133,8 @@ const rawLimitOverrides = new Map([
   ['./use-websocket', 14336],
 ]);
 const gzipLimitOverrides = new Map([
+  ['./use-local-storage', 3072],
+  ['./use-session-storage', 3072],
   ['./use-key-press', 3072],
   ['./use-websocket', 3072],
 ]);

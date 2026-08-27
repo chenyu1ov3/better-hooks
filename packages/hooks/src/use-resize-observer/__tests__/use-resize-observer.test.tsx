@@ -12,8 +12,18 @@ interface FakeResizeInstance {
   trigger(entry: ResizeObserverEntry): void;
 }
 
+type ResizeInstances = FakeResizeInstance[] & {
+  0: FakeResizeInstance;
+  1: FakeResizeInstance;
+  2: FakeResizeInstance;
+};
+
+function emptyInstances(): ResizeInstances {
+  return [] as unknown as ResizeInstances;
+}
+
 const originalDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'ResizeObserver');
-let instances: FakeResizeInstance[] = [];
+let instances = emptyInstances();
 let constructorFailure: Error | undefined;
 let observeFailure: Error | undefined;
 
@@ -49,7 +59,7 @@ function installObserver(): void {
 }
 
 function restoreObserver(): void {
-  instances = [];
+  instances = emptyInstances();
   constructorFailure = undefined;
   observeFailure = undefined;
   if (originalDescriptor) {

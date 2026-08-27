@@ -42,15 +42,13 @@ export function useDebounceFn<Args extends unknown[], Result>(
   fn: (...args: Args) => Result,
   options: DebounceFnOptions,
 ): DebouncedFunction<Args, Result> {
-  const timing: TimingOptions = {
-    delay: normalizeDelay(options.delay),
-    leading: options.leading ?? false,
-    trailing: options.trailing ?? true,
-    maxWait: options.maxWait === undefined ? undefined : normalizeDelay(options.maxWait),
-  };
+  const delay = normalizeDelay(options.delay);
+  const leading = options.leading ?? false;
+  const trailing = options.trailing ?? true;
+  const maxWait = options.maxWait === undefined ? undefined : normalizeDelay(options.maxWait);
   const fnRef = useRef(fn);
   const onErrorRef = useRef(options.onError);
-  const timingRef = useRef(timing);
+  const timingRef = useRef<TimingOptions>({ delay, leading, trailing, maxWait });
   const state = useRef<SchedulerState<Args, Result>>({
     open: false,
     live: false,
@@ -161,17 +159,17 @@ export function useDebounceFn<Args extends unknown[], Result>(
   useIsomorphicLayoutEffect(() => {
     const old = timingRef.current;
     const changed =
-      !Object.is(old.delay, timing.delay) ||
-      old.leading !== timing.leading ||
-      old.trailing !== timing.trailing ||
-      !Object.is(old.maxWait, timing.maxWait);
-    timingRef.current = timing;
+      !Object.is(old.delay, delay) ||
+      old.leading !== leading ||
+      old.trailing !== trailing ||
+      !Object.is(old.maxWait, maxWait);
+    timingRef.current = { delay, leading, trailing, maxWait };
     if (!changed || !state.live || !state.open) return;
 
     clear();
-    if (!timing.trailing) drop();
+    if (!trailing) drop();
     start();
-  }, [clear, drop, start, state, timing.delay, timing.leading, timing.maxWait, timing.trailing]);
+  }, [clear, delay, drop, leading, maxWait, start, state, trailing]);
 
   return {
     run,

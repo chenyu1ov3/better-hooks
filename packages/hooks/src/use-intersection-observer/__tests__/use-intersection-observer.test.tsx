@@ -12,8 +12,18 @@ interface FakeIntersectionInstance {
   trigger(entry: IntersectionObserverEntry): void;
 }
 
+type IntersectionInstances = FakeIntersectionInstance[] & {
+  0: FakeIntersectionInstance;
+  1: FakeIntersectionInstance;
+  2: FakeIntersectionInstance;
+};
+
+function emptyInstances(): IntersectionInstances {
+  return [] as unknown as IntersectionInstances;
+}
+
 const originalDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'IntersectionObserver');
-let instances: FakeIntersectionInstance[] = [];
+let instances = emptyInstances();
 
 class FakeIntersectionObserver implements IntersectionObserver {
   readonly root = null;
@@ -54,7 +64,7 @@ function installObserver(): void {
 }
 
 function restoreObserver(): void {
-  instances = [];
+  instances = emptyInstances();
   constructorFailure = undefined;
   observeFailure = undefined;
   if (originalDescriptor) {
