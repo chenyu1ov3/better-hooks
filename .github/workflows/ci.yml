@@ -116,20 +116,19 @@ jobs:
           pnpm exec changeset status --output "$RUNNER_TEMP/changeset-status.json"
           node scripts/version-pr-title.mjs "$RUNNER_TEMP/changeset-status.json"
       - id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        uses: changesets/action@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
-          version: pnpm version-packages
-          title: ${{ steps.release-plan.outputs.title }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version-script: pnpm version-packages
+          pr-title: ${{ steps.release-plan.outputs.title }}
       # Pull-request runs created by github-actions[bot] require contributor
       # approval. Dispatching is the trusted, non-duplicative check path unless
       # that separate bot run is manually approved.
       - name: Dispatch checks for the Version PR
-        if: steps.changesets.outputs.pullRequestNumber != ''
+        if: steps.changesets.outputs.pr-number != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ steps.changesets.outputs.pullRequestNumber }}
+          PR_NUMBER: ${{ steps.changesets.outputs.pr-number }}
         run: |
           head_ref="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefName --jq '.headRefName')"
           gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$head_ref"
