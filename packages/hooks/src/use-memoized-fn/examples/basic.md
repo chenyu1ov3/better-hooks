@@ -1,36 +1,25 @@
 # use-memoized-fn
 
-`useMemoizedFn` keeps a function reference stable while each call uses the latest committed implementation. This lets long-lived subscriptions observe fresh state without being reinstalled.
+`useMemoizedFn` keeps a callback reference stable while making each call use the latest committed implementation.
 
 ## Example
 
 ```tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useMemoizedFn } from 'better-hooks/use-memoized-fn';
 
-export function StableGreetingSubscription() {
+export function MemoizedGreeting() {
   const [name, setName] = useState('Ada');
-  const [message, setMessage] = useState('No greeting yet');
-  const [events] = useState(() => new EventTarget());
-  const greet = useMemoizedFn(() => setMessage(`Hello, ${name}`));
-
-  useEffect(() => {
-    events.addEventListener('greet', greet);
-    return () => events.removeEventListener('greet', greet);
-  }, [events, greet]);
+  const greet = useMemoizedFn(() => window.alert(`Hello, ${name}`));
 
   return (
     <div>
-      <label>
-        Name
-        <input value={name} onChange={(event) => setName(event.currentTarget.value)} />
-      </label>
-      <button type="button" onClick={() => events.dispatchEvent(new Event('greet'))}>
-        Dispatch greeting
+      <input value={name} onChange={(event) => setName(event.target.value)} />
+      <button type="button" onClick={greet}>
+        Greet
       </button>
-      <output aria-live="polite">{message}</output>
     </div>
   );
 }
@@ -38,4 +27,4 @@ export function StableGreetingSubscription() {
 
 ## Behavior
 
-The returned function keeps the same identity, so the effect above subscribes once. Its implementation is replaced after each successful commit, ensuring the event always reads the latest name without exposing callbacks from abandoned renders.
+The returned function keeps the same identity across renders. Its callback is replaced after commit, so abandoned concurrent renders cannot change what it invokes.

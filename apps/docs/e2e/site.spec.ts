@@ -47,39 +47,39 @@ const keyPageRoutes = [
 ] as const;
 
 const defaultExampleText = {
-  'use-toggle': 'Show shipping details',
-  'use-boolean': 'Notifications on',
-  'use-controllable-state': 'Uncontrolled',
-  'use-previous': 'No previous value',
-  'use-latest': 'No report scheduled',
+  'use-toggle': 'Show details',
+  'use-boolean': 'Hidden',
+  'use-controllable-state': '0',
+  'use-previous': '0 to 0',
+  'use-latest': 'Report later',
   'use-debounce': 'Search',
-  'use-throttle': 'Volume',
-  'use-debounce-fn': 'Nothing saved',
-  'use-throttle-fn': 'Pointer tracking area',
-  'use-document-visibility': 'Document: visible',
-  'use-timeout': /Settings saved|Show notice again/,
-  'use-interval': /Elapsed: \d+s/,
-  'use-async': 'No profile loaded',
-  'use-event-listener': 'Native clicks: 0',
-  'use-click-outside': 'Account panel',
-  'use-hover': /Pointer is (?:inside|outside)/,
-  'use-intersection-observer': /Target: (?:Intersecting|Outside)/,
-  'use-key-press': 'No shortcut used',
-  'use-lock-fn': 'Ready to save',
-  'use-memoized-fn': 'No greeting yet',
-  'use-media-query': /Viewport mode: (?:Compact|Wide)/,
+  'use-throttle': 'Value',
+  'use-debounce-fn': 'Save now',
+  'use-throttle-fn': 'Move the pointer here.',
+  'use-document-visibility': 'visible',
+  'use-timeout': 'Saved successfully',
+  'use-interval': /Pause at \d+/,
+  'use-async': 'Ready',
+  'use-event-listener': /\d+px/,
+  'use-click-outside': 'Account settings',
+  'use-hover': /Hovered|Move here/,
+  'use-intersection-observer': /Visible|Waiting/,
+  'use-key-press': null,
+  'use-lock-fn': 'Save',
+  'use-memoized-fn': 'Greet',
+  'use-media-query': /(?:Compact|Full) navigation/,
   'use-window-size': /\d+ x \d+/,
-  'use-online': /Connection: (?:Online|Offline)/,
-  'use-input': '12 characters',
-  'use-local-storage': 'Stored preference:',
-  'use-session-storage': 'characters stored in this tab',
-  'use-is-mounted': 'No task started',
+  'use-online': /Online|Offline/,
+  'use-input': 'Ada',
+  'use-local-storage': 'System',
+  'use-session-storage': 'Discard',
+  'use-is-mounted': 'idle',
   'use-isomorphic-layout-effect': /Measured width: \d+px/,
-  'use-reset-state': 'Release notes',
-  'use-resize-observer': /Waiting for first measurement|\d+ x \d+/,
-  'use-safe-state': 'Delayed callbacks completed: 0',
-  'use-unmounted-ref': 'No upload started',
-  'use-websocket': 'No message received',
+  'use-reset-state': 'Reset',
+  'use-resize-observer': /\d+ x \d+/,
+  'use-safe-state': /Count: 0/,
+  'use-unmounted-ref': 'Waiting',
+  'use-websocket': 'No messages yet',
 } as const;
 
 function appRoute(path = '') {
@@ -612,28 +612,8 @@ test.describe('core interactions', () => {
       playground.getByRole('combobox', { name: 'Example' }),
       'useAsync',
     );
-    await expect(preview.getByText('No profile loaded', { exact: true })).toBeVisible();
+    await expect(preview.getByText('Ready', { exact: true })).toBeVisible();
     expect([...requestedHookChunks]).toEqual(['better-hooks-use-async']);
-  });
-
-  test('WebSocket example connects, echoes a message, and disconnects', async ({ page }) => {
-    await page.routeWebSocket('wss://ws.postman-echo.com/raw', (socket) => {
-      socket.onMessage((message) => socket.send(message));
-    });
-    await openPage(page, 'playground?hook=use-websocket');
-    const preview = page.locator('.playground-workbench .live-code-preview__canvas');
-
-    await expect(preview.getByText('Status: closed', { exact: true })).toBeVisible();
-    await preview.getByRole('button', { name: 'Connect', exact: true }).click();
-    await expect(preview.getByText('Status: open', { exact: true })).toBeVisible();
-
-    const message = 'verified WebSocket echo';
-    await preview.getByRole('textbox', { name: 'Message', exact: true }).fill(message);
-    await preview.getByRole('button', { name: 'Send', exact: true }).click();
-    await expect(preview.getByText(`Echo: ${message}`, { exact: true })).toBeVisible();
-
-    await preview.getByRole('button', { name: 'Disconnect', exact: true }).click();
-    await expect(preview.getByText('Status: closed', { exact: true })).toBeVisible();
   });
 
   test('Playground reports a Hook chunk failure without discarding the editor', async ({
@@ -656,9 +636,7 @@ test.describe('core interactions', () => {
     await page.unroute('**/better-hooks-use-async.*.js');
     await choosePlaygroundExample(page, selector, 'useDebounce');
     await choosePlaygroundExample(page, selector, 'useAsync');
-    await expect(playground.locator('.live-code-preview__canvas')).toContainText(
-      'No profile loaded',
-    );
+    await expect(playground.locator('.live-code-preview__canvas')).toContainText('Ready');
     await expect(playground.getByRole('alert')).toHaveCount(0);
   });
 

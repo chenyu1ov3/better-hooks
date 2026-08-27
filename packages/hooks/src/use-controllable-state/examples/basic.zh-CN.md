@@ -1,59 +1,28 @@
 # use-controllable-state
 
-`useControllableState` 让可复用组件通过同一套 API 同时支持父组件持有状态和内部管理状态。下面并列展示两种模式。
+`useControllableState` 可以让状态由父组件控制，也可以在组件内部管理，适合同时支持受控和非受控用法的可复用组件。
 
 ## 示例
 
 ```tsx
 'use client';
 
-import { useState } from 'react';
 import { useControllableState } from 'better-hooks/use-controllable-state';
 
-function Counter({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value?: number;
-  onChange?: (value: number) => void;
-}) {
+export function UncontrolledCounter() {
   const [count, setCount] = useControllableState({
-    defaultValue: 1,
-    ...(value === undefined ? {} : { value }),
-    ...(onChange === undefined ? {} : { onChange }),
+    defaultValue: 0,
+    onChange: (value) => console.info('计数', value),
   });
 
   return (
-    <div>
-      <span>{label}</span>
-      <button type="button" aria-label={`${label}减一`} onClick={() => setCount((n) => n - 1)}>
-        -
-      </button>
-      <output>{count}</output>
-      <button type="button" aria-label={`${label}加一`} onClick={() => setCount((n) => n + 1)}>
-        +
-      </button>
-    </div>
-  );
-}
-
-export function CounterModes() {
-  const [controlled, setControlled] = useState(1);
-
-  return (
-    <div>
-      <Counter label="非受控" />
-      <Counter label="受控" value={controlled} onChange={setControlled} />
-      <button type="button" onClick={() => setControlled(1)}>
-        重置父组件值
-      </button>
-    </div>
+    <button type="button" onClick={() => setCount((value) => value + 1)}>
+      {count}
+    </button>
   );
 }
 ```
 
 ## 行为说明
 
-省略 `value` 属性时，状态会根据 `defaultValue` 在内部管理；提供 `value` 后则以父组件为准，引用稳定的 setter 会通过 `onChange` 发出更新请求。每个组件实例的所有权模式在首次渲染后保持不变。
+省略 `value` 时由组件内部管理状态；提供 `value` 后，稳定的更新函数会通过 `onChange` 请求变更。组件在整个生命周期内应保持同一种模式。

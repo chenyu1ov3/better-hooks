@@ -1,49 +1,23 @@
 # use-resize-observer
 
-`useResizeObserver` reports an element's latest content rectangle. The measurement is rendered outside the observed box so the result cannot resize its own target.
+`useResizeObserver` tracks an element's content rectangle and exposes its
+current width and height.
 
 ## Example
 
 ```tsx
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useResizeObserver } from 'better-hooks/use-resize-observer';
 
-export function ResizablePanel() {
-  const targetRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState(60);
-  const measurement = useResizeObserver(targetRef);
+export function MeasuredPanel() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { width, height } = useResizeObserver(ref, { box: 'border-box' });
 
   return (
-    <div>
-      <label>
-        Panel width
-        <input
-          type="range"
-          min="30"
-          max="100"
-          value={size}
-          onChange={(event) => setSize(event.currentTarget.valueAsNumber)}
-        />
-      </label>
-      <div
-        ref={targetRef}
-        style={{
-          boxSizing: 'border-box',
-          width: `${size}%`,
-          height: 72,
-          border: '1px solid currentColor',
-        }}
-      >
-        Observed panel
-      </div>
-      <output aria-live="polite">
-        {measurement.rect
-          ? `${Math.round(measurement.width)} x ${Math.round(measurement.height)}`
-          : 'Waiting for first measurement'}
-      </output>
-      {measurement.error === undefined ? null : <output>Observer setup failed</output>}
+    <div ref={ref}>
+      {Math.round(width)} x {Math.round(height)}
     </div>
   );
 }
@@ -51,4 +25,8 @@ export function ResizablePanel() {
 
 ## Behavior
 
-The observer follows ref targets and rebuilds when the target, `box`, or enabled state changes. Width and height are normalized from the native `contentRect`; disabling, SSR, and unsupported browsers return an empty zero-sized snapshot. Setup and callback failures are exposed in `error` and through `onError`.
+The observer follows ref targets and is rebuilt when the target or `box` option
+changes. SSR and browsers without `ResizeObserver` return
+`{ rect: null, width: 0, height: 0 }`. Callback failures disconnect the
+observer before `onError` observes and the original error is rethrown. Setup
+failures follow the same propagation rule.

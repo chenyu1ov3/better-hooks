@@ -1,6 +1,6 @@
 # use-async
 
-`useAsync` runs abort-aware work while exposing status, retained data, errors, and stable controls. This example uses a local delayed task so it works without an application API.
+`useAsync` runs synchronous or asynchronous work while exposing status, result, and error state. This self-contained task also demonstrates cancellation without relying on an external API.
 
 ## Example
 
@@ -10,15 +10,15 @@
 import { useAsync } from 'better-hooks/use-async';
 
 function loadProfile(signal: AbortSignal) {
-  return new Promise<{ name: string; role: string }>((resolve, reject) => {
-    const abort = () => {
-      window.clearTimeout(timer);
-      reject(new DOMException('Profile load cancelled', 'AbortError'));
-    };
-    const timer = window.setTimeout(() => {
+  return new Promise<{ name: string }>((resolve, reject) => {
+    const timeout = window.setTimeout(() => {
       signal.removeEventListener('abort', abort);
-      resolve({ name: 'Ada Lovelace', role: 'Mathematician' });
-    }, 1200);
+      resolve({ name: 'Ada Lovelace' });
+    }, 900);
+    const abort = () => {
+      window.clearTimeout(timeout);
+      reject(new Error('The profile load was cancelled'));
+    };
 
     if (signal.aborted) abort();
     else signal.addEventListener('abort', abort, { once: true });
@@ -27,34 +27,19 @@ function loadProfile(signal: AbortSignal) {
 
 export function ProfileLoader() {
   const request = useAsync(loadProfile);
-
-  const run = () => {
+  const handleLoad = () => {
     void request.run().catch(() => undefined);
   };
 
   return (
     <div>
-      <button type="button" onClick={run}>
-        {request.status === 'pending' ? 'Restart load' : 'Load profile'}
+      <button type="button" disabled={request.status === 'pending'} onClick={handleLoad}>
+        Load
       </button>
       <button type="button" disabled={request.status !== 'pending'} onClick={request.cancel}>
         Cancel
       </button>
-      <button
-        type="button"
-        disabled={request.status === 'idle' && !request.data}
-        onClick={request.reset}
-      >
-        Reset
-      </button>
-      <output aria-live="polite">Status: {request.status}</output>
-      <output>
-        {request.data
-          ? `${request.data.name} · ${request.data.role}`
-          : request.error instanceof Error
-            ? request.error.message
-            : 'No profile loaded'}
-      </output>
+      <output>{request.data?.name ?? (request.status === 'pending' ? 'Loading…' : 'Ready')}</output>
     </div>
   );
 }
@@ -62,4 +47,4 @@ export function ProfileLoader() {
 
 ## Behavior
 
-Each `run` aborts the previous controller and ignores stale state updates while preserving the returned promise's result or rejection. `cancel` keeps existing data and returns to idle; `reset` also clears data and errors. Expected cancellation errors are not reported through `onError`.
+Starting a run aborts the previous run, and stale results cannot replace newer state. `cancel` keeps existing data while returning to idle; `reset` also clears data and errors.

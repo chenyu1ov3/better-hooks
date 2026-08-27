@@ -1,34 +1,23 @@
 # use-event-listener
 
-`useEventListener` subscribes to a native `EventTarget` while keeping the callback fresh without reinstalling the listener. A ref target keeps this demo contained inside its preview.
+`useEventListener` subscribes to a native EventTarget with a callback that stays fresh without reinstalling the listener. It supports the window shorthand, explicit targets, and refs.
 
 ## Example
 
 ```tsx
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useEventListener } from 'better-hooks/use-event-listener';
 
-export function NativeClickCounter() {
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [clicks, setClicks] = useState(0);
-
-  useEventListener(buttonRef, 'click', () => {
-    setClicks((value) => value + 1);
-  });
-
-  return (
-    <div>
-      <button ref={buttonRef} type="button">
-        Native event target
-      </button>
-      <output aria-live="polite">Native clicks: {clicks}</output>
-    </div>
-  );
+export function ViewportWidth() {
+  const [width, setWidth] = useState(0);
+  useEffect(() => setWidth(window.innerWidth), []);
+  useEventListener('resize', () => setWidth(window.innerWidth), { passive: true });
+  return <output>{width}px</output>;
 }
 ```
 
 ## Behavior
 
-The Hook resolves direct targets and ref-like targets after each commit. Callback changes are published without rebinding; target, event type, capture, passive, once, or signal changes install a matching native listener. Unmounting always removes the active binding.
+Changing a callback does not reinstall the listener. Changing the target, event type, capture, passive, once, or signal option rebinds it, and unmounting always removes it.

@@ -1,6 +1,6 @@
 # use-websocket
 
-`useWebSocket` manages a browser WebSocket with observable lifecycle state, raw messages, stable actions, and optional bounded reconnects. This demo connects only on request to a verified public echo endpoint.
+`useWebSocket` manages a browser WebSocket connection, exposes its lifecycle and latest message, and keeps imperative actions stable across renders. Reconnects are opt-in so examples and server rendering never open a network connection by surprise.
 
 ## Example
 
@@ -10,59 +10,31 @@
 import { useState } from 'react';
 import { useWebSocket } from 'better-hooks/use-websocket';
 
-const echoUrl = 'wss://ws.postman-echo.com/raw';
-
-function describeError(error: unknown) {
-  return error instanceof Error ? error.message : 'WebSocket connection failed';
-}
-
-export function WebSocketEcho() {
+export function WebSocketStatus() {
   const [enabled, setEnabled] = useState(false);
-  const [draft, setDraft] = useState('Hello from better-hooks');
-  const socket = useWebSocket(echoUrl, {
+  const [message, setMessage] = useState('hello from better-hooks');
+  const socket = useWebSocket('wss://echo.websocket.events', {
     enabled,
-    reconnect: { maxAttempts: 2, initialDelay: 500 },
+    reconnect: { maxAttempts: 3 },
+    onMessage: (event) => setMessage(String(event.data)),
   });
 
-  const disconnect = () => {
-    socket.close(1000, 'Demo disconnected');
-    setEnabled(false);
-  };
   const send = () => {
-    try {
-      socket.send(draft);
-    } catch {
-      // A close between render and click is exposed through socket.error.
-    }
+    socket.send(message);
   };
 
   return (
     <div>
-      <button type="button" disabled={enabled} onClick={() => setEnabled(true)}>
-        Connect
+      <button type="button" onClick={() => setEnabled((value) => !value)}>
+        {enabled ? 'Disconnect' : 'Connect'}
       </button>
-      <button type="button" disabled={!enabled} onClick={disconnect}>
-        Disconnect
-      </button>
-      <button
-        type="button"
-        disabled={!enabled || socket.status === 'connecting'}
-        onClick={socket.reconnect}
-      >
-        Reconnect
-      </button>
-      <label>
-        Message
-        <input value={draft} onChange={(event) => setDraft(event.currentTarget.value)} />
-      </label>
-      <button type="button" disabled={socket.status !== 'open' || !draft} onClick={send}>
+      <button type="button" disabled={socket.status !== 'open'} onClick={send}>
         Send
       </button>
-      <output aria-live="polite">Status: {socket.status}</output>
+      <input value={message} onChange={(event) => setMessage(event.target.value)} />
       <output>
-        Echo: {socket.data === undefined ? 'No message received' : String(socket.data)}
+        {socket.status}: {String(socket.data ?? 'No messages yet')}
       </output>
-      {socket.error === undefined ? null : <output>Error: {describeError(socket.error)}</output>}
     </div>
   );
 }
@@ -70,4 +42,12 @@ export function WebSocketEcho() {
 
 ## Behavior
 
-Disabled mode and SSR stay `closed` without constructing a socket. URL, protocol, or enabled changes replace the connection and ignore stale events. `send` succeeds only while `open`; every other state throws `InvalidStateError` and stores it in `error`. Manual close suppresses retries, while server-initiated closes use the bounded reconnect policy when enabled.
+The hook starts in `closed` during SSR and while disabled. URL, protocol, or
+enabled changes replace the old socket and ignore events from it. Reconnect
+policy updates affect future retries without replacing the active socket.
+`reconnect` is disabled by default; when enabled it retries server-initiated
+closes, including clean close codes, with bounded exponential backoff. `send`
+only writes while the socket is `open`; otherwise it throws an
+`InvalidStateError` and reports it through `onError`. Native failures from an
+open socket and `close` failures are preserved. A callback failure closes the
+active socket before the original error is rethrown.
