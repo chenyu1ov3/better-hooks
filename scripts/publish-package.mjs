@@ -596,6 +596,39 @@ async function verifyPublishedPackage(record, expectedIntegrity) {
   return tarball;
 }
 
+const retryableAttestationStatuses = new Set([404, 408, 425, 429, 500, 502, 503, 504]);
+
+export async function readProvenanceDocument(
+  url,
+  {
+    fetchImpl = fetch,
+    sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+    maxAttempts = 12,
+    retryDelayMs = 5_000,
+  } = {},
+) {
+  if (typeof url !== 'string' || url.length === 0) {
+    throw new Error('npm attestation URL is missing.');
+  }
+  if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1) {
+    throw new Error('npm attestation attempts must be a positive integer.');
+  }
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const response = await fetchImpl(url, {
+      headers: { accept: 'application/json' },
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (response.ok) return response.json();
+    if (!retryableAttestationStatuses.has(response.status) || attempt === maxAttempts) {
+      throw new Error(`npm attestations returned HTTP ${response.status}.`);
+    }
+    await sleep(retryDelayMs);
+  }
+
+  throw new Error('npm attestation retry loop completed unexpectedly.');
+}
+
 async function verifyProvenance(attestations) {
   if (
     !attestations?.url ||
@@ -603,12 +636,7 @@ async function verifyProvenance(attestations) {
   ) {
     throw new Error('Published package is missing npm provenance metadata.');
   }
-  const response = await fetch(attestations.url, {
-    headers: { accept: 'application/json' },
-    signal: AbortSignal.timeout(20_000),
-  });
-  if (!response.ok) throw new Error(`npm attestations returned HTTP ${response.status}.`);
-  const document = await response.json();
+  const document = await readProvenanceDocument(attestations.url);
   const searchable = [JSON.stringify(document), ...decodeDssePayloads(document)].join('\n');
   if (
     !searchable.toLowerCase().includes(releaseCommit()) ||
