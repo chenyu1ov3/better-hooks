@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+
+### Patch Changes
+
+- 77fcdc4: Clarify the package feature contract around committed lifecycle work, SSR snapshots, shared browser channels, per-subscriber storage semantics, error observability, and ESM distribution.
+- f5f0cbc: Keep storage and media-query registries free of abandoned render state, rebind `useKeyPress` when its event list changes, and report media listener setup and cleanup failures through `onError`.
+
 ## 1.1.1
 
 ### Patch Changes
