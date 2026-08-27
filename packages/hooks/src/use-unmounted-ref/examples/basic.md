@@ -1,30 +1,54 @@
 # use-unmounted-ref
 
-`useUnmountedRef` exposes a stable ref for guarding asynchronous work that may finish after a component unmounts.
+`useUnmountedRef` exposes a stable ref whose value becomes true during unmount cleanup. It is convenient in callback APIs that expect a mutable guard rather than a function.
 
 ## Example
 
 ```tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useUnmountedRef } from 'better-hooks/use-unmounted-ref';
 
-export function AsyncStatus() {
-  const [ready, setReady] = useState(false);
-  const unmountedRef = useUnmountedRef();
+function UploadTask({ onResult }: { onResult: (message: string) => void }) {
+  const unmounted = useUnmountedRef();
+  const [status, setStatus] = useState('Idle');
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      if (!unmountedRef.current) setReady(true);
-    }, 500);
-    return () => window.clearTimeout(timer);
-  }, [unmountedRef]);
+  const start = () => {
+    setStatus('Uploading...');
+    window.setTimeout(() => {
+      if (unmounted.current) {
+        onResult('Upload callback arrived after unmount');
+        return;
+      }
+      setStatus('Uploaded');
+      onResult('Upload completed while mounted');
+    }, 1200);
+  };
 
-  return <output>{ready ? 'Ready' : 'Waiting'}</output>;
+  return (
+    <button type="button" onClick={start}>
+      {status}
+    </button>
+  );
+}
+
+export function UnmountedUploadGuard() {
+  const [showUpload, setShowUpload] = useState(true);
+  const [result, setResult] = useState('No upload started');
+
+  return (
+    <div>
+      {showUpload ? <UploadTask onResult={setResult} /> : <span>Uploader removed</span>}
+      <button type="button" onClick={() => setShowUpload((value) => !value)}>
+        {showUpload ? 'Remove uploader' : 'Mount uploader'}
+      </button>
+      <output aria-live="polite">{result}</output>
+    </div>
+  );
 }
 ```
 
 ## Behavior
 
-The ref starts as `false`, remains stable across renders, and becomes `true` during unmount cleanup. It stays `false` during server rendering.
+The ref starts at `false`, remains the same object across renders, and becomes `true` in unmount cleanup. Strict Mode effect replay restores it to `false` for the live component. It also stays `false` during server rendering.

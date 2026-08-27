@@ -1,34 +1,54 @@
 # use-key-press
 
-`useKeyPress` 监听键盘事件，支持按键名称、旧版数字 keyCode、备选数组、谓词和
-字符串形式的修饰键组合。
+`useKeyPress` 支持按键、候选列表、谓词、旧式键码和修饰键组合。将监听器限定到 ref，可以让快捷键只在草稿输入框内生效。
 
 ## 示例
 
 ```tsx
 'use client';
 
+import { useRef, useState } from 'react';
 import { useKeyPress } from 'better-hooks/use-key-press';
 
-export function Shortcuts() {
-  useKeyPress(['Escape', 'Enter'], (_event, key) => {
-    console.log(`按下 ${key}`);
-  });
+export function DraftShortcuts() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState('季度更新');
+  const [action, setAction] = useState('尚未使用快捷键');
 
-  useKeyPress('ctrl+s', (event) => {
-    event.preventDefault();
-    console.log('保存');
-  });
-  return null;
+  useKeyPress(
+    ['ctrl+s', 'meta+s'],
+    (event) => {
+      event.preventDefault();
+      setAction(`已保存：${draft || '空草稿'}`);
+    },
+    { ref: inputRef, exactMatch: true },
+  );
+
+  useKeyPress(
+    'Escape',
+    () => {
+      setDraft('');
+      setAction('草稿已清空');
+    },
+    { ref: inputRef },
+  );
+
+  return (
+    <div>
+      <label>
+        支持 Ctrl/Cmd+S 和 Escape 的草稿
+        <input
+          ref={inputRef}
+          value={draft}
+          onChange={(event) => setDraft(event.currentTarget.value)}
+        />
+      </label>
+      <output aria-live="polite">{action}</output>
+    </div>
+  );
 }
 ```
 
 ## 行为说明
 
-筛选器和处理函数始终使用最近一次已提交的版本；目标、事件列表或捕获模式变化时会替换原生监听器。
-
-可以通过 `target` 或 `ref` 限定监听范围，用 `enabled` 暂停监听，并在需要时使用
-`capture` 捕获阶段。回调异常会先通知 `onError`，然后继续抛出。
-
-数组始终表示彼此独立的备选按键。修饰键组合必须写成单个字符串，例如 `ctrl+s` 或
-`ctrl.s`；`['ctrl', 's']` 不会组成组合键。
+数组表示彼此独立的候选项，因此修饰键组合必须写成 `ctrl+s` 这样的单个字符串。过滤器和处理函数始终使用最近提交的值。目标、事件列表、精确匹配、捕获或启用状态变化时会协调原生监听器，卸载时则全部移除。

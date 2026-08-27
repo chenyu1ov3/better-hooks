@@ -1,6 +1,6 @@
 # use-local-storage
 
-`useLocalStorage` 会让类型安全的值与 `localStorage` 存储项保持同步，通过 `error` 暴露持久化失败，并保证 SSR 期间不访问浏览器存储。
+`useLocalStorage` 将类型化值与 localStorage 键同步，并暴露可恢复的存储或编解码错误，同时避免在 SSR 期间访问浏览器存储。
 
 ## 示例
 
@@ -9,28 +9,32 @@
 
 import { useLocalStorage } from 'better-hooks/use-local-storage';
 
-export function ThemePreference() {
-  const theme = useLocalStorage('theme:v1', 'system');
+type ThemePreference = 'system' | 'light' | 'dark';
+
+export function ThemePreferencePicker() {
+  const theme = useLocalStorage<ThemePreference>('better-hooks:theme-example', 'system');
 
   return (
     <div>
-      <button type="button" onClick={() => theme.setValue('light')}>
+      <button
+        type="button"
+        aria-pressed={theme.value === 'light'}
+        onClick={() => theme.setValue('light')}
+      >
         浅色
       </button>
-      <button type="button" onClick={() => theme.setValue('dark')}>
+      <button
+        type="button"
+        aria-pressed={theme.value === 'dark'}
+        onClick={() => theme.setValue('dark')}
+      >
         深色
       </button>
-      <button type="button" onClick={theme.remove}>
+      <button type="button" aria-pressed={theme.value === 'system'} onClick={theme.remove}>
         跟随系统
       </button>
-      <output>
-        {theme.error
-          ? '存储不可用'
-          : theme.value === 'light'
-            ? '浅色'
-            : theme.value === 'dark'
-              ? '深色'
-              : '跟随系统'}
+      <output aria-live="polite">
+        {theme.error === undefined ? `已存储偏好：${theme.value}` : '存储不可用'}
       </output>
     </div>
   );
@@ -39,4 +43,4 @@ export function ThemePreference() {
 
 ## 行为说明
 
-函数式更新和使用同一存储项的 Hook 实例共享内存快照。删除存储项会恢复首次捕获的初始值；下一次操作成功后，可恢复的存储错误会被清除。
+初始值只捕获一次，用于 SSR 以及删除键后的回退。同键 Hook 实例共享内存快照，浏览器 `storage` 事件则同步其他文档。函数式更新使用最新共享值；后续操作成功时会清除可恢复错误。

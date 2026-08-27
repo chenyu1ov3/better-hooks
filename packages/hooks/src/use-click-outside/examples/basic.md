@@ -1,6 +1,6 @@
 # use-click-outside
 
-`useClickOutside` invokes a callback when a pointer is pressed outside a referenced element. It is intended for popovers, menus, and dismissible panels.
+`useClickOutside` handles captured pointer presses outside a referenced element. The separate inside and outside controls below make the boundary explicit.
 
 ## Example
 
@@ -13,23 +13,42 @@ import { useClickOutside } from 'better-hooks/use-click-outside';
 export function DismissiblePanel() {
   const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(true);
-  useClickOutside(panelRef, () => setOpen(false), open);
+  const [insideActions, setInsideActions] = useState(0);
+  const [dismissals, setDismissals] = useState(0);
 
-  return open ? (
-    <div ref={panelRef}>
-      <p>Account settings</p>
-      <button type="button" onClick={() => setOpen(false)}>
-        Close
+  useClickOutside(
+    panelRef,
+    () => {
+      setOpen(false);
+      setDismissals((value) => value + 1);
+    },
+    { enabled: open },
+  );
+
+  return (
+    <div>
+      {open ? (
+        <div ref={panelRef}>
+          <span>Account panel</span>
+          <button type="button" onClick={() => setInsideActions((value) => value + 1)}>
+            Inside action
+          </button>
+        </div>
+      ) : (
+        <span>Panel dismissed</span>
+      )}
+      <button type="button" disabled={open} onClick={() => setOpen(true)}>
+        Open panel
       </button>
+      <button type="button">Outside target</button>
+      <output>
+        Inside actions: {insideActions}; outside dismissals: {dismissals}
+      </output>
     </div>
-  ) : (
-    <button type="button" onClick={() => setOpen(true)}>
-      Open panel
-    </button>
   );
 }
 ```
 
 ## Behavior
 
-The listener uses the element's document and capture phase, so stopped bubbling does not hide outside presses. Events inside Shadow DOM are checked through their composed path.
+The listener uses the element's owner document and capture phase, so stopped bubbling cannot hide outside presses. The current ref target is checked for every event, disabled mode removes the binding, and composed paths preserve correct behavior across Shadow DOM.

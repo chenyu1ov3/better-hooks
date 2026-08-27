@@ -1,25 +1,36 @@
 # use-memoized-fn
 
-`useMemoizedFn` keeps a callback reference stable while making each call use the latest committed implementation.
+`useMemoizedFn` keeps a function reference stable while each call uses the latest committed implementation. This lets long-lived subscriptions observe fresh state without being reinstalled.
 
 ## Example
 
 ```tsx
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMemoizedFn } from 'better-hooks/use-memoized-fn';
 
-export function MemoizedGreeting() {
+export function StableGreetingSubscription() {
   const [name, setName] = useState('Ada');
-  const greet = useMemoizedFn(() => window.alert(`Hello, ${name}`));
+  const [message, setMessage] = useState('No greeting yet');
+  const [events] = useState(() => new EventTarget());
+  const greet = useMemoizedFn(() => setMessage(`Hello, ${name}`));
+
+  useEffect(() => {
+    events.addEventListener('greet', greet);
+    return () => events.removeEventListener('greet', greet);
+  }, [events, greet]);
 
   return (
     <div>
-      <input value={name} onChange={(event) => setName(event.target.value)} />
-      <button type="button" onClick={greet}>
-        Greet
+      <label>
+        Name
+        <input value={name} onChange={(event) => setName(event.currentTarget.value)} />
+      </label>
+      <button type="button" onClick={() => events.dispatchEvent(new Event('greet'))}>
+        Dispatch greeting
       </button>
+      <output aria-live="polite">{message}</output>
     </div>
   );
 }
@@ -27,4 +38,4 @@ export function MemoizedGreeting() {
 
 ## Behavior
 
-The returned function keeps the same identity across renders. Its callback is replaced after commit, so abandoned concurrent renders cannot change what it invokes.
+The returned function keeps the same identity, so the effect above subscribes once. Its implementation is replaced after each successful commit, ensuring the event always reads the latest name without exposing callbacks from abandoned renders.

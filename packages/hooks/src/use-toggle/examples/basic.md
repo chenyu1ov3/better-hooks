@@ -1,6 +1,6 @@
 # use-toggle
 
-`useToggle` is a compact boolean state primitive with a stable action. The action can invert the value, set it explicitly, or apply a functional update.
+`useToggle` is a compact boolean state primitive whose stable action can invert the current value, set it explicitly, or apply a functional update.
 
 ## Example
 
@@ -9,15 +9,22 @@
 
 import { useToggle } from 'better-hooks/use-toggle';
 
-export function Disclosure() {
+export function ShippingDisclosure() {
   const [open, toggle] = useToggle(false);
 
   return (
     <div>
       <button type="button" aria-expanded={open} onClick={() => toggle()}>
-        {open ? 'Hide details' : 'Show details'}
+        {open ? 'Hide shipping details' : 'Show shipping details'}
       </button>
-      {open ? <p>Additional details</p> : null}
+      {open ? (
+        <div>
+          <p>Orders usually leave the warehouse in two business days.</p>
+          <button type="button" onClick={() => toggle(false)}>
+            Close
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -25,4 +32,4 @@ export function Disclosure() {
 
 ## Behavior
 
-The action identity stays stable across renders. Multiple functional updates in one React batch are applied in order against the latest queued value.
+The action identity stays stable across renders. Calling it without an argument inverts the latest state, while an explicit boolean sets the state directly. Functional updates compose in order within the same React batch.
