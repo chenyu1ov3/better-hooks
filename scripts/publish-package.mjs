@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 import {
   appendFile,
   copyFile,
@@ -16,7 +14,8 @@ import {
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
-import { gunzipSync } from 'node:zlib';
+import { pathToFileURL } from 'node:url';
+import { canonicalJson, readTarGzip, sha256, sri } from './package-artifact.mjs';
 
 const packageName = 'better-hooks';
 const officialRepository = 'chenyu1ov3/better-hooks';
@@ -28,7 +27,6 @@ const firstReleaseRcPattern = /^1\.0\.0-rc\.\d+$/;
 const registryUrl = `https://registry.npmjs.org/${packageName}`;
 const packageDirectory = path.resolve('packages/hooks');
 const manifest = JSON.parse(await readFile(path.join(packageDirectory, 'package.json'), 'utf8'));
-const command = process.argv[2] ?? 'status';
 const expectedKeywords = [
   'debounce',
   'esm',
@@ -45,18 +43,26 @@ const expectedKeywords = [
 ];
 const logoUrl = 'https://chenyu1ov3.github.io/better-hooks/better-hooks-mark.svg';
 
-try {
+export async function runCommand(command = process.argv[2] ?? 'status') {
   validateManifest();
   if (command === 'status') await reportStatus();
   else if (command === 'validate') await validateReleaseCandidate();
+  else if (command === 'pack') await createReleaseArtifact();
   else if (command === 'publish') await publishOrReconcile();
-  else
+  else {
     throw new Error(
-      `Unknown command ${JSON.stringify(command)}. Use status, validate, or publish.`,
+      `Unknown command ${JSON.stringify(command)}. Use status, validate, pack, or publish.`,
     );
-} catch (error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
+  }
+}
+
+if (isMainModule()) {
+  try {
+    await runCommand();
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  }
 }
 
 async function reportStatus() {
@@ -101,21 +107,43 @@ async function reportStatus() {
   console.log(JSON.stringify(outputs, null, 2));
 }
 
+async function createReleaseArtifact() {
+  assertReleaseContext();
+  const { channel, sha } = await validateReleaseCandidate();
+  assertPinnedNpm();
+
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), 'better-hooks-pack-'));
+  try {
+    const packedArtifact = await packLocalArtifact(tempDirectory);
+    await writeReleaseAssets(packedArtifact);
+    const persistedArtifact = await readReleaseArtifact();
+    if (persistedArtifact.integrity !== packedArtifact.integrity) {
+      throw new Error('Persisted release artifact integrity changed after packing.');
+    }
+    const outputs = {
+      version: manifest.version,
+      tag: releaseTag(),
+      'dist-tag': channel,
+      state: 'packed',
+      commit: sha,
+      artifact: persistedArtifact.path,
+      integrity: persistedArtifact.integrity,
+    };
+    await writeOutputs(outputs);
+    console.log(JSON.stringify(outputs, null, 2));
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+}
+
 async function publishOrReconcile() {
   assertReleaseContext();
   const { channel, sha } = await validateReleaseCandidate();
-  if (await hasPendingChangesets()) {
-    throw new Error('Pending Changesets must be consumed by the Version PR before publishing.');
-  }
-  const npmVersion = runNpm(['--version'], { encoding: 'utf8' }).trim();
-  if (npmVersion !== requiredNpmVersion) {
-    throw new Error(`Publishing requires npm ${requiredNpmVersion}; received ${npmVersion}.`);
-  }
+  assertPinnedNpm();
+  const localArtifact = await readReleaseArtifact();
 
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), 'better-hooks-release-'));
   try {
-    const localArtifact = packLocalArtifact(tempDirectory);
-    await writeReleaseAssets(localArtifact);
     assertReleaseRecordsCompatible(await readGitHubState(), sha, channel);
     const registry = await readRegistry();
     let versionRecord = registry.versions?.[manifest.version];
@@ -175,6 +203,13 @@ async function publishOrReconcile() {
     console.log(JSON.stringify(outputs, null, 2));
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
+  }
+}
+
+function assertPinnedNpm() {
+  const npmVersion = runNpm(['--version'], { encoding: 'utf8' }).trim();
+  if (npmVersion !== requiredNpmVersion) {
+    throw new Error(`Publishing requires npm ${requiredNpmVersion}; received ${npmVersion}.`);
   }
 }
 
@@ -354,7 +389,7 @@ function assertReleaseContext() {
   if (!releaseToken()) throw new Error('GITHUB_TOKEN is required to reconcile tags and releases.');
 }
 
-function packLocalArtifact(tempDirectory) {
+async function packLocalArtifact(tempDirectory) {
   const output = runNpm(
     ['pack', packageDirectory, '--pack-destination', tempDirectory, '--ignore-scripts', '--json'],
     { encoding: 'utf8' },
@@ -364,25 +399,33 @@ function packLocalArtifact(tempDirectory) {
     throw new Error('npm pack did not return exactly one artifact.');
   }
   const tarballPath = path.join(tempDirectory, records[0].filename);
-  const tarball = readFileSync(tarballPath);
+  const tarball = await readFile(tarballPath);
   return { path: tarballPath, bytes: tarball, integrity: sri(tarball) };
 }
 
-async function writeReleaseAssets(localArtifact) {
-  const outputDirectory = process.env.BETTER_HOOKS_RELEASE_ARTIFACT_DIR;
-  if (!outputDirectory) return;
-  await mkdir(outputDirectory, { recursive: true });
+function releaseArtifactPaths() {
+  const configuredDirectory = process.env.BETTER_HOOKS_RELEASE_ARTIFACT_DIR?.trim();
+  if (!configuredDirectory) {
+    throw new Error('BETTER_HOOKS_RELEASE_ARTIFACT_DIR is required for packing and publishing.');
+  }
+  const directory = path.resolve(configuredDirectory);
   const filename = `${packageName}-${manifest.version}.tgz`;
-  const outputPath = path.join(outputDirectory, filename);
-  await copyFile(localArtifact.path, outputPath);
-  const digest = createHash('sha256').update(localArtifact.bytes).digest('hex');
+  return {
+    directory,
+    filename,
+    tarball: path.join(directory, filename),
+    checksum: path.join(directory, `${filename}.sha256`),
+    metadata: path.join(directory, 'release-metadata.json'),
+  };
+}
+
+async function writeReleaseAssets(localArtifact) {
+  const paths = releaseArtifactPaths();
+  await mkdir(paths.directory, { recursive: true });
+  await copyFile(localArtifact.path, paths.tarball);
+  await writeFile(paths.checksum, `${sha256(localArtifact.bytes)}  ${paths.filename}\n`, 'utf8');
   await writeFile(
-    path.join(outputDirectory, `${filename}.sha256`),
-    `${digest}  ${filename}\n`,
-    'utf8',
-  );
-  await writeFile(
-    path.join(outputDirectory, 'release-metadata.json'),
+    paths.metadata,
     `${JSON.stringify(
       {
         name: packageName,
@@ -395,6 +438,64 @@ async function writeReleaseAssets(localArtifact) {
     )}\n`,
     'utf8',
   );
+}
+
+export async function readReleaseArtifact() {
+  const paths = releaseArtifactPaths();
+  const expectedFiles = new Set([
+    paths.filename,
+    path.basename(paths.checksum),
+    path.basename(paths.metadata),
+  ]);
+  const entries = await readdir(paths.directory, { withFileTypes: true });
+  const unexpected = entries
+    .filter((entry) => !entry.isFile() || !expectedFiles.has(entry.name))
+    .map((entry) => entry.name);
+  if (unexpected.length > 0) {
+    throw new Error(
+      `Release artifact directory contains unexpected entries: ${unexpected.join(', ')}.`,
+    );
+  }
+
+  const [bytes, checksum, metadataSource] = await Promise.all([
+    readFile(paths.tarball),
+    readFile(paths.checksum, 'utf8'),
+    readFile(paths.metadata, 'utf8'),
+  ]);
+  const integrity = sri(bytes);
+  const expectedChecksum = `${sha256(bytes)}  ${paths.filename}\n`;
+  if (checksum !== expectedChecksum) throw new Error('Release artifact SHA-256 does not match.');
+
+  const metadata = JSON.parse(metadataSource);
+  assertReleaseArtifactMetadata(metadata, {
+    name: packageName,
+    version: manifest.version,
+    commit: releaseCommit(),
+    integrity,
+  });
+
+  const files = readTarGzip(bytes);
+  const packedManifestSource = files.get('package/package.json');
+  if (!packedManifestSource) throw new Error('Release artifact is missing package/package.json.');
+  const packedManifest = JSON.parse(packedManifestSource.toString('utf8'));
+  if (packedManifest.name !== packageName || packedManifest.version !== manifest.version) {
+    throw new Error('Release artifact package identity does not match the candidate.');
+  }
+
+  return { path: paths.tarball, bytes, integrity };
+}
+
+export function assertReleaseArtifactMetadata(metadata, expected) {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    throw new Error('Release artifact metadata must be an object.');
+  }
+  for (const key of ['name', 'version', 'commit', 'integrity']) {
+    if (metadata[key] !== expected[key]) {
+      throw new Error(
+        `Release artifact metadata ${key}=${JSON.stringify(metadata[key])}; expected ${JSON.stringify(expected[key])}.`,
+      );
+    }
+  }
 }
 
 async function readRegistry() {
@@ -656,7 +757,7 @@ async function waitForGitHubState(predicate, message) {
   return state;
 }
 
-function assertReleaseRecordsCompatible(
+export function assertReleaseRecordsCompatible(
   state,
   sha,
   channel = manifest.version.includes('-') ? 'next' : 'latest',
@@ -730,50 +831,9 @@ async function githubRequest(endpoint, options = {}) {
   return response.json();
 }
 
-function readTarGzip(tarball) {
-  const archive = gunzipSync(tarball);
-  const files = new Map();
-  for (let offset = 0; offset + 512 <= archive.length;) {
-    const header = archive.subarray(offset, offset + 512);
-    if (header.every((byte) => byte === 0)) break;
-    const name = readTarString(header, 0, 100);
-    const prefix = readTarString(header, 345, 155);
-    const filename = prefix ? `${prefix}/${name}` : name;
-    const size = Number.parseInt(readTarString(header, 124, 12).trim() || '0', 8);
-    const type = String.fromCharCode(header[156] || 48);
-    const bodyStart = offset + 512;
-    if (type === '0' || type === '\0')
-      files.set(filename, archive.subarray(bodyStart, bodyStart + size));
-    offset = bodyStart + Math.ceil(size / 512) * 512;
-  }
-  return files;
-}
-
-function readTarString(buffer, start, length) {
-  const end = buffer.indexOf(0, start);
-  return buffer
-    .subarray(start, end === -1 || end > start + length ? start + length : end)
-    .toString();
-}
-
-function sri(bytes) {
-  return `sha512-${createHash('sha512').update(bytes).digest('base64')}`;
-}
-
-function canonicalJson(value) {
-  return JSON.stringify(canonicalize(value));
-}
-
-function canonicalize(value) {
-  if (Array.isArray(value)) return value.map(canonicalize);
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.keys(value)
-        .sort()
-        .map((key) => [key, canonicalize(value[key])]),
-    );
-  }
-  return value;
+function isMainModule() {
+  if (!process.argv[1]) return false;
+  return import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
 }
 
 function releaseTag() {

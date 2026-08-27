@@ -20,12 +20,12 @@ pnpm add better-hooks
 
 ## Features
 
-- 33 focused Hooks, including dedicated localStorage and sessionStorage entries.
-- TypeScript declarations and explicit ESM exports for every public entry.
-- Direct imports for a smaller initial module graph and reliable tree shaking.
-- Stable callback-oriented APIs designed for React 19 concurrent rendering.
-- Defined SSR fallbacks and preserved `"use client"` boundaries for RSC applications.
-- No runtime dependency other than the React peer dependency.
+- **Commit-safe lifecycle work.** Subscriptions, timers, and asynchronous tasks start after commit, clean up symmetrically, and tolerate React Strict Mode replay. Abandoned renders do not claim shared external-store registries.
+- **Latest committed callbacks with stable actions.** Long-lived work calls the latest committed handler without rebuilding native subscriptions; returned actions keep their identity wherever the API contract permits it.
+- **Deterministic SSR and explicit RSC boundaries.** Runtime entries preserve `"use client"`, imports have no browser side effects, and browser-facing Hooks define stable server snapshots.
+- **Shared native work with isolated instance semantics.** Equal browser queries and storage keys can share native channels, while storage initial values, codecs, decoded values, and errors remain scoped to each subscriber.
+- **Observable errors and explicit cancellation.** `onError` observers do not swallow the original failure, and stale or cancelled asynchronous work follows each Hook's documented suppression rules.
+- **Auditable ESM distribution.** All 33 Hooks ship typed root and direct exports with `sideEffects: false`, package-level size budgets, and no runtime dependency beyond the React peer.
 
 ## Imports
 
