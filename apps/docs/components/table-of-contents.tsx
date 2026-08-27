@@ -60,8 +60,12 @@ export function TableOfContents({
       .filter((element): element is HTMLElement => element !== null);
     if (!elements.length) return;
 
+    const scrollOffset = Number.parseFloat(
+      window.getComputedStyle(document.documentElement).scrollPaddingTop,
+    );
+    const activationLine = (Number.isFinite(scrollOffset) ? scrollOffset : 0) + 1;
+
     function updateActiveHeading() {
-      const activationLine = Math.min(160, window.innerHeight * 0.25);
       let current = elements[0];
 
       for (const element of elements) {
@@ -79,18 +83,30 @@ export function TableOfContents({
       if (headingIds.includes(hashId)) setActiveId(hashId);
     }
 
-    const observer = new IntersectionObserver(updateActiveHeading, {
-      rootMargin: '-96px 0px -65% 0px',
+    let animationFrame: number | undefined;
+    function scheduleActiveHeadingUpdate() {
+      if (animationFrame !== undefined) return;
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = undefined;
+        updateActiveHeading();
+      });
+    }
+
+    const observer = new IntersectionObserver(scheduleActiveHeadingUpdate, {
+      rootMargin: `-${Math.max(0, activationLine - 1)}px 0px -65% 0px`,
       threshold: [0, 1],
     });
     elements.forEach((element) => observer.observe(element));
     window.addEventListener('hashchange', syncFromHash);
-    syncFromHash();
+    window.addEventListener('scroll', scheduleActiveHeadingUpdate, { passive: true });
     updateActiveHeading();
+    syncFromHash();
 
     return () => {
       observer.disconnect();
       window.removeEventListener('hashchange', syncFromHash);
+      window.removeEventListener('scroll', scheduleActiveHeadingUpdate);
+      if (animationFrame !== undefined) window.cancelAnimationFrame(animationFrame);
     };
   }, [headings]);
 
