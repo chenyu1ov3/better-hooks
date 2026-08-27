@@ -59,9 +59,17 @@ jobs:
         run: npm --version
       - name: Validate release candidate
         run: node scripts/publish-package.mjs validate
-      - name: Validate package artifact
-        run: pnpm check:package
-      - name: Publish package and reconcile GitHub records
+      - name: Build package
+        run: pnpm build
+      - name: Pack immutable release artifact
+        run: node scripts/publish-package.mjs pack
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Validate immutable release artifact
+        run: node scripts/check-package.mjs
+        env:
+          BETTER_HOOKS_PACKAGE_ARTIFACT: ${{ env.BETTER_HOOKS_RELEASE_ARTIFACT_DIR }}/better-hooks-${{ inputs.version }}.tgz
+      - name: Publish verified artifact and reconcile GitHub records
         run: node scripts/publish-package.mjs publish
         env:
           GITHUB_TOKEN: ${{ github.token }}

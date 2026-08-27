@@ -8,6 +8,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { brotliCompressSync, gzipSync } from 'node:zlib';
 import ts from 'typescript';
+import { canonicalJson, readTarGzip } from './package-artifact.mjs';
 
 const packageDirectory = path.resolve(process.argv[2] ?? 'packages/hooks');
 const manifestPath = path.join(packageDirectory, 'package.json');
@@ -173,14 +174,48 @@ console.table(rows);
 exitOnFailures(`Direct entries exceed a size budget (default gzip limit: ${gzipLimit} bytes)`);
 console.log(`Validated size budgets for ${rows.length} direct entries.`);
 
-const tempDirectory = await mkdtemp(path.join(os.tmpdir(), 'better-hooks-pack-'));
-const tarball = path.join(tempDirectory, 'better-hooks.tgz');
+const configuredArtifact = process.env.BETTER_HOOKS_PACKAGE_ARTIFACT?.trim();
+const tempDirectory = configuredArtifact
+  ? undefined
+  : await mkdtemp(path.join(os.tmpdir(), 'better-hooks-pack-'));
+const tarball = configuredArtifact
+  ? path.resolve(configuredArtifact)
+  : path.join(tempDirectory, 'better-hooks.tgz');
 
 try {
-  console.log('Packing the published artifact...');
-  runPnpm(['pack', '--out', tarball], { cwd: packageDirectory });
+  if (configuredArtifact) {
+    console.log(
+      `Validating the existing package artifact ${path.relative(process.cwd(), tarball)}...`,
+    );
+  } else {
+    console.log('Packing the published artifact...');
+    runPnpm(['pack', '--out', tarball], { cwd: packageDirectory });
+  }
   await access(tarball, constants.R_OK);
-  const entries = listPackEntries(packageDirectory);
+  const artifactFiles = readTarGzip(await readFile(tarball));
+  const entries = [...artifactFiles.keys()];
+  for (const [filename, contents] of artifactFiles) {
+    if (!filename.startsWith('package/')) {
+      failures.push(`Published artifact contains a file outside package/: ${filename}`);
+      continue;
+    }
+    const relativePath = filename.slice('package/'.length);
+    try {
+      const candidateContents = await readFile(path.join(packageDirectory, relativePath));
+      const matchesCandidate =
+        relativePath === 'package.json'
+          ? canonicalJson(JSON.parse(contents.toString('utf8'))) ===
+            canonicalJson(JSON.parse(candidateContents.toString('utf8')))
+          : contents.equals(candidateContents);
+      if (!matchesCandidate) {
+        failures.push(`Published artifact ${filename} differs from the built release candidate`);
+      }
+    } catch (error) {
+      failures.push(
+        `Published artifact ${filename} has no candidate source: ${formatError(error)}`,
+      );
+    }
+  }
   const forbiddenEntries = entries.filter(
     (entry) =>
       entry.startsWith('package/src/') ||
@@ -218,7 +253,7 @@ try {
 
   console.log('Package artifact validation passed.');
 } finally {
-  await rm(tempDirectory, { recursive: true, force: true });
+  if (tempDirectory) await rm(tempDirectory, { recursive: true, force: true });
 }
 
 async function checkPublishedMetadata() {
@@ -267,6 +302,8 @@ async function checkPublishedMetadata() {
     `English | <a href="${repositoryFileUrl}/README.zh-CN.md">简体中文</a>`,
     '## Installation',
     '## Features',
+    '**Commit-safe lifecycle work.**',
+    '**Shared native work with isolated instance semantics.**',
     '## Imports',
     '## Supported environments',
     '## SSR and React Server Components',
@@ -288,6 +325,8 @@ async function checkPublishedMetadata() {
     `<a href="${repositoryFileUrl}/README.md">English</a> | 简体中文`,
     '## 安装',
     '## 特性',
+    '**提交安全的生命周期工作。**',
+    '**共享原生工作，同时隔离实例语义。**',
     '## 导入',
     '## 支持环境',
     '## SSR 与 React Server Components',
@@ -415,30 +454,6 @@ function runPnpm(args, options = {}) {
   }
 
   execFileSync('pnpm', args, { stdio: 'inherit', ...options });
-}
-
-function listPackEntries(directory) {
-  try {
-    const npmArgs = ['pack', '--dry-run', '--json', '--ignore-scripts'];
-    const executable = process.platform === 'win32' ? (process.env.ComSpec ?? 'cmd.exe') : 'npm';
-    const args = process.platform === 'win32' ? ['/d', '/s', '/c', 'npm.cmd', ...npmArgs] : npmArgs;
-    const output = execFileSync(executable, args, {
-      cwd: directory,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'inherit'],
-    });
-    const records = JSON.parse(output);
-    return records.flatMap((record) =>
-      Array.isArray(record.files)
-        ? record.files
-            .filter((file) => file && typeof file.path === 'string')
-            .map((file) => `package/${file.path}`)
-        : [],
-    );
-  } catch (error) {
-    failures.push(`Unable to inspect the package file list: ${formatError(error)}`);
-    return [];
-  }
 }
 
 function exitOnFailures(heading) {

@@ -9,6 +9,7 @@ export default defineConfig({
           include: [
             'packages/**/__tests__/**/*.node.test.{ts,tsx}',
             'packages/**/__tests__/**/*.ssr.test.{ts,tsx}',
+            'scripts/__tests__/**/*.test.mjs',
           ],
           environment: 'node',
         },
