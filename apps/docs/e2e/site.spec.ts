@@ -1140,10 +1140,26 @@ test.describe('documentation navigation', () => {
     );
   });
 
-  test('desktop documentation keeps the active navigation group in view', async ({ page }) => {
+  test('desktop documentation navigates without prefetch contention and keeps the active group in view', async ({
+    page,
+  }) => {
+    let targetWasPrefetched = false;
+    page.on('request', (request) => {
+      if (
+        request.headers()['next-router-prefetch'] === '1' &&
+        new URL(request.url()).pathname.includes('/hooks/use-online/')
+      ) {
+        targetWasPrefetched = true;
+      }
+    });
+
     await page.setViewportSize({ width: 1440, height: 900 });
     await openPage(page, 'hooks/use-websocket');
     const docsNavigation = page.locator('[data-docs-navigation="desktop"]');
+    const articleHeading = page.locator('main article h1');
+
+    expect(targetWasPrefetched).toBe(false);
+    await expect(articleHeading).toHaveText('useWebSocket');
 
     async function navigationPosition() {
       return docsNavigation.evaluate((navigation) => {
@@ -1179,6 +1195,7 @@ test.describe('documentation navigation', () => {
 
     await docsNavigation.getByRole('link', { name: 'useOnline', exact: true }).click();
     await expect(page).toHaveURL(/\/hooks\/use-online\/$/);
+    await expect(articleHeading).toHaveText('useOnline');
     await expect(docsNavigation.getByRole('link', { name: 'useOnline' })).toHaveAttribute(
       'aria-current',
       'page',

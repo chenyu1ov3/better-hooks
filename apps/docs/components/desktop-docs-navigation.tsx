@@ -51,6 +51,7 @@ export function DesktopDocsNavigation({
                     className="flex min-h-9 items-center border-l-2 border-transparent px-2.5 py-1 text-[13px] leading-5 text-muted-foreground transition-[color,background-color,border-color] hover:text-foreground aria-[current=page]:border-brand aria-[current=page]:bg-brand/8 aria-[current=page]:font-semibold aria-[current=page]:text-foreground"
                     key={item.href}
                     href={item.href}
+                    prefetch={false}
                     aria-current={item.href === currentHref ? 'page' : undefined}
                   >
                     {item.label}
