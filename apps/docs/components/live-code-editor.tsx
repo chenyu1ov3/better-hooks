@@ -342,6 +342,7 @@ export default function LiveCodeEditor({
           '[&_select]:min-h-11 [&_select]:w-full [&_select]:rounded-md [&_select]:border [&_select]:border-border [&_select]:bg-background [&_select]:px-3 [&_select]:outline-none [&_select]:focus-visible:border-ring [&_select]:focus-visible:ring-2 [&_select]:focus-visible:ring-ring/30',
           '[&_input[type=range]]:w-full [&_input[type=range]]:max-w-80 [&_input[type=range]]:accent-foreground',
           '[&_button]:min-h-11 [&_button]:rounded-md [&_button]:border [&_button]:border-border [&_button]:bg-muted [&_button]:px-3 [&_button]:text-xs [&_button]:font-medium [&_button]:outline-none [&_button]:transition-[color,background-color,border-color,box-shadow] [&_button]:hover:border-border-strong [&_button]:hover:bg-background [&_button]:hover:text-foreground [&_button]:focus-visible:border-ring [&_button]:focus-visible:ring-2 [&_button]:focus-visible:ring-ring/30 [&_button]:disabled:pointer-events-none [&_button]:disabled:opacity-50',
+          '[&_p]:m-0!',
           '[&_output]:flex [&_output]:min-h-11 [&_output]:min-w-[min(100%,180px)] [&_output]:items-center [&_output]:border-l-[3px] [&_output]:border-foreground [&_output]:bg-muted [&_output]:px-3 [&_output]:py-2 [&_output]:font-mono [&_output]:text-xs [&_output]:wrap-anywhere',
         )}
       />
