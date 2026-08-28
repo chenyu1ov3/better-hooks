@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useLayoutEffect, useRef } from 'react';
 import type { NavGroup } from '../lib/navigation';
+import { DocumentNavigationLink } from './document-navigation-link';
 
 export function DesktopDocsNavigation({
   groups,
@@ -47,15 +47,14 @@ export function DesktopDocsNavigation({
               <p className="m-0 text-xs font-bold text-foreground uppercase">{group.label}</p>
               <div className="mt-2 grid gap-px">
                 {group.items.map((item) => (
-                  <Link
+                  <DocumentNavigationLink
                     className="flex min-h-9 items-center border-l-2 border-transparent px-2.5 py-1 text-[13px] leading-5 text-muted-foreground transition-[color,background-color,border-color] hover:text-foreground aria-[current=page]:border-brand aria-[current=page]:bg-brand/8 aria-[current=page]:font-semibold aria-[current=page]:text-foreground"
                     key={item.href}
                     href={item.href}
-                    prefetch={false}
                     aria-current={item.href === currentHref ? 'page' : undefined}
                   >
                     {item.label}
-                  </Link>
+                  </DocumentNavigationLink>
                 ))}
               </div>
             </section>

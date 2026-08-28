@@ -1147,7 +1147,7 @@ test.describe('documentation navigation', () => {
     page.on('request', (request) => {
       if (
         request.headers()['next-router-prefetch'] === '1' &&
-        new URL(request.url()).pathname.includes('/hooks/use-online/')
+        new URL(request.url()).pathname.includes('/hooks/use-interval/')
       ) {
         targetWasPrefetched = true;
       }
@@ -1193,10 +1193,20 @@ test.describe('documentation navigation', () => {
     expect(position.groupVisible).toBe(true);
     expect(position.groupOffset).toBeGreaterThanOrEqual(-1);
 
-    await docsNavigation.getByRole('link', { name: 'useOnline', exact: true }).click();
-    await expect(page).toHaveURL(/\/hooks\/use-online\/$/);
-    await expect(articleHeading).toHaveText('useOnline');
-    await expect(docsNavigation.getByRole('link', { name: 'useOnline' })).toHaveAttribute(
+    await page.evaluate(() => {
+      document.documentElement.dataset.navigationMarker = 'current-document';
+    });
+    await docsNavigation.getByRole('link', { name: 'useInterval', exact: true }).click();
+    await expect(page).toHaveURL(/\/hooks\/use-interval\/$/);
+    await expect(articleHeading).toHaveText('useInterval');
+    await expect(page.locator('html')).not.toHaveAttribute(
+      'data-navigation-marker',
+      'current-document',
+    );
+    await expect(
+      page.locator('.live-code-preview__canvas').getByRole('button', { name: /Pause at \d+/ }),
+    ).toBeVisible();
+    await expect(docsNavigation.getByRole('link', { name: 'useInterval' })).toHaveAttribute(
       'aria-current',
       'page',
     );
@@ -1257,6 +1267,18 @@ test.describe('documentation navigation', () => {
     ).toHaveAttribute('aria-current', 'page');
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
+
+    await page.getByRole('button', { name: 'Docs', exact: true }).click();
+    await page.evaluate(() => {
+      document.documentElement.dataset.navigationMarker = 'current-document';
+    });
+    await dialog.getByRole('link', { name: 'Installation', exact: true }).click();
+    await expect(page).toHaveURL(/\/docs\/installation\/$/);
+    await expect(page.locator('main article h1')).toHaveText('Installation');
+    await expect(page.locator('html')).not.toHaveAttribute(
+      'data-navigation-marker',
+      'current-document',
+    );
   });
 });
 
