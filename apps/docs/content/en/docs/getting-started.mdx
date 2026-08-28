@@ -1,42 +1,46 @@
 ---
 title: Getting started
-description: Client boundaries, direct imports, and the first Better Hooks component.
-section: Docs
+description: Use one Better Hook in a small client component and keep the first render predictable.
+section: Getting started
 order: 3
 ---
 
 # Getting started
 
-## Choose a Hook by lifecycle problem
+Start with one behavior, not a new layer in your application. The [Hook index](/hooks) groups the library by the problem each Hook solves.
 
-Start with the behavior you need rather than a framework adapter: state transitions, delayed work, a browser subscription, form input, storage, or a mount boundary. The [Hooks explorer](/hooks) groups every public entry into those concerns.
+## Make the component client-side
 
-## Add the client boundary
-
-Every Better Hooks entry is a Client Component API. In an RSC framework, put the directive in the smallest component that calls the Hook:
+Better Hooks uses React client Hooks. In an RSC application, put `'use client'` in the smallest component that calls one:
 
 ```tsx
 'use client';
 
 import { useToggle } from 'better-hooks/use-toggle';
 
-export function Disclosure() {
+export function DetailsButton() {
   const [open, toggle] = useToggle(false);
 
-  return <button onClick={() => toggle()}>{open ? 'Hide' : 'Show'}</button>;
+  return (
+    <button type="button" aria-expanded={open} onClick={() => toggle()}>
+      {open ? 'Hide details' : 'Show details'}
+    </button>
+  );
 }
 ```
 
-The directive is not required in a client-only React application, but the Hook still runs during the React client lifecycle.
+A client-only React application does not need the directive. The direct import keeps this component's dependency easy to spot; the root `better-hooks` export works too.
 
-## Prefer direct entries for examples
+## Give the first render a calm answer
 
-Documentation examples use explicit entries such as `better-hooks/use-toggle`. The root `better-hooks` entry exports the same public Hooks, but a direct path communicates ownership and gives build tools the smallest obvious graph.
+Server rendering cannot know the viewport, connection, or storage contents. Use an explicit initial value when the UI needs one. Browser-facing Hooks also document their neutral server value: `useWindowSize` starts at `{ width: 0, height: 0 }`, while `useMediaQuery` accepts `defaultMatches`.
 
-## Keep render deterministic
+The browser value arrives after hydration. Build the first frame so that this handoff does not move or replace more UI than necessary.
 
-Pass deterministic initial values when markup is server rendered. Hooks that subscribe to browser state expose documented snapshots: for example, `useWindowSize` starts at `{ width: 0, height: 0 }`, and `useMediaQuery` accepts `defaultMatches`.
+## Let the Hook own its work
 
-## Handle cleanup through the Hook
+Do not add a second timer or native listener around the Hook. Change its inputs and let React trigger the matching cleanup. This is especially important for delayed callbacks, browser subscriptions, observers, and network work.
 
-Do not duplicate timers or native listeners around a Hook. Update its inputs and let React run the Hook's cleanup when dependencies change or the component unmounts.
+## Keep going
+
+Open the reference page for the Hook you chose; it lists the signature, behavior, SSR notes, and a live example. For the lifecycle rules shared by the library, continue with [React 19](/docs/react-19).

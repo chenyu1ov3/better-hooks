@@ -70,17 +70,10 @@ export type UiDictionary = {
     react19: string;
     performance: string;
     supportMatrix: string;
-    architecture: string;
-    runtimeBoundaries: string;
-    apiSemantics: string;
-    packageToolchain: string;
-    performanceEvidence: string;
-    verificationGates: string;
     onThisPage: string;
     previous: string;
     next: string;
     editPage: string;
-    overview: string;
     signature: string;
     parameters: string;
     returns: string;
@@ -159,24 +152,17 @@ export const dictionaries = {
     },
     docs: {
       start: 'Start here',
-      concepts: 'Concepts',
+      concepts: 'Core concepts',
       introduction: 'Introduction',
       installation: 'Installation',
       gettingStarted: 'Getting started',
       react19: 'React 19',
       performance: 'Performance',
       supportMatrix: 'Support matrix',
-      architecture: 'Architecture',
-      runtimeBoundaries: 'Runtime boundaries',
-      apiSemantics: 'API semantics',
-      packageToolchain: 'Package toolchain',
-      performanceEvidence: 'Performance evidence',
-      verificationGates: 'Verification gates',
       onThisPage: 'On this page',
       previous: 'Previous',
       next: 'Next',
       editPage: 'Edit this page',
-      overview: 'Overview',
       signature: 'Signature',
       parameters: 'Parameters',
       returns: 'Returns',
@@ -252,25 +238,18 @@ export const dictionaries = {
       dark: '深色',
     },
     docs: {
-      start: '开始使用',
+      start: '入门',
       concepts: '核心概念',
       introduction: '介绍',
       installation: '安装',
-      gettingStarted: '快速开始',
+      gettingStarted: '开始使用',
       react19: 'React 19',
       performance: '性能',
       supportMatrix: '支持矩阵',
-      architecture: '架构',
-      runtimeBoundaries: '运行时边界',
-      apiSemantics: 'API 语义',
-      packageToolchain: '包工具链',
-      performanceEvidence: '性能证据',
-      verificationGates: '验证与发布门禁',
       onThisPage: '本页内容',
       previous: '上一篇',
       next: '下一篇',
       editPage: '编辑此页',
-      overview: '概览',
       signature: '函数签名',
       parameters: '参数',
       returns: '返回值',

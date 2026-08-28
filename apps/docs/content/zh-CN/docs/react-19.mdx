@@ -1,38 +1,34 @@
 ---
 title: React 19
-description: 了解 Better Hooks 的生命周期、回调、清理和错误语义。
+description: 了解 Better Hooks 在多次渲染与 Effect 之间保持稳定的几条规则。
 section: 核心概念
 order: 4
 ---
 
 # React 19
 
-Better Hooks 补充 React 内置状态与 Effect 周边的小型生命周期能力。重点不是重新包装已有 API，而是在 React 可能渲染、暂停、重放或放弃工作时，仍保持稳定且可组合的契约。
+一次渲染只是草稿。React 可能暂停它、重跑它，甚至直接丢弃它。Better Hooks 会等到 commit 之后，再把值和浏览器任务当成已经生效的事实。
 
-## 只暴露已提交的值
+## 渲染只是草稿
 
-`useLatest` 与 `usePrevious` 在 Effect 中更新 ref，因此暴露的是已经提交的值，而不是被中断或放弃的渲染结果。当长生命周期回调在并发渲染期间读取状态时，这一区别尤其重要。
+`useLatest` 和 `usePrevious` 在 Effect 中发布数据，因此读到的是已经提交的值，不是 React 放弃的某次渲染结果。当定时器、监听器或 Promise 回调比创建它的那次渲染活得更久时，这一点很重要。
 
-## 操作函数跨渲染保持可用
+## 操作函数稳定，回调保持新鲜
 
-只要契约允许，Hook 返回的操作函数就会保持稳定引用。长生命周期的定时器、监听器和异步任务会调用最近一次已提交的回调，而不会继续使用过期渲染中的闭包。组件更新输入时，无需因此重建每个订阅。
+如果文档说明某个操作函数引用稳定，它就不会因为组件再次渲染而变化。长生命周期任务可以一直持有这个操作函数，同时调用最近一次已经提交的回调，既避开过期闭包，也不用反复重建订阅。
 
-## 清理可以承受 Strict Mode 重放
+## 清理也是功能的一部分
 
-开发环境中的 React Strict Mode 可能重放 Effect 和订阅。监听器、定时器、存储和外部状态源 Hook 都采用成对的建立与清理逻辑，避免重放后遗留重复的原生订阅。
+Strict Mode 在开发环境中可能重放 Effect。建立和清理必须成对出现：移除监听器、取消定时器、断开 Observer，并让旧任务失效。重放结束后，页面中存活的原生任务应当和普通挂载一致。
 
-## 错误保持可观察
+## 错误不会凭空消失
 
-定时器、事件和 Promise 回调会先清理自己的任务，再报告错误。可选的 `onError` 观察器可以检查失败，但原始抛出或拒绝仍交给应用处理；已经取消或过期的任务可以按契约抑制错误。
+`onError` 可以观察失败，但不会把失败变成成功。原始抛出或 Promise 拒绝仍由应用处理。只有文档明确说明时，已经取消或被新任务取代的工作才会被忽略。
 
-## 浏览器状态使用外部状态源
+## React 已经合适时就直接用 React
 
-`useMediaQuery`、`useOnline`、`useWindowSize`、`useLocalStorage` 和 `useSessionStorage` 使用 `useSyncExternalStore` 连接浏览器状态。它们都提供稳定的服务端快照，并且只在组件提交后建立订阅。
+`useTransition`、`useDeferredValue`、`useOptimistic`、`useActionState` 和 `use` 继续直接使用。Better Hooks 补的是生命周期空隙，不会为了换名字而包一层 React API。
 
-## React 已解决的问题继续用 React
+## 支持版本
 
-Better Hooks 不会只为换一个名字而包装 React API。请直接使用 `useTransition`、`useDeferredValue`、`useOptimistic`、`useActionState` 和 `use`。本库只补充这些 API 尚未覆盖的生命周期能力。
-
-## 支持范围
-
-包的 peer dependency 为 `react >=19.0.0 <20.0.0`。只有明确更新 package manifest 并通过相应测试后，才会声明对其他版本的兼容性。
+当前 peer dependency 为 `react >=19.0.0 <20.0.0`。只有包配置和测试都完成更新后，文档才会扩大这个范围。

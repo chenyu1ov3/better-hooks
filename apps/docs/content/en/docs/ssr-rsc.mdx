@@ -1,42 +1,40 @@
 ---
 title: SSR and RSC
-description: Where to place Client Component boundaries and how to keep browser state deterministic.
-section: Concepts
+description: Place the client boundary well and give browser state a steady first render.
+section: Core concepts
 order: 5
 ---
 
 # SSR and RSC
 
-## Put the boundary where the Hook is called
+The server can render useful markup, but it cannot know a visitor's viewport, clipboard, connection, or storage. Better Hooks keeps that gap visible instead of guessing.
 
-All Better Hooks call React client hooks and must run in a Client Component. Put `'use client'` in the smallest component that calls the Hook. A Server Component may render that child and pass serializable props, but it cannot call a Better Hook itself.
+## Put the boundary beside the Hook
+
+A Better Hook must run in a Client Component. Put `'use client'` in the smallest component that calls it. A Server Component can render that child and pass serializable props, but it cannot call the Hook itself.
 
 ## Importing is safe; calling is client work
 
-The package does not register listeners, start timers, read storage, or access the DOM as an import-time side effect. A module can therefore enter a server build safely; importing it is still different from calling its Hook in a Server Component.
+Importing the package does not register listeners, start timers, read storage, or touch the DOM. That makes an import safe in a server build. Calling the Hook still belongs in the client tree.
 
-## Choose a deterministic server snapshot
+## Start with a steady fallback
 
-Browser-facing Hooks use deterministic fallbacks:
+Browser-facing Hooks return a documented server value:
 
 | Hook                     | Server result                                    |
 | ------------------------ | ------------------------------------------------ |
 | `useMediaQuery`          | `defaultMatches`, otherwise `false`              |
 | `useWindowSize`          | `{ width: 0, height: 0 }`                        |
 | `useOnline`              | `true`                                           |
-| storage Hooks            | the supplied initial value                       |
+| storage Hooks            | the initial value you provide                    |
 | listener and timer Hooks | no subscription or timer during server rendering |
 
-Use an explicit initial value when the UI needs a different neutral state. The snapshot is part of the Hook's contract, not an implementation detail to infer from the browser.
+Choose an explicit initial value when the neutral default is not right for your UI.
 
-## Keep hydration stable
+## Let hydration fill in the browser value
 
-Choose a server fallback that can render acceptable initial markup. React will reconcile the browser snapshot after hydration. Do not branch the server tree on an unknown browser measurement when a stable neutral layout will do.
+Render a useful first frame, then let React reconcile the live browser snapshot after hydration. Avoid replacing a large part of the page only because a measurement was unknown on the server.
 
-## Browser failures stay inside the contract
+## Treat missing browser APIs as normal
 
-Browser APIs can be missing or reject access. Hooks feature-detect the relevant target and expose the documented fallback or error behavior; callers should render a useful neutral state instead of assuming a browser API exists.
-
-## RSC-friendly does not mean server-callable
-
-In this project, RSC-friendly means explicit client boundaries, import-time safety, serializable props into the client leaf, and documented server snapshots. It does not mean a Hook can execute inside a Server Component.
+A browser API may be unavailable or may reject access. Each Hook either returns its documented fallback or exposes the error. Keep a neutral UI available instead of assuming the capability is always present.

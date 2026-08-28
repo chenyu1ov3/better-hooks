@@ -1,25 +1,39 @@
 ---
 title: Installation
-description: Install the published package, review runtime requirements, and choose package entries.
-section: Docs
+description: Add Better Hooks, choose an import style, and check the supported runtime.
+section: Getting started
 order: 2
 ---
 
 # Installation
 
-## Install the package
+One package, no setup step.
 
-Install with pnpm:
+## Add the package
 
 ```sh
 pnpm add better-hooks
 ```
 
-The same package is available through npm and other package managers. Review the [npm package page](https://www.npmjs.com/package/better-hooks) for release metadata.
+The same package is available through npm and other package managers. Published versions and release metadata live on the [npm package page](https://www.npmjs.com/package/better-hooks).
 
-## Runtime requirements
+## Choose an import
 
-The package manifest currently declares:
+Use a direct entry when you want the dependency to be obvious:
+
+```ts
+import { useToggle } from 'better-hooks/use-toggle';
+```
+
+The root entry is also supported when a module uses several Hooks:
+
+```ts
+import { useDebounce, useToggle } from 'better-hooks';
+```
+
+Both styles are typed ESM imports. The package declares `sideEffects: false`, so the choice is mostly about clarity and the module graph your bundler sees first.
+
+## Check the requirements
 
 | Requirement                        | Supported range    |
 | ---------------------------------- | ------------------ |
@@ -27,10 +41,6 @@ The package manifest currently declares:
 | Node.js for development and builds | `>=22.18.0`        |
 | Module format                      | ESM only           |
 
-React is a peer dependency. The package has no runtime dependency beyond the React APIs supplied by the consuming application.
+React is a peer dependency. Better Hooks has no other runtime dependency.
 
-## Import model
-
-The package name is `better-hooks`. The root export is convenient, while every Hook also has an explicit direct entry such as `better-hooks/use-toggle`. Direct entries make the requested module graph clear and work with the package's `sideEffects: false` declaration.
-
-Release notes are available in the [Changelog](/changelog).
+Continue with [Getting started](/docs/getting-started), or scan the latest changes in the [Changelog](/changelog).

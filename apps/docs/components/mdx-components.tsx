@@ -5,7 +5,7 @@ import { Link2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Heading as DocumentHeading } from '../lib/content';
 import type { Locale } from '../lib/i18n';
-import { ArchitectureDecisions, ArchitectureMap, PackageMetrics } from './architecture-figures';
+import { PackageMetrics } from './package-metrics';
 import { CodeBlock } from './code-block';
 
 function Anchor({ href = '', children, ...props }: ComponentProps<'a'>) {
@@ -148,10 +148,6 @@ export function createMdxComponents({
     h2: (props: ComponentProps<'h2'>) => <Heading level={2} {...props} />,
     h3: (props: ComponentProps<'h3'>) => <Heading level={3} {...props} />,
     table: Table,
-    ArchitectureMap: () => <ArchitectureMap locale={locale} />,
-    ArchitectureDecisions: () => <ArchitectureDecisions locale={locale} />,
-    PackageMetrics: ({ variant }: { variant?: 'full' | 'summary' }) => (
-      <PackageMetrics locale={locale} variant={variant} />
-    ),
+    PackageMetrics: () => <PackageMetrics locale={locale} />,
   };
 }
