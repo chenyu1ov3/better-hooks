@@ -15,6 +15,12 @@ const moduleLoaders = {
     import(
       /* webpackChunkName: "better-hooks-use-controllable-state" */ 'better-hooks/use-controllable-state'
     ),
+  'better-hooks/use-copy-to-clipboard': () =>
+    import(
+      /* webpackChunkName: "better-hooks-use-copy-to-clipboard" */ 'better-hooks/use-copy-to-clipboard'
+    ),
+  'better-hooks/use-counter': () =>
+    import(/* webpackChunkName: "better-hooks-use-counter" */ 'better-hooks/use-counter'),
   'better-hooks/use-debounce': () =>
     import(/* webpackChunkName: "better-hooks-use-debounce" */ 'better-hooks/use-debounce'),
   'better-hooks/use-debounce-fn': () =>
@@ -53,6 +59,8 @@ const moduleLoaders = {
     ),
   'better-hooks/use-lock-fn': () =>
     import(/* webpackChunkName: "better-hooks-use-lock-fn" */ 'better-hooks/use-lock-fn'),
+  'better-hooks/use-map': () =>
+    import(/* webpackChunkName: "better-hooks-use-map" */ 'better-hooks/use-map'),
   'better-hooks/use-media-query': () =>
     import(/* webpackChunkName: "better-hooks-use-media-query" */ 'better-hooks/use-media-query'),
   'better-hooks/use-memoized-fn': () =>
@@ -69,6 +77,8 @@ const moduleLoaders = {
     ),
   'better-hooks/use-safe-state': () =>
     import(/* webpackChunkName: "better-hooks-use-safe-state" */ 'better-hooks/use-safe-state'),
+  'better-hooks/use-set': () =>
+    import(/* webpackChunkName: "better-hooks-use-set" */ 'better-hooks/use-set'),
   'better-hooks/use-session-storage': () =>
     import(
       /* webpackChunkName: "better-hooks-use-session-storage" */ 'better-hooks/use-session-storage'

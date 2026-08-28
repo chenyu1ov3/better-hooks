@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "package": "better-hooks",
   "version": "1.1.2",
-  "buildFingerprint": "8aa78ea8bcbe",
+  "buildFingerprint": "8f90ccf61cae",
   "measurement": {
     "format": "ESM",
     "target": "ES2022",
@@ -17,17 +17,17 @@
     "defaultGzipBytes": 2048
   },
   "summary": {
-    "directEntries": 33,
-    "withinBudget": 33,
-    "medianGzipBytes": 1089,
+    "directEntries": 37,
+    "withinBudget": 37,
+    "medianGzipBytes": 1043,
     "p90GzipBytes": 2172
   },
   "root": {
     "entry": "better-hooks",
-    "modules": 35,
-    "rawBytes": 98856,
-    "gzipBytes": 19481,
-    "brotliBytes": 15675
+    "modules": 39,
+    "rawBytes": 108351,
+    "gzipBytes": 21234,
+    "brotliBytes": 17106
   },
   "entries": [
     {
@@ -63,6 +63,24 @@
       "rawBytes": 2588,
       "gzipBytes": 923,
       "brotliBytes": 766,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-copy-to-clipboard",
+      "modules": 3,
+      "rawBytes": 3371,
+      "gzipBytes": 1242,
+      "brotliBytes": 1043,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
+      "entry": "better-hooks/use-counter",
+      "modules": 2,
+      "rawBytes": 2755,
+      "gzipBytes": 1043,
+      "brotliBytes": 873,
       "rawBudgetBytes": 4096,
       "gzipBudgetBytes": 2048
     },
@@ -193,6 +211,15 @@
       "gzipBudgetBytes": 2048
     },
     {
+      "entry": "better-hooks/use-map",
+      "modules": 1,
+      "rawBytes": 2204,
+      "gzipBytes": 820,
+      "brotliBytes": 716,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
+    },
+    {
       "entry": "better-hooks/use-media-query",
       "modules": 2,
       "rawBytes": 4164,
@@ -263,6 +290,15 @@
       "brotliBytes": 1940,
       "rawBudgetBytes": 9216,
       "gzipBudgetBytes": 3072
+    },
+    {
+      "entry": "better-hooks/use-set",
+      "modules": 1,
+      "rawBytes": 2135,
+      "gzipBytes": 764,
+      "brotliBytes": 665,
+      "rawBudgetBytes": 4096,
+      "gzipBudgetBytes": 2048
     },
     {
       "entry": "better-hooks/use-throttle",

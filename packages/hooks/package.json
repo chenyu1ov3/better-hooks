@@ -55,6 +55,26 @@
       "import": "./dist/use-boolean/index.js",
       "default": "./dist/use-boolean/index.js"
     },
+    "./use-counter": {
+      "types": "./dist/use-counter/index.d.ts",
+      "import": "./dist/use-counter/index.js",
+      "default": "./dist/use-counter/index.js"
+    },
+    "./use-map": {
+      "types": "./dist/use-map/index.d.ts",
+      "import": "./dist/use-map/index.js",
+      "default": "./dist/use-map/index.js"
+    },
+    "./use-set": {
+      "types": "./dist/use-set/index.d.ts",
+      "import": "./dist/use-set/index.js",
+      "default": "./dist/use-set/index.js"
+    },
+    "./use-copy-to-clipboard": {
+      "types": "./dist/use-copy-to-clipboard/index.d.ts",
+      "import": "./dist/use-copy-to-clipboard/index.js",
+      "default": "./dist/use-copy-to-clipboard/index.js"
+    },
     "./use-previous": {
       "types": "./dist/use-previous/index.d.ts",
       "import": "./dist/use-previous/index.js",

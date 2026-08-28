@@ -6,6 +6,8 @@ import {
   useBoolean,
   useClickOutside,
   useControllableState,
+  useCopyToClipboard,
+  useCounter,
   useDebounce,
   useDebounceFn,
   useDocumentVisibility,
@@ -20,6 +22,7 @@ import {
   useLatest,
   useLocalStorage,
   useLockFn,
+  useMap,
   useMemoizedFn,
   useMediaQuery,
   useOnline,
@@ -28,6 +31,7 @@ import {
   useResizeObserver,
   useSafeState,
   useSessionStorage,
+  useSet,
   useThrottle,
   useThrottleFn,
   useTimeout,
@@ -44,6 +48,10 @@ function ServerHarness(): JSX.Element {
   const previous = usePrevious('current', 'initial');
   const latest = useLatest('latest');
   const [controlled] = useControllableState({ defaultValue: 'state' });
+  const counter = useCounter(2);
+  const [map] = useMap([['entry', 3] as const]);
+  const [set] = useSet(['value']);
+  const clipboard = useCopyToClipboard();
   const memoized = useMemoizedFn(() => 'memoized');
   const [safe] = useSafeState('safe');
   const [resettable] = useResetState('resettable');
@@ -79,6 +87,8 @@ function ServerHarness(): JSX.Element {
       data-actions={String(debouncedAction.pending || throttledAction.pending)}
       data-async={request.status}
       data-controlled={controlled}
+      data-collections={`${counter.count}:${map.get('entry')}:${String(set.has('value'))}`}
+      data-clipboard={clipboard.status}
       data-height={size.height}
       data-input={input.value}
       data-visibility={visibility}
@@ -111,6 +121,8 @@ describe('server rendering', () => {
     const html = renderToString(<ServerHarness />);
 
     expect(html).toContain('data-async="idle"');
+    expect(html).toContain('data-clipboard="idle"');
+    expect(html).toContain('data-collections="2:3:true"');
     expect(html).toContain('data-media="true"');
     expect(html).toContain('data-online="true"');
     expect(html).toContain('data-width="0"');

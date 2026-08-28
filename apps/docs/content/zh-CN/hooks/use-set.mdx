@@ -1,0 +1,48 @@
+---
+title: useSet
+description: 用稳定操作管理不可变的 Set 快照。
+section: 状态
+order: 109.5
+---
+
+# useSet
+
+## 概览
+
+`useSet` 将 Set 作为只读 React 状态管理，并提供用于更新成员关系的稳定操作。
+
+## 函数签名
+
+```ts
+function useSet<T>(
+  initialValue?: Iterable<T> | (() => Iterable<T>),
+): readonly [ReadonlySet<T>, UseSetActions<T>];
+```
+
+## 参数
+
+初始 iterable 或惰性初始化函数只会复制一次。成员比较遵循原生 Set 的规则。
+
+## 返回值
+
+返回只读 Set 快照，以及稳定的 `add`、`remove`、`toggle`、`clear` 和 `reset` 操作。
+
+## 行为说明
+
+每次有效操作都会创建新的 Set 快照，不会修改之前的快照。添加已有值和删除不存在的值属于无效操作，会保留当前快照引用。`reset` 恢复捕获的初始成员。
+
+## SSR / RSC
+
+该 Hook 使用确定性的 React 状态，SSR 期间不会访问浏览器 API。将操作连接到交互时，请在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+渲染依赖成员关系的控件时可以使用 `Set.prototype.has`，并将所有变更限制在返回的 actions 中。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-set/index.ts)。

@@ -1,0 +1,52 @@
+---
+title: useCopyToClipboard
+description: Copy text with observable status and stale-result protection.
+section: Browser & DOM
+order: 131
+---
+
+# useCopyToClipboard
+
+## Overview
+
+`useCopyToClipboard` wraps the browser Clipboard API with pending, success, and error state while keeping the copy action stable.
+
+## Signature
+
+```ts
+function useCopyToClipboard(options?: { onError?: (error: unknown) => void }): {
+  status: 'idle' | 'pending' | 'success' | 'error';
+  copiedText: string | undefined;
+  error: unknown;
+  copy: (text: string) => Promise<void>;
+  reset: () => void;
+};
+```
+
+## Parameters
+
+`copy` accepts the text to write. `onError` observes an active write failure without replacing the original rejection.
+
+## Returns
+
+`status` describes the latest write, `copiedText` retains the most recent successful text, and `error` contains the latest active failure. `copy` and `reset` are stable actions.
+
+## Behavior
+
+The Hook uses `navigator.clipboard.writeText` and does not fall back to deprecated document commands. A newer copy invalidates older state updates, but each returned Promise still settles with its original result. `reset` returns to `idle` and invalidates pending state.
+
+## SSR / RSC
+
+The server snapshot is `idle` with no copied text or error. Browser access starts only when `copy` is called after a client commit. Unsupported Clipboard APIs reject with a `NotSupportedError`-named error.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Catch the returned Promise when a failed copy is expected, and use `error` to expose a recovery message in the surrounding UI.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-copy-to-clipboard/index.ts).

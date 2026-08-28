@@ -178,6 +178,51 @@ export const hooks = [
     },
   }),
   defineHook({
+    slug: 'use-counter',
+    name: 'useCounter',
+    importPath: 'better-hooks/use-counter',
+    signature: 'useCounter(initialValue?: number, options?: UseCounterOptions): UseCounterResult',
+    category: 'state',
+    description: {
+      en: 'Manages a bounded number with stable increment, decrement, set, and reset actions.',
+      'zh-CN': '管理有边界的数字，并提供稳定的增加、减少、设置和重置操作。',
+    },
+    ssrBehavior: {
+      en: 'Uses deterministic React state and does not access browser APIs during SSR.',
+      'zh-CN': '使用确定性的 React 状态，SSR 期间不会访问浏览器 API。',
+    },
+  }),
+  defineHook({
+    slug: 'use-map',
+    name: 'useMap',
+    importPath: 'better-hooks/use-map',
+    signature: 'useMap<K, V>(initialValue?: MapInitializer<K, V>): UseMapResult<K, V>',
+    category: 'state',
+    description: {
+      en: 'Manages a readonly Map snapshot with stable immutable actions.',
+      'zh-CN': '用稳定的不可变操作管理只读 Map 快照。',
+    },
+    ssrBehavior: {
+      en: 'Copies deterministic initial entries without accessing browser APIs during SSR.',
+      'zh-CN': '复制确定性的初始 entries，SSR 期间不会访问浏览器 API。',
+    },
+  }),
+  defineHook({
+    slug: 'use-set',
+    name: 'useSet',
+    importPath: 'better-hooks/use-set',
+    signature: 'useSet<T>(initialValue?: SetInitializer<T>): UseSetResult<T>',
+    category: 'state',
+    description: {
+      en: 'Manages a readonly Set snapshot with stable membership actions.',
+      'zh-CN': '用稳定的成员操作管理只读 Set 快照。',
+    },
+    ssrBehavior: {
+      en: 'Copies deterministic initial values without accessing browser APIs during SSR.',
+      'zh-CN': '复制确定性的初始值，SSR 期间不会访问浏览器 API。',
+    },
+  }),
+  defineHook({
     slug: 'use-debounce',
     name: 'useDebounce',
     importPath: 'better-hooks/use-debounce',
@@ -442,6 +487,21 @@ export const hooks = [
     },
   }),
   defineHook({
+    slug: 'use-copy-to-clipboard',
+    name: 'useCopyToClipboard',
+    importPath: 'better-hooks/use-copy-to-clipboard',
+    signature: 'useCopyToClipboard(options?: UseCopyToClipboardOptions): UseCopyToClipboardResult',
+    category: 'browser-dom',
+    description: {
+      en: 'Copies text with observable status and protection from stale write results.',
+      'zh-CN': '复制文本并提供可观察状态，同时防止过期写入结果覆盖新状态。',
+    },
+    ssrBehavior: {
+      en: 'Returns an idle snapshot during SSR; the Clipboard API is used only after client commit.',
+      'zh-CN': 'SSR 期间返回 idle 快照；Clipboard API 只会在客户端提交后使用。',
+    },
+  }),
+  defineHook({
     slug: 'use-input',
     name: 'useInput',
     importPath: 'better-hooks/use-input',
@@ -570,9 +630,9 @@ export const hooks = [
 export const apiEntries = hooks as readonly ApiEntryDefinition[];
 
 export const hookCategoryCounts = {
-  state: 8,
+  state: 11,
   async: 9,
-  'browser-dom': 10,
+  'browser-dom': 11,
   forms: 1,
   storage: 2,
   lifecycle: 3,

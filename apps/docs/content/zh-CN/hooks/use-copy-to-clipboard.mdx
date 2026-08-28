@@ -1,0 +1,52 @@
+---
+title: useCopyToClipboard
+description: 复制文本并观察状态，同时保护过期结果。
+section: 浏览器与 DOM
+order: 131
+---
+
+# useCopyToClipboard
+
+## 概览
+
+`useCopyToClipboard` 封装浏览器 Clipboard API，提供等待、成功和错误状态，并保持复制操作稳定。
+
+## 函数签名
+
+```ts
+function useCopyToClipboard(options?: { onError?: (error: unknown) => void }): {
+  status: 'idle' | 'pending' | 'success' | 'error';
+  copiedText: string | undefined;
+  error: unknown;
+  copy: (text: string) => Promise<void>;
+  reset: () => void;
+};
+```
+
+## 参数
+
+`copy` 接收要写入的文本。`onError` 可以观察当前写入失败，但不会替换原始拒绝结果。
+
+## 返回值
+
+`status` 描述最近一次写入，`copiedText` 保留最近一次成功写入的文本，`error` 保存最近一次当前失败。`copy` 和 `reset` 都是稳定操作。
+
+## 行为说明
+
+该 Hook 使用 `navigator.clipboard.writeText`，不会回退到已废弃的 document 命令。新的复制操作会使旧状态更新失效，但每个返回的 Promise 仍会保留自己的结果。`reset` 会回到 `idle` 并使等待中的状态失效。
+
+## SSR / RSC
+
+服务端快照为 `idle`，没有复制文本和错误。只有客户端提交后调用 `copy` 时才会访问浏览器 API。如果 Clipboard API 不支持，会以名称为 `NotSupportedError` 的错误拒绝。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+预期复制失败时请捕获返回的 Promise，并使用 `error` 在周围界面中显示恢复提示。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-copy-to-clipboard/index.ts)。

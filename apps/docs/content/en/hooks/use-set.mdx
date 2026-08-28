@@ -1,0 +1,48 @@
+---
+title: useSet
+description: Manage an immutable Set snapshot with stable actions.
+section: State
+order: 109.5
+---
+
+# useSet
+
+## Overview
+
+`useSet` manages a Set as readonly React state and exposes stable actions for membership updates.
+
+## Signature
+
+```ts
+function useSet<T>(
+  initialValue?: Iterable<T> | (() => Iterable<T>),
+): readonly [ReadonlySet<T>, UseSetActions<T>];
+```
+
+## Parameters
+
+The initial iterable or lazy initializer is copied once. Values are compared using the native Set membership rules.
+
+## Returns
+
+A readonly Set snapshot and stable `add`, `remove`, `toggle`, `clear`, and `reset` actions.
+
+## Behavior
+
+Each meaningful action creates a new Set snapshot without mutating the previous one. Adding an existing value and removing a missing value are no-ops that preserve the snapshot reference. `reset` restores the captured values.
+
+## SSR / RSC
+
+The Hook uses deterministic React state and does not access browser APIs during SSR. Use it in a Client Component when actions are connected to interaction.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `Set.prototype.has` while rendering membership-dependent controls, and keep all mutations behind the returned actions.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-set/index.ts).
