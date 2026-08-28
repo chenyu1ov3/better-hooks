@@ -6,13 +6,12 @@ import type { Locale } from '../lib/i18n';
 import { siteConfig } from '../lib/site';
 import { CopyButton } from './copy-button';
 import { HighlightedCommand } from './highlighted-code';
-import { HookRuntimeDemo } from './hook-runtime-demo';
 
 export function LandingPage({ locale }: { locale: Locale }) {
   const copy =
     locale === 'en'
       ? {
-          lead: 'Typed, composable hooks for React applications that need predictable behavior.',
+          lead: 'Small, typed hooks for the work between render and cleanup.',
           docs: 'Read the docs',
           source: 'View on GitHub',
           install: 'Install better-hooks',
@@ -20,7 +19,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
           copiedInstall: 'Install command copied',
         }
       : {
-          lead: '为 React 应用提供类型安全、易于组合且行为可预测的 Hooks。',
+          lead: '让 Hooks 接手渲染与清理之间的琐事。',
           docs: '阅读文档',
           source: '查看 GitHub',
           install: '安装 better-hooks',
@@ -30,10 +29,10 @@ export function LandingPage({ locale }: { locale: Locale }) {
 
   return (
     <section
-      className="precision-grid mx-auto grid min-h-[calc(100svh-var(--header-height))] w-full max-w-[1360px] grid-cols-1 items-center gap-10 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(500px,1.2fr)] lg:gap-14 xl:gap-24"
+      className="precision-grid mx-auto flex min-h-[calc(100svh-var(--header-height))] w-full max-w-[1360px] items-center px-4 py-10 sm:px-6 md:py-12 lg:px-16 xl:px-24"
       aria-labelledby="hero-title"
     >
-      <div className="max-w-[660px]">
+      <div className="w-full max-w-[760px]">
         <h1
           id="hero-title"
           className="m-0 text-5xl leading-[0.98] font-[780] text-balance text-foreground sm:text-6xl lg:text-[66px]"
@@ -69,10 +68,6 @@ export function LandingPage({ locale }: { locale: Locale }) {
             className="h-11 w-11 rounded-none border-l border-border text-muted-foreground hover:bg-accent hover:text-foreground"
           />
         </div>
-      </div>
-
-      <div className="min-w-0 w-full lg:justify-self-end">
-        <HookRuntimeDemo locale={locale} />
       </div>
     </section>
   );

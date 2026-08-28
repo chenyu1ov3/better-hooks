@@ -1,42 +1,46 @@
 ---
-title: 快速开始
-description: 了解客户端边界、直接导入方式，并编写第一个 Better Hooks 组件。
-section: 文档
+title: 开始使用
+description: 在一个小型客户端组件中使用 Better Hook，并让首屏渲染保持稳定。
+section: 开始使用
 order: 3
 ---
 
-# 快速开始
+# 开始使用
 
-## 按生命周期问题选择 Hook
+先解决一个具体问题，不必给应用再加一层抽象。[Hook 索引](/zh/hooks)已经按每个 Hook 解决的场景整理好全部入口。
 
-先判断要解决的是状态切换、延迟任务、浏览器订阅、表单输入、存储，还是挂载边界，而不要从框架适配层入手。[Hooks 索引](/zh/hooks)已按这些场景整理全部公开 Hook。
+## 把调用 Hook 的组件放到客户端
 
-## 添加客户端边界
-
-Better Hooks 的所有入口都是 Client Component API。在使用 RSC 的框架中，请把客户端指令放在实际调用 Hook 的最小组件中：
+Better Hooks 会调用 React 客户端 Hook。在使用 RSC 的应用中，请把 `'use client'` 放在实际调用 Hook 的最小组件里：
 
 ```tsx
 'use client';
 
 import { useToggle } from 'better-hooks/use-toggle';
 
-export function Disclosure() {
+export function DetailsButton() {
   const [open, toggle] = useToggle(false);
 
-  return <button onClick={() => toggle()}>{open ? '收起' : '展开'}</button>;
+  return (
+    <button type="button" aria-expanded={open} onClick={() => toggle()}>
+      {open ? '收起详情' : '查看详情'}
+    </button>
+  );
 }
 ```
 
-纯客户端 React 应用无需添加这条指令，但 Hook 仍运行在 React 的客户端生命周期中。
+纯客户端 React 应用不需要这条指令。独立入口能让组件依赖更容易看懂；从根入口 `better-hooks` 导入也同样受支持。
 
-## 示例优先使用直接入口
+## 给首屏一个安稳的答案
 
-文档示例使用 `better-hooks/use-toggle` 这样的显式入口。根入口 `better-hooks` 同样导出所有公开 Hook，但直接路径更能体现模块归属，也能让构建工具获得更小、更明确的依赖图。
+服务端不知道窗口大小、网络状态或存储内容。界面有明确需求时，请传入初始值。面向浏览器的 Hook 也会说明自己的中性服务端结果：`useWindowSize` 从 `{ width: 0, height: 0 }` 开始，`useMediaQuery` 则可以通过 `defaultMatches` 指定初始值。
 
-## 保持渲染结果确定
+Hydration 后真实浏览器值会接上来。首屏布局应能接住这次变化，避免因为一个未知测量值替换大块界面。
 
-服务端渲染时，请传入确定的初始值。订阅浏览器状态的 Hook 都有明确的服务端快照，例如 `useWindowSize` 初始为 `{ width: 0, height: 0 }`，`useMediaQuery` 则可通过 `defaultMatches` 配置回退值。
+## 让 Hook 收好自己的工作
 
-## 把清理交给 Hook
+不要在 Hook 外再套一层定时器或原生监听器。更新输入，让 React 触发对应清理。延迟回调、浏览器订阅、Observer 和网络任务尤其需要遵守这一点。
 
-不要在 Hook 外重复创建定时器或原生监听器。只需更新输入，让 React 在依赖变化或组件卸载时执行 Hook 内部的清理逻辑。
+## 接着往下看
+
+打开所选 Hook 的参考页，就能看到签名、行为、SSR 说明和在线示例。想了解整个库共用的生命周期规则，可以继续阅读 [React 19](/zh/docs/react-19)。

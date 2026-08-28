@@ -42,7 +42,6 @@ const keyPageRoutes = [
   { name: 'Hooks explorer', path: 'hooks' },
   { name: 'Playground', path: 'playground' },
   { name: 'Hook reference', path: 'hooks/use-debounce' },
-  { name: 'Architecture', path: 'docs/architecture' },
   { name: 'Performance evidence', path: 'docs/performance' },
 ] as const;
 
@@ -241,7 +240,6 @@ test.describe('responsive layout', () => {
       await expect(hero.getByRole('heading', { level: 1, name: 'Better Hooks' })).toBeVisible();
       await expect(hero.getByRole('link', { name: 'Read the docs' })).toBeVisible();
       await expect(hero.getByRole('link', { name: 'View on GitHub' })).toBeVisible();
-      await expect(page.getByTestId('hook-lifecycle-visual')).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await expectHomeFitsViewport(page);
     });
@@ -316,21 +314,6 @@ test.describe('brand structure', () => {
     await expect(mark).toHaveCount(1);
     await expect(mark.locator('path')).toHaveCount(2);
     await expect(mark.locator('circle, rect')).toHaveCount(0);
-  });
-
-  test('Homepage debounce runtime publishes only after changes settle', async ({ page }) => {
-    await openPage(page);
-    const runtime = page.getByTestId('hook-lifecycle-visual');
-    const input = runtime.getByRole('textbox', { name: 'Try a value' });
-    const published = runtime.getByLabel('Published value');
-
-    await expect(runtime).toBeVisible();
-    await expect(published).toHaveText('search hooks');
-    await input.fill('effect cleanup');
-    await expect(runtime.getByText('effect cleanup', { exact: true }).first()).toBeVisible();
-    await expect(runtime.getByText('Waiting for changes to settle', { exact: true })).toBeVisible();
-    await expect(published).toHaveText('search hooks');
-    await expect(published).toHaveText('effect cleanup');
   });
 
   test('Homepage exposes install and real project links', async ({ context, page }) => {
@@ -596,7 +579,7 @@ test.describe('core interactions', () => {
     );
   });
 
-  test('Playground loads Hook modules only when selected', async ({ page }) => {
+  test('Playground loads only the selected Hook module', async ({ page }) => {
     const requestedHookChunks = new Set<string>();
     page.on('request', (request) => {
       const filename = new URL(request.url()).pathname.split('/').at(-1);
@@ -609,7 +592,7 @@ test.describe('core interactions', () => {
     const playground = page.locator('.playground-workbench');
     const preview = playground.locator('.live-code-preview__canvas');
     await expect(preview.getByText('Search', { exact: true })).toBeVisible();
-    expect([...requestedHookChunks]).toEqual([]);
+    expect([...requestedHookChunks]).toEqual(['better-hooks-use-debounce']);
 
     await choosePlaygroundExample(
       page,
@@ -617,7 +600,9 @@ test.describe('core interactions', () => {
       'useAsync',
     );
     await expect(preview.getByText('Ready', { exact: true })).toBeVisible();
-    expect([...requestedHookChunks]).toEqual(['better-hooks-use-async']);
+    expect([...requestedHookChunks].sort()).toEqual(
+      ['better-hooks-use-async', 'better-hooks-use-debounce'].sort(),
+    );
   });
 
   test('Playground reports a Hook chunk failure without discarding the editor', async ({
@@ -881,71 +866,16 @@ test.describe('documentation navigation', () => {
     expect(await sitemapResponse.text()).not.toContain('/examples/');
   });
 
-  test('Architecture records are public, bilingual, and backed by generated metrics', async ({
-    page,
-    request,
-  }) => {
-    await openPage(page, 'docs/architecture');
-    const docsNavigation = page.getByRole('navigation', { name: 'Docs' }).filter({ visible: true });
-    await expect(docsNavigation.getByText('Architecture', { exact: true })).toBeVisible();
-    await expect(docsNavigation.getByRole('link', { name: 'Verification gates' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 1, name: 'Architecture' })).toBeVisible();
-    await expect(page.locator('[data-architecture-map]')).toBeVisible();
-    await expect(page.locator('[data-architecture-decisions]')).toBeVisible();
-
+  test('Package metrics stay available on the performance page', async ({ page }) => {
+    await openPage(page, 'docs/performance');
     const metrics = page.locator('[data-package-metrics]');
     await expect(metrics).toBeVisible();
     await expect(metrics).toHaveAttribute('data-package-version', /^\d+\.\d+\.\d+/);
     await expect(metrics.getByText('37 / 37', { exact: true })).toBeVisible();
 
-    await openPage(page, 'docs/performance');
-    const fullMetrics = page.locator('[data-package-metrics]');
-    await fullMetrics.getByText('View all 37 direct entries', { exact: true }).click();
-    await expect(fullMetrics.locator('tbody tr')).toHaveCount(37);
-    await expect(fullMetrics.getByRole('row', { name: /use-websocket/ })).toContainText('3.07 kB');
-
-    await page.keyboard.press('Control+K');
-    const searchDialog = page.getByRole('dialog', { name: 'Search documentation' });
-    const searchbox = searchDialog.getByRole('combobox', { name: 'Search documentation' });
-    await searchbox.fill('ADR 001');
-    await expect(
-      searchDialog.getByText('ADR 001 — Runtime boundaries', { exact: true }),
-    ).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(searchDialog).toBeHidden();
-
-    for (const path of [
-      'docs/architecture',
-      'docs/architecture/adr/001-boundaries',
-      'docs/architecture/adr/005-verification',
-      'zh/docs/architecture',
-      'zh/docs/architecture/adr/001-boundaries',
-      'zh/docs/architecture/adr/005-verification',
-    ]) {
-      const response = await request.get(appRoute(path));
-      expect(response.ok(), `Expected /${path}/ to be public`).toBe(true);
-    }
-
-    const sitemapResponse = await request.get('./sitemap.xml');
-    expect(sitemapResponse.ok()).toBe(true);
-    const sitemap = await sitemapResponse.text();
-    expect(sitemap).toContain('/docs/architecture/');
-    expect(sitemap).toContain('/docs/architecture/adr/005-verification/');
-    expect(sitemap).toContain('/zh/docs/architecture/');
-    expect(sitemap).toContain('/zh/docs/architecture/adr/005-verification/');
-
-    await openPage(page, 'docs/architecture');
-    await page.getByRole('link', { name: '中文', exact: true }).click();
-    await expect(page).toHaveURL(/\/zh\/docs\/architecture\/$/);
-    await expect(page.getByRole('heading', { level: 1, name: '架构' })).toBeVisible();
-    await expect(page.getByText('better-hooks 构建报告', { exact: true })).toBeVisible();
-    await page.keyboard.press('Control+K');
-    const chineseSearch = page.getByRole('dialog', { name: '搜索文档' });
-    const chineseSearchbox = chineseSearch.getByRole('combobox', { name: '搜索文档' });
-    await chineseSearchbox.fill('ADR 005');
-    await expect(
-      chineseSearch.getByText('ADR 005 — 验证与发布门禁', { exact: true }),
-    ).toBeVisible();
+    await metrics.getByText('View all 37 direct entries', { exact: true }).click();
+    await expect(metrics.locator('tbody tr')).toHaveCount(37);
+    await expect(metrics.getByRole('row', { name: /use-websocket/ })).toContainText('3.07 kB');
   });
 
   test('Code and terminal frames expose the right gutter and copy clean source', async ({
@@ -1039,21 +969,24 @@ test.describe('documentation navigation', () => {
     await openPage(page, 'docs/getting-started');
     const englishHeading = page.getByRole('heading', {
       level: 2,
-      name: /Choose a Hook by lifecycle problem/,
+      name: /Make the component client-side/,
     });
     const englishLink = englishHeading.getByRole('link', {
-      name: 'Permalink to Choose a Hook by lifecycle problem',
+      name: 'Permalink to Make the component client-side',
     });
     const englishId = await englishHeading.getAttribute('id');
     expect(englishId).toBeTruthy();
     await expect(englishLink).toHaveAttribute('href', `#${englishId}`);
 
     await page.getByRole('link', { name: '中文', exact: true }).click();
-    const chineseHeading = page.getByRole('heading', { level: 2, name: /按生命周期问题选择 Hook/ });
+    const chineseHeading = page.getByRole('heading', {
+      level: 2,
+      name: /把调用 Hook 的组件放到客户端/,
+    });
     const chineseId = await chineseHeading.getAttribute('id');
     expect(chineseId).toBeTruthy();
     await expect(
-      chineseHeading.getByRole('link', { name: '按生命周期问题选择 Hook 的固定链接' }),
+      chineseHeading.getByRole('link', { name: '把调用 Hook 的组件放到客户端 的固定链接' }),
     ).toHaveAttribute('href', `#${chineseId}`);
   });
 
@@ -1086,21 +1019,21 @@ test.describe('documentation navigation', () => {
   }) => {
     await openPage(page, 'docs/react-19');
     await expect(
-      page.getByRole('heading', { level: 2, name: 'Actions stay usable across renders' }),
+      page.getByRole('heading', { level: 2, name: 'Actions stay stable, callbacks stay fresh' }),
     ).toBeVisible();
-    await expect(page.locator('main article')).toContainText('Errors remain observable');
+    await expect(page.locator('main article')).toContainText('Errors do not disappear');
 
     await page.getByRole('link', { name: '中文', exact: true }).click();
     await expect(
-      page.getByRole('heading', { level: 2, name: '操作函数跨渲染保持可用' }),
+      page.getByRole('heading', { level: 2, name: '操作函数稳定，回调保持新鲜' }),
     ).toBeVisible();
-    await expect(page.locator('main article')).toContainText('错误保持可观察');
+    await expect(page.locator('main article')).toContainText('错误不会凭空消失');
 
     await openPage(page, 'zh/docs/ssr-rsc');
     await expect(
-      page.getByRole('heading', { level: 2, name: '在调用 Hook 的位置设置边界' }),
+      page.getByRole('heading', { level: 2, name: '把边界放在 Hook 旁边' }),
     ).toBeVisible();
-    await expect(page.locator('main article')).toContainText('选择确定的服务端快照');
+    await expect(page.locator('main article')).toContainText('从稳定的回退值开始');
   });
 
   test('document labels are meaningful and useKeyPress documents the frozen chord contract', async ({
@@ -1287,7 +1220,6 @@ test.describe('WCAG A/AA', () => {
     { path: 'hooks', name: 'Hooks explorer' },
     { path: 'playground', name: 'Playground' },
     { path: 'docs/getting-started', name: 'documentation' },
-    { path: 'docs/architecture', name: 'architecture' },
     { path: 'docs/performance', name: 'performance evidence' },
   ] as const;
 
@@ -1356,9 +1288,6 @@ test('reduced motion removes long-running CSS motion', async ({ page }) => {
   expect(await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(
     true,
   );
-  const runtime = page.getByTestId('hook-lifecycle-visual');
-  await runtime.getByRole('textbox', { name: 'Try a value' }).fill('reduced motion value');
-
   const longRunningAnimations = await page.evaluate(() =>
     document.getAnimations().flatMap((animation) => {
       const timing = animation.effect?.getComputedTiming();
@@ -1371,5 +1300,4 @@ test('reduced motion removes long-running CSS motion', async ({ page }) => {
   );
 
   expect(longRunningAnimations).toEqual([]);
-  await expect(runtime.getByLabel('Published value')).toHaveText('reduced motion value');
 });

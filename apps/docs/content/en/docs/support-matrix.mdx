@@ -1,39 +1,42 @@
 ---
 title: Support matrix
-description: The runtime, rendering, module, and browser API boundaries supported by this release.
-section: Concepts
+description: The runtimes, rendering modes, modules, and browser behavior supported by this release.
+section: Core concepts
 order: 7
 ---
 
 # Support matrix
 
-## Runtime and package
+Use this page as a boundary check. It lists what the current release actually supports, without turning one passing example into a promise about every framework or browser.
 
-| Surface         | Current support                                  |
-| --------------- | ------------------------------------------------ |
-| React           | `>=19.0.0 <20.0.0`                               |
-| Package modules | ESM only                                         |
-| TypeScript      | declarations are generated from the typed source |
-| Node.js         | `>=22.18.0`                                      |
+## Package
 
-## Rendering boundaries
+| Surface      | Current support                                 |
+| ------------ | ----------------------------------------------- |
+| React        | `>=19.0.0 <20.0.0`                              |
+| Modules      | ESM only                                        |
+| TypeScript   | declarations generated from the typed source    |
+| Node.js      | `>=22.18.0` for development and package tooling |
+| Runtime deps | React peer dependency only                      |
 
-| Environment             | Support boundary                                           |
-| ----------------------- | ---------------------------------------------------------- |
-| Client-rendered React   | Supported                                                  |
-| SSR plus hydration      | Supported through documented server snapshots              |
-| React Server Components | Import-safe, but Hooks must be called in Client Components |
-| Browser workers         | Not a React DOM target and not claimed                     |
-| React Native            | Not tested or claimed                                      |
+## Rendering
 
-## Browser API behavior
+| Environment             | Support boundary                              |
+| ----------------------- | --------------------------------------------- |
+| Client-rendered React   | Supported                                     |
+| SSR plus hydration      | Supported through documented server snapshots |
+| React Server Components | Import-safe; Hooks run in Client Components   |
+| Browser workers         | Not a React DOM target and not claimed        |
+| React Native            | Not tested or claimed                         |
 
-Hooks feature-detect the APIs they use. `useMediaQuery` falls back when `matchMedia` is unavailable. Storage Hooks preserve their current value and expose an error when storage access or serialization fails. Event Hooks skip missing targets. These fallbacks are part of the documented runtime contract.
+## Browser behavior
+
+Hooks check the APIs they use. `useMediaQuery` falls back when `matchMedia` is missing. Storage Hooks keep their current value and expose access or serialization errors. Event Hooks skip a missing target. Clipboard access can reject and remains observable to the caller.
 
 ## Frameworks
 
-Framework compatibility follows three boundaries: React 19, ESM packages, and the relevant Client Component or hydration model. Named framework claims require dedicated integration tests.
+A framework needs React 19, ESM support, and a compatible client or hydration model. A named framework is added here only when the repository has a matching integration test.
 
-## Update policy
+## When this matrix changes
 
-This matrix describes the current manifest and implementation. A broader claim belongs here only after it is represented in tests or release validation; a framework or browser version is not implied by a passing local example.
+Support expands when the manifest, implementation, and tests move together. Until then, the ranges above are the public boundary for this release.

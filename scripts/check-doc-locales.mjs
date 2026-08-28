@@ -4,7 +4,6 @@ import process from 'node:process';
 
 const workspaceRoot = path.resolve(process.argv[2] ?? '.');
 const contentRoot = path.join(workspaceRoot, 'apps', 'docs', 'content');
-const architectureRoot = path.join(workspaceRoot, 'docs', 'architecture');
 const localeRoots = {
   en: path.join(contentRoot, 'en'),
   'zh-CN': path.join(contentRoot, 'zh-CN'),
@@ -12,18 +11,7 @@ const localeRoots = {
 const failures = [];
 const documents = Object.fromEntries(
   await Promise.all(
-    Object.entries(localeRoots).map(async ([locale, root]) => {
-      const standard = await collect(root);
-      const architecture = await collectArchitecture(locale);
-      for (const [relativePath, source] of architecture) {
-        if (standard.has(relativePath)) {
-          failures.push(`${relativePath}: duplicate documentation source`);
-        } else {
-          standard.set(relativePath, source);
-        }
-      }
-      return [locale, standard];
-    }),
+    Object.entries(localeRoots).map(async ([locale, root]) => [locale, await collect(root)]),
   ),
 );
 const paths = new Set([...documents.en.keys(), ...documents['zh-CN'].keys()]);
@@ -60,19 +48,6 @@ async function collect(root) {
   return files;
 }
 
-async function collectArchitecture(locale) {
-  const files = new Map();
-  const localeSuffix = locale === 'zh-CN' ? '.zh-CN' : '';
-  const readme = path.join(architectureRoot, `README${localeSuffix}.md`);
-  const readmeSource = await readUtf8(readme).catch((error) => {
-    if (error?.code === 'ENOENT') return undefined;
-    throw error;
-  });
-  if (readmeSource) files.set('docs/architecture/index.mdx', readmeSource);
-  await walkArchitecture(architectureRoot, architectureRoot, files, locale);
-  return files;
-}
-
 async function walk(root, directory, files) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const absolutePath = path.join(directory, entry.name);
@@ -86,26 +61,6 @@ async function walk(root, directory, files) {
       path.relative(root, absolutePath).replaceAll(path.sep, '/'),
       await readUtf8(absolutePath),
     );
-  }
-}
-
-async function walkArchitecture(root, directory, files, locale) {
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const absolutePath = path.join(directory, entry.name);
-    if (entry.isDirectory()) {
-      await walkArchitecture(root, absolutePath, files, locale);
-      continue;
-    }
-
-    const suffix = locale === 'zh-CN' ? '.zh-CN.mdx' : '.mdx';
-    if (!entry.name.endsWith(suffix)) continue;
-    if (locale === 'en' && entry.name.endsWith('.zh-CN.mdx')) continue;
-    const relativeDirectory = path.dirname(path.relative(root, absolutePath));
-    const name = entry.name.slice(0, -suffix.length);
-    const canonical = path
-      .join('docs', 'architecture', relativeDirectory, `${name}.mdx`)
-      .replaceAll(path.sep, '/');
-    files.set(canonical, await readUtf8(absolutePath));
   }
 }
 

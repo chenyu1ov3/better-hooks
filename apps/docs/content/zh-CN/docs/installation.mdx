@@ -1,25 +1,39 @@
 ---
 title: 安装
-description: 安装已发布的包，了解运行环境要求与包入口约定。
-section: 文档
+description: 安装 Better Hooks，选择导入方式，并确认当前版本的运行要求。
+section: 开始使用
 order: 2
 ---
 
 # 安装
 
-## 安装包
+一个包，不需要额外配置。
 
-使用 pnpm 安装：
+## 添加依赖
 
 ```sh
 pnpm add better-hooks
 ```
 
-也可以使用 npm 或其他包管理器；版本信息请查看 [npm 包页面](https://www.npmjs.com/package/better-hooks)。
+也可以使用 npm 或其他包管理器。已发布版本和元数据可以在 [npm 包页面](https://www.npmjs.com/package/better-hooks)查看。
 
-## 运行要求
+## 选择导入方式
 
-当前 package manifest 声明：
+想让依赖一眼可见，可以使用独立入口：
+
+```ts
+import { useToggle } from 'better-hooks/use-toggle';
+```
+
+同一个模块里需要多个 Hook 时，也可以从根入口导入：
+
+```ts
+import { useDebounce, useToggle } from 'better-hooks';
+```
+
+两种方式都是带类型的 ESM 导入。包声明了 `sideEffects: false`；区别主要在代码表达是否清楚，以及构建工具最先看到哪一段模块图。
+
+## 确认运行要求
 
 | 要求                     | 支持范围           |
 | ------------------------ | ------------------ |
@@ -27,10 +41,6 @@ pnpm add better-hooks
 | 开发与构建使用的 Node.js | `>=22.18.0`        |
 | 模块格式                 | 仅 ESM             |
 
-React 是 peer dependency。除了由使用方应用提供的 React API，这个包没有其他运行时依赖。
+React 是 peer dependency，除此之外没有其他运行时依赖。
 
-## 导入方式
-
-包名为 `better-hooks`。根入口适合集中导入，每个 Hook 也有 `better-hooks/use-toggle` 这样的显式直接入口。直接入口能更清楚地表达依赖关系，并配合包的 `sideEffects: false` 声明完成 Tree Shaking。
-
-版本变更记录在[更新日志](/zh/changelog)中。
+接下来可以直接[开始使用](/zh/docs/getting-started)，也可以先看看最近的[更新日志](/zh/changelog)。

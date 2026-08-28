@@ -1,26 +1,29 @@
 ---
 title: 介绍
-description: 了解 Better Hooks 的定位、设计保证，以及它在 React 19 应用中的使用边界。
-section: 文档
+description: 快速了解 Better Hooks 解决什么问题，以及它适合放在 React 应用的哪个位置。
+section: 开始使用
 order: 1
 ---
 
 # 介绍
 
-Better Hooks 是一组小巧且类型安全的 React 19 Hooks。它专注于处理 Effect 周边的生命周期问题，包括订阅、定时器、任务取消、浏览器回退值，以及只暴露已提交数据的状态语义。
+React 已经负责状态和 Effect。Better Hooks 接手周边那些看似不大、却很容易留下问题的工作：取消定时器、移除监听器、处理服务端无法得知的浏览器状态，以及丢弃已经过期的异步结果。
 
-## 这个库优先解决什么
+## 一个 Hook 只做一件事
 
-- **组合优先。** 每个 Hook 只解决一个生命周期问题，并能自然地与 React 内置 Hook 配合。
-- **可预测的清理。** 依赖变化或组件卸载时，定时器、监听器、订阅和异步任务都会被释放。
-- **服务端安全渲染。** 导入模块时不触碰浏览器 API；面向浏览器的 Hooks 提供明确的服务端快照。
-- **直接导入。** 每个公开 Hook 都有显式 package export，整个包同时声明 `sideEffects: false`。
-- **类型推断。** 泛型值、回调参数和事件映射可以贯穿公开 API，无需额外断言。
+每个入口都保持小而明确。切换状态用 `useToggle`，等待输入稳定用 `useDebounce`，读取联网状态用 `useOnline`，响应用户复制操作用 `useCopyToClipboard`。剩下的组件代码还是普通 React。
 
-## 接下来阅读什么
+## Hook 会替你处理的事
 
-先从[快速开始](/zh/docs/getting-started)了解客户端边界与导入约定，再通过 [Hooks 索引](/zh/hooks)按使用场景选择 API。在服务端渲染应用中使用浏览器 Hook 前，请先阅读 [SSR 与 RSC](/zh/docs/ssr-rsc)。
+- 仅仅导入模块，不会启动浏览器任务。
+- 输入变化或组件卸载时，定时器、监听器、订阅和待处理任务都会被清理。
+- 对于有此约定的 Hook，长生命周期回调会读到最近一次已经提交的值。
+- 每个公开 Hook 都有带类型的独立入口，也可以从根入口导入。
 
-## 非目标
+## 从一个小功能开始
 
-Better Hooks 是无样式的底层能力库。它不提供 UI 组件、请求缓存或状态容器，也不替代 React 的 `useTransition`、`useOptimistic` 和 `useActionState` 等 API。
+跟着[开始使用](/zh/docs/getting-started)写一个客户端组件，再到 [Hook 索引](/zh/hooks)按实际需求搜索。组件需要服务端渲染时，使用浏览器状态前先看一遍 [SSR 与 RSC](/zh/docs/ssr-rsc)。
+
+## 它不负责什么
+
+Better Hooks 是无样式的工具库，不提供 UI 组件、请求缓存或状态容器，也不会给 React 已经好用的 API 换个名字再包装一次。

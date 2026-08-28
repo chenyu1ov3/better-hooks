@@ -1,26 +1,29 @@
 ---
 title: Introduction
-description: What Better Hooks is, what it guarantees, and where it fits in a React 19 application.
-section: Docs
+description: A quick tour of what Better Hooks handles and where it fits in a React application.
+section: Getting started
 order: 1
 ---
 
 # Introduction
 
-Better Hooks is a collection of small, typed React 19 hooks. It focuses on the work around effects: subscriptions, timers, cancellation, browser fallbacks, and committed-value semantics.
+React gives you state and effects. Better Hooks handles the small jobs around them: timers that need cancelling, listeners that need removing, browser values the server cannot know, and async work that can go stale.
 
-## What the library optimizes for
+## One Hook, one job
 
-- **Composition first.** Each hook solves one lifecycle problem and remains useful beside React's built-in hooks.
-- **Predictable cleanup.** Timers, listeners, subscriptions, and async work are released when dependencies change or a component unmounts.
-- **Server-safe rendering.** Browser APIs are not touched at import time. Browser-facing hooks document deterministic server snapshots.
-- **Direct imports.** Every public hook has an explicit package export, and the package declares `sideEffects: false`.
-- **Type inference.** Generic values, callback arguments, and event maps flow through the public API without wrapper casts.
+Each entry stays small enough to understand and combine. Use `useToggle` for a switch, `useDebounce` for settling input, `useOnline` for browser connectivity, or `useCopyToClipboard` for a user-triggered copy. The rest of your component stays ordinary React.
 
-## Where to go next
+## What the Hook takes care of
 
-Read [Getting started](/docs/getting-started) for the client boundary and import conventions. Use the [Hooks explorer](/hooks) to choose by problem, or inspect [SSR and RSC](/docs/ssr-rsc) before adding a browser-facing hook to a server-rendered application.
+- Importing a Hook does not start browser work.
+- Timers, listeners, subscriptions, and pending work are cleaned up when their inputs change or the component unmounts.
+- Long-lived callbacks see the latest committed values when the Hook is designed to do so.
+- Every public Hook has a typed direct entry as well as the root export.
 
-## Non-goals
+## Start with something useful
 
-Better Hooks is headless and unstyled. It does not provide UI components, a data-fetching cache, a state container, or replacements for React APIs such as `useTransition`, `useOptimistic`, and `useActionState`.
+Follow [Getting started](/docs/getting-started) to build a small client component, then open the [Hook index](/hooks) and search for the behavior you need. If the component is server rendered, read [SSR and RSC](/docs/ssr-rsc) before using browser state.
+
+## What is not included
+
+Better Hooks is headless. It does not ship UI components, a request cache, or a state container, and it does not rename React APIs that already solve the problem well.
