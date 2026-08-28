@@ -671,6 +671,35 @@ export function BrokenExample() {
     await expect(reset).toBeDisabled();
   });
 
+  test('Live example paragraphs align with adjacent controls', async ({ page }) => {
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 1280, height: 800 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await openPage(page, 'hooks/use-toggle');
+      const preview = page.locator('.live-example .live-code-preview__canvas');
+      await preview.getByRole('button', { name: 'Show details', exact: true }).click();
+
+      const [buttonBounds, paragraphBounds, paragraphMargin] = await Promise.all([
+        preview.getByRole('button', { name: 'Hide details', exact: true }).boundingBox(),
+        preview.locator('p').boundingBox(),
+        preview.locator('p').evaluate((element) => getComputedStyle(element).margin),
+      ]);
+
+      expect(buttonBounds).not.toBeNull();
+      expect(paragraphBounds).not.toBeNull();
+      expect(paragraphMargin).toBe('0px');
+      expect(
+        Math.abs(
+          buttonBounds!.y +
+            buttonBounds!.height / 2 -
+            (paragraphBounds!.y + paragraphBounds!.height / 2),
+        ),
+      ).toBeLessThanOrEqual(1);
+    }
+  });
+
   test('All 37 default Playground examples compile and render', async ({ page }) => {
     await openPage(page, 'playground');
     const playground = page.locator('.playground-workbench');
