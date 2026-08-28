@@ -1,6 +1,6 @@
 {
   "name": "better-hooks",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Type-safe, SSR-aware React 19 Hooks with stable callbacks and direct ESM entry points.",
   "keywords": [
     "debounce",
