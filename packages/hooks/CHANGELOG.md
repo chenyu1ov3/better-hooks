@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- fa16955: Add `useCounter`, `useMap`, `useSet`, and `useCopyToClipboard` with stable actions, SSR-safe boundaries, and observable clipboard errors.
+
 ## 1.1.2
 
 ### Patch Changes
