@@ -1,7 +1,6 @@
 'use client';
 
 import { Menu, X } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,6 +12,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import type { NavGroup } from '../lib/navigation';
+import { DocumentNavigationLink } from './document-navigation-link';
 
 export function MobileDocsNavigation({
   groups,
@@ -61,16 +61,15 @@ export function MobileDocsNavigation({
                 <p className="m-0 text-xs font-bold text-foreground uppercase">{group.label}</p>
                 <div className="mt-2 grid gap-px">
                   {group.items.map((item) => (
-                    <Link
+                    <DocumentNavigationLink
                       className="flex min-h-11 items-center border-l-2 border-transparent px-2.5 py-1.5 text-sm text-muted-foreground transition-[color,background-color,border-color] hover:text-foreground aria-[current=page]:border-brand aria-[current=page]:bg-brand/8 aria-[current=page]:font-semibold aria-[current=page]:text-foreground"
                       key={item.href}
                       href={item.href}
-                      prefetch={false}
                       aria-current={item.href === currentHref ? 'page' : undefined}
                       onClick={close}
                     >
                       {item.label}
-                    </Link>
+                    </DocumentNavigationLink>
                   ))}
                 </div>
               </section>
