@@ -1199,7 +1199,7 @@ test.describe('documentation navigation', () => {
     await docsNavigation.getByRole('link', { name: 'useInterval', exact: true }).click();
     await expect(page).toHaveURL(/\/hooks\/use-interval\/$/);
     await expect(articleHeading).toHaveText('useInterval');
-    await expect(page.locator('html')).not.toHaveAttribute(
+    await expect(page.locator('html')).toHaveAttribute(
       'data-navigation-marker',
       'current-document',
     );
@@ -1275,7 +1275,7 @@ test.describe('documentation navigation', () => {
     await dialog.getByRole('link', { name: 'Installation', exact: true }).click();
     await expect(page).toHaveURL(/\/docs\/installation\/$/);
     await expect(page.locator('main article h1')).toHaveText('Installation');
-    await expect(page.locator('html')).not.toHaveAttribute(
+    await expect(page.locator('html')).toHaveAttribute(
       'data-navigation-marker',
       'current-document',
     );
