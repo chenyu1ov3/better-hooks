@@ -1,0 +1,48 @@
+---
+title: useMap
+description: Manage an immutable Map snapshot with stable actions.
+section: State
+order: 109
+---
+
+# useMap
+
+## Overview
+
+`useMap` manages a Map as readonly React state and creates a new snapshot only for meaningful updates.
+
+## Signature
+
+```ts
+function useMap<K, V>(
+  initialValue?: Iterable<readonly [K, V]> | (() => Iterable<readonly [K, V]>),
+): readonly [ReadonlyMap<K, V>, UseMapActions<K, V>];
+```
+
+## Parameters
+
+The initial iterable or lazy initializer is copied once. `setAll` accepts any iterable of key-value pairs and replaces the current entries.
+
+## Returns
+
+A readonly Map snapshot and stable `set`, `setAll`, `remove`, `clear`, and `reset` actions.
+
+## Behavior
+
+Updates copy the current Map instead of mutating it. Setting the same value, removing a missing key, clearing an empty Map, or resetting an unchanged Map preserves the current snapshot reference. `reset` restores the entries captured during initialization.
+
+## SSR / RSC
+
+The Hook uses only deterministic React state and can render the initial Map during SSR. Use it in a Client Component when actions are connected to interaction.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use the Map snapshot with `useMemo` when deriving indexed views, and keep mutations behind the returned actions.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-map/index.ts).

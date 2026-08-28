@@ -46,9 +46,9 @@ const directExports = Object.keys(packageExports).filter((subpath) => subpath.st
 if (Object.hasOwn(packageExports, './use-storage')) {
   failures.push('the removed ./use-storage aggregate export must not be published');
 }
-if (directExports.length !== 33) {
+if (directExports.length !== 37) {
   failures.push(
-    `public API must contain exactly 33 direct Hook entries; received ${directExports.length}`,
+    `public API must contain exactly 37 direct Hook entries; received ${directExports.length}`,
   );
 }
 
@@ -254,7 +254,7 @@ async function checkPublishedMetadata() {
     '## Supported environments',
     '## SSR and React Server Components',
     '## API',
-    '33 Hooks',
+    '37 Hooks',
     "from 'better-hooks'",
     "from 'better-hooks/use-debounce'",
     'https://chenyu1ov3.github.io/better-hooks/',
@@ -277,7 +277,7 @@ async function checkPublishedMetadata() {
     '## 支持环境',
     '## SSR 与 React Server Components',
     '## API',
-    '33 个 Hook',
+    '37 个 Hook',
     "from 'better-hooks'",
     "from 'better-hooks/use-debounce'",
     'https://chenyu1ov3.github.io/better-hooks/zh/',

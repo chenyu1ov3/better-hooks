@@ -76,6 +76,10 @@ const defaultExampleText = {
   'use-is-mounted': 'idle',
   'use-isomorphic-layout-effect': /Measured width: \d+px/,
   'use-reset-state': 'Reset',
+  'use-counter': 'Count: 2',
+  'use-map': 'ready',
+  'use-set': 'Selected',
+  'use-copy-to-clipboard': 'Ready',
   'use-resize-observer': /\d+ x \d+/,
   'use-safe-state': /Count: 0/,
   'use-unmounted-ref': 'Waiting',
@@ -682,7 +686,7 @@ export function BrokenExample() {
     await expect(reset).toBeDisabled();
   });
 
-  test('All 33 default Playground examples compile and render', async ({ page }) => {
+  test('All 37 default Playground examples compile and render', async ({ page }) => {
     await openPage(page, 'playground');
     const playground = page.locator('.playground-workbench');
     const selector = playground.getByRole('combobox', { name: 'Example' });
@@ -696,7 +700,7 @@ export function BrokenExample() {
     const optionLabels = (await page.getByRole('option').allTextContents()).map((label) =>
       label.trim(),
     );
-    expect(optionLabels).toHaveLength(33);
+    expect(optionLabels).toHaveLength(37);
     expect(optionLabels.sort()).toEqual(examples.map(({ label }) => label).sort());
     await page.keyboard.press('Escape');
 
@@ -892,12 +896,12 @@ test.describe('documentation navigation', () => {
     const metrics = page.locator('[data-package-metrics]');
     await expect(metrics).toBeVisible();
     await expect(metrics).toHaveAttribute('data-package-version', /^\d+\.\d+\.\d+/);
-    await expect(metrics.getByText('33 / 33', { exact: true })).toBeVisible();
+    await expect(metrics.getByText('37 / 37', { exact: true })).toBeVisible();
 
     await openPage(page, 'docs/performance');
     const fullMetrics = page.locator('[data-package-metrics]');
-    await fullMetrics.getByText('View all 33 direct entries', { exact: true }).click();
-    await expect(fullMetrics.locator('tbody tr')).toHaveCount(33);
+    await fullMetrics.getByText('View all 37 direct entries', { exact: true }).click();
+    await expect(fullMetrics.locator('tbody tr')).toHaveCount(37);
     await expect(fullMetrics.getByRole('row', { name: /use-websocket/ })).toContainText('3.07 kB');
 
     await page.keyboard.press('Control+K');

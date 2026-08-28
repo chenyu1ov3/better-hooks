@@ -1,0 +1,55 @@
+---
+title: useCounter
+description: Manage a bounded number with stable counter actions.
+section: State
+order: 108
+---
+
+# useCounter
+
+## Overview
+
+`useCounter` manages a number with optional inclusive bounds and stable actions for incrementing, decrementing, setting, and resetting the count.
+
+## Signature
+
+```ts
+function useCounter(
+  initialValue?: number,
+  options?: { min?: number; max?: number },
+): {
+  count: number;
+  increment: (delta?: number) => void;
+  decrement: (delta?: number) => void;
+  set: (next: number | ((previous: number) => number)) => void;
+  reset: () => void;
+};
+```
+
+## Parameters
+
+`initialValue` defaults to `0` and is captured on the first render. `min` and `max` are inclusive bounds. Non-finite bounds are ignored; `min` must not be greater than `max`.
+
+## Returns
+
+The current `count` and referentially stable `increment`, `decrement`, `set`, and `reset` actions.
+
+## Behavior
+
+Initial and updated values are clamped to the current bounds. Functional updates use the latest queued count, so repeated actions in one event compose correctly. Changing the bounds does not silently change the current count; the next update or reset applies the new bounds.
+
+## SSR / RSC
+
+The count uses deterministic React state and does not access browser APIs during SSR. Use the Hook in a Client Component.
+
+## Example
+
+<HookExample />
+
+## Composition
+
+Use `useBoolean` for boolean-specific actions, or combine the counter with `useDebounce` when publishing a count should wait for changes to settle.
+
+## Source
+
+[Read the implementation on GitHub](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-counter/index.ts).

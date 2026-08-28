@@ -1,0 +1,48 @@
+---
+title: useMap
+description: 用稳定操作管理不可变的 Map 快照。
+section: 状态
+order: 109
+---
+
+# useMap
+
+## 概览
+
+`useMap` 将 Map 作为只读 React 状态管理，并且只有在内容真正变化时才创建新的快照。
+
+## 函数签名
+
+```ts
+function useMap<K, V>(
+  initialValue?: Iterable<readonly [K, V]> | (() => Iterable<readonly [K, V]>),
+): readonly [ReadonlyMap<K, V>, UseMapActions<K, V>];
+```
+
+## 参数
+
+初始 iterable 或惰性初始化函数只会复制一次。`setAll` 可以接收任意 key-value iterable，并替换当前 entries。
+
+## 返回值
+
+返回只读 Map 快照，以及稳定的 `set`、`setAll`、`remove`、`clear` 和 `reset` 操作。
+
+## 行为说明
+
+更新会复制当前 Map，而不会直接修改它。设置相同值、删除不存在的 key、清空空 Map，或重置未变化的 Map 时，会保留当前快照引用。`reset` 会恢复初始化时捕获的 entries。
+
+## SSR / RSC
+
+该 Hook 只使用确定性的 React 状态，SSR 可以直接渲染初始 Map。将操作连接到交互时，请在 Client Component 中使用。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+可以在派生索引视图时配合 `useMemo` 使用 Map 快照，并将所有变更限制在返回的 actions 中。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-map/index.ts)。

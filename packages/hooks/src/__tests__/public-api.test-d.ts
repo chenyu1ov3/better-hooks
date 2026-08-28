@@ -4,6 +4,8 @@ import * as asyncEntry from 'better-hooks/use-async';
 import * as booleanEntry from 'better-hooks/use-boolean';
 import * as clickOutsideEntry from 'better-hooks/use-click-outside';
 import * as controllableEntry from 'better-hooks/use-controllable-state';
+import * as copyToClipboardEntry from 'better-hooks/use-copy-to-clipboard';
+import * as counterEntry from 'better-hooks/use-counter';
 import * as debounceEntry from 'better-hooks/use-debounce';
 import * as debounceFnEntry from 'better-hooks/use-debounce-fn';
 import * as documentVisibilityEntry from 'better-hooks/use-document-visibility';
@@ -18,6 +20,7 @@ import * as keyPressEntry from 'better-hooks/use-key-press';
 import * as latestEntry from 'better-hooks/use-latest';
 import * as localStorageEntry from 'better-hooks/use-local-storage';
 import * as lockFnEntry from 'better-hooks/use-lock-fn';
+import * as mapEntry from 'better-hooks/use-map';
 import * as memoizedFnEntry from 'better-hooks/use-memoized-fn';
 import * as mediaQueryEntry from 'better-hooks/use-media-query';
 import * as onlineEntry from 'better-hooks/use-online';
@@ -26,6 +29,7 @@ import * as resetStateEntry from 'better-hooks/use-reset-state';
 import * as resizeObserverEntry from 'better-hooks/use-resize-observer';
 import * as safeStateEntry from 'better-hooks/use-safe-state';
 import * as sessionStorageEntry from 'better-hooks/use-session-storage';
+import * as setEntry from 'better-hooks/use-set';
 import * as throttleEntry from 'better-hooks/use-throttle';
 import * as throttleFnEntry from 'better-hooks/use-throttle-fn';
 import * as timeoutEntry from 'better-hooks/use-timeout';
@@ -41,6 +45,10 @@ test('direct entries match the root API', () => {
   expectTypeOf(controllableEntry.useControllableState).toEqualTypeOf<
     typeof root.useControllableState
   >();
+  expectTypeOf(copyToClipboardEntry.useCopyToClipboard).toEqualTypeOf<
+    typeof root.useCopyToClipboard
+  >();
+  expectTypeOf(counterEntry.useCounter).toEqualTypeOf<typeof root.useCounter>();
   expectTypeOf(debounceEntry.useDebounce).toEqualTypeOf<typeof root.useDebounce>();
   expectTypeOf(debounceFnEntry.useDebounceFn).toEqualTypeOf<typeof root.useDebounceFn>();
   expectTypeOf(documentVisibilityEntry.useDocumentVisibility).toEqualTypeOf<
@@ -61,6 +69,7 @@ test('direct entries match the root API', () => {
   expectTypeOf(latestEntry.useLatest).toEqualTypeOf<typeof root.useLatest>();
   expectTypeOf(localStorageEntry.useLocalStorage).toEqualTypeOf<typeof root.useLocalStorage>();
   expectTypeOf(lockFnEntry.useLockFn).toEqualTypeOf<typeof root.useLockFn>();
+  expectTypeOf(mapEntry.useMap).toEqualTypeOf<typeof root.useMap>();
   expectTypeOf(memoizedFnEntry.useMemoizedFn).toEqualTypeOf<typeof root.useMemoizedFn>();
   expectTypeOf(mediaQueryEntry.useMediaQuery).toEqualTypeOf<typeof root.useMediaQuery>();
   expectTypeOf(onlineEntry.useOnline).toEqualTypeOf<typeof root.useOnline>();
@@ -73,6 +82,7 @@ test('direct entries match the root API', () => {
   expectTypeOf(sessionStorageEntry.useSessionStorage).toEqualTypeOf<
     typeof root.useSessionStorage
   >();
+  expectTypeOf(setEntry.useSet).toEqualTypeOf<typeof root.useSet>();
   expectTypeOf(throttleEntry.useThrottle).toEqualTypeOf<typeof root.useThrottle>();
   expectTypeOf(throttleFnEntry.useThrottleFn).toEqualTypeOf<typeof root.useThrottleFn>();
   expectTypeOf(timeoutEntry.useTimeout).toEqualTypeOf<typeof root.useTimeout>();
@@ -105,6 +115,23 @@ test('generic Hooks preserve useful inference', () => {
   const [controlled, setControlled] = root.useControllableState({ defaultValue: 'ready' });
   expectTypeOf(controlled).toBeString();
   expectTypeOf(setControlled).parameter(0).toEqualTypeOf<string | ((previous: string) => string)>();
+
+  const counter = root.useCounter(1, { min: 0, max: 10 });
+  expectTypeOf(counter.count).toBeNumber();
+  expectTypeOf(counter.set).parameter(0).toEqualTypeOf<root.CounterUpdater>();
+
+  const [map, mapActions] = root.useMap<string, number>([['count', 1]]);
+  expectTypeOf(map).toEqualTypeOf<ReadonlyMap<string, number>>();
+  expectTypeOf(mapActions.set).parameters.toEqualTypeOf<[key: string, value: number]>();
+
+  const [set, setActions] = root.useSet(['ready']);
+  expectTypeOf(set).toEqualTypeOf<ReadonlySet<string>>();
+  expectTypeOf(setActions.toggle).parameter(0).toBeString();
+
+  const clipboard = root.useCopyToClipboard();
+  expectTypeOf(clipboard.status).toEqualTypeOf<root.ClipboardStatus>();
+  expectTypeOf(clipboard.copy).parameters.toEqualTypeOf<[text: string]>();
+  expectTypeOf(clipboard.copy).returns.toEqualTypeOf<Promise<void>>();
 
   const previous = root.usePrevious(1, 'initial');
   expectTypeOf(previous).toEqualTypeOf<number | string>();
@@ -186,6 +213,7 @@ test('error observers accept unknown errors across callback hooks', () => {
   root.useThrottleFn(() => undefined, { delay: 10, onError });
   root.useEventListener('click', () => undefined, { onError });
   root.useClickOutside({ current: null }, () => undefined, { onError });
+  root.useCopyToClipboard({ onError });
   root.useMediaQuery('(min-width: 1px)', { onError });
   root.useKeyPress('Enter', () => undefined, { onError });
   root.useHover({ onError });

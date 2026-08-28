@@ -1,0 +1,55 @@
+---
+title: useCounter
+description: 用稳定的计数操作管理有边界的数字。
+section: 状态
+order: 108
+---
+
+# useCounter
+
+## 概览
+
+`useCounter` 管理一个数字和可选的闭区间边界，并提供用于增加、减少、设置和重置的稳定操作。
+
+## 函数签名
+
+```ts
+function useCounter(
+  initialValue?: number,
+  options?: { min?: number; max?: number },
+): {
+  count: number;
+  increment: (delta?: number) => void;
+  decrement: (delta?: number) => void;
+  set: (next: number | ((previous: number) => number)) => void;
+  reset: () => void;
+};
+```
+
+## 参数
+
+`initialValue` 默认为 `0`，只在首次渲染时捕获。`min` 和 `max` 是包含边界值的限制；非有限边界会被忽略，`min` 不能大于 `max`。
+
+## 返回值
+
+返回当前 `count`，以及引用稳定的 `increment`、`decrement`、`set` 和 `reset` 操作。
+
+## 行为说明
+
+初始值和后续更新值都会限制在当前边界内。函数式更新使用最新排队的 count，因此同一事件中的连续操作可以正确组合。边界变化不会静默修改当前 count；下一次更新或重置时才会应用新边界。
+
+## SSR / RSC
+
+count 使用确定性的 React 状态，SSR 期间不会访问浏览器 API。请在 Client Component 中使用该 Hook。
+
+## 示例
+
+<HookExample />
+
+## 组合使用
+
+需要布尔专用操作时使用 `useBoolean`；如果计数发布需要等待变化稳定，可以配合 `useDebounce`。
+
+## 源码
+
+[在 GitHub 查看实现](https://github.com/chenyu1ov3/better-hooks/blob/main/packages/hooks/src/use-counter/index.ts)。
