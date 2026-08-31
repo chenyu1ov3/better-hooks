@@ -1,8 +1,8 @@
 import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { hrefFor } from '../lib/content';
 import type { Locale } from '../lib/i18n';
+import { SiteLink } from './site-link';
 
 export function NotFoundPage({ locale }: { locale: Locale }) {
   return (
@@ -17,10 +17,10 @@ export function NotFoundPage({ locale }: { locale: Locale }) {
           : '你可以前往 Hook 索引，或从文档首页重新开始。'}
       </p>
       <Button asChild size="lg" className="mt-6 min-h-11">
-        <Link href={hrefFor(locale, 'hooks')}>
+        <SiteLink href={hrefFor(locale, 'hooks')}>
           <ArrowLeft aria-hidden="true" size={16} />
           {locale === 'en' ? 'Browse hooks' : '查看 Hook'}
-        </Link>
+        </SiteLink>
       </Button>
     </main>
   );

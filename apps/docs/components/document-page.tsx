@@ -1,5 +1,4 @@
 import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import rehypePrettyCode from 'rehype-pretty-code';
 import remarkGfm from 'remark-gfm';
@@ -13,6 +12,7 @@ import { SHIKI_THEMES } from './code-block-config';
 import proseStyles from './document-prose.module.css';
 import { LiveExample } from './live-example';
 import { createMdxComponents } from './mdx-components';
+import { SiteLink } from './site-link';
 
 export async function DocumentPage({ document }: { document: DocumentRecord }) {
   const dictionary = dictionaryFor(document.locale);
@@ -93,7 +93,7 @@ export async function DocumentPage({ document }: { document: DocumentRecord }) {
         aria-label={document.locale === 'en' ? 'Document pagination' : '文档翻页'}
       >
         {previous ? (
-          <Link
+          <SiteLink
             className="group flex min-h-20 min-w-0 items-center gap-3 rounded-md border border-border p-4 transition-colors hover:border-foreground"
             href={hrefFor(document.locale, previous.slug)}
           >
@@ -104,12 +104,12 @@ export async function DocumentPage({ document }: { document: DocumentRecord }) {
               </small>
               <span className="block truncate">{previous.title}</span>
             </span>
-          </Link>
+          </SiteLink>
         ) : (
           <span aria-hidden="true" className="hidden sm:block" />
         )}
         {next ? (
-          <Link
+          <SiteLink
             className="group flex min-h-20 min-w-0 items-center gap-3 rounded-md border border-border p-4 transition-colors hover:border-foreground sm:justify-end sm:text-right"
             href={hrefFor(document.locale, next.slug)}
           >
@@ -120,7 +120,7 @@ export async function DocumentPage({ document }: { document: DocumentRecord }) {
               <span className="block truncate">{next.title}</span>
             </span>
             <ArrowRight aria-hidden="true" size={15} />
-          </Link>
+          </SiteLink>
         ) : null}
       </nav>
     </article>

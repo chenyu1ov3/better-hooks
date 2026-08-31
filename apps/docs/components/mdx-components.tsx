@@ -1,12 +1,12 @@
 import { slug } from 'github-slugger';
 import { isValidElement, type ComponentProps, type ReactNode } from 'react';
-import Link from 'next/link';
 import { Link2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Heading as DocumentHeading } from '../lib/content';
 import type { Locale } from '../lib/i18n';
 import { PackageMetrics } from './package-metrics';
 import { CodeBlock } from './code-block';
+import { SiteLink } from './site-link';
 
 function Anchor({ href = '', children, ...props }: ComponentProps<'a'>) {
   const external = href.startsWith('http');
@@ -18,9 +18,9 @@ function Anchor({ href = '', children, ...props }: ComponentProps<'a'>) {
     );
   }
   return (
-    <Link href={href || '#'} {...props}>
+    <SiteLink href={href || '#'} {...props}>
       {children}
-    </Link>
+    </SiteLink>
   );
 }
 

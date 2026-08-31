@@ -477,7 +477,7 @@ export default function LiveCodeEditor({
             {sourceOpen ? (
               <div
                 className={cn(
-                  'min-w-0 overflow-hidden border-b border-[var(--code-border)] lg:h-full lg:border-r lg:border-b-0',
+                  'min-w-0 overflow-hidden border-b border-[var(--code-border)] lg:h-full lg:min-h-0! lg:border-r lg:border-b-0',
                   styles.sourceViewport,
                 )}
               >

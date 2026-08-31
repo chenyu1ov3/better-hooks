@@ -1,11 +1,11 @@
 import { ArrowRight, GitFork } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { hrefFor } from '../lib/content';
 import type { Locale } from '../lib/i18n';
 import { siteConfig } from '../lib/site';
 import { CopyButton } from './copy-button';
 import { HighlightedCommand } from './highlighted-code';
+import { SiteLink } from './site-link';
 
 export function LandingPage({ locale }: { locale: Locale }) {
   const copy =
@@ -44,10 +44,10 @@ export function LandingPage({ locale }: { locale: Locale }) {
         </p>
         <div className="mt-6 flex flex-wrap gap-2.5">
           <Button asChild size="lg" className="h-11 px-5 font-bold">
-            <Link href={hrefFor(locale, 'docs')}>
+            <SiteLink href={hrefFor(locale, 'docs')}>
               {copy.docs}
               <ArrowRight aria-hidden="true" size={17} />
-            </Link>
+            </SiteLink>
           </Button>
           <Button asChild size="lg" variant="outline" className="h-11 px-5 font-bold">
             <a href={siteConfig.repositoryUrl} target="_blank" rel="noreferrer">

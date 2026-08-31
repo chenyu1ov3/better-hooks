@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { MouseEvent, ReactNode } from 'react';
+import { SiteLink } from './site-link';
 
 export function LanguageLink({
   href,
@@ -13,8 +12,6 @@ export function LanguageLink({
   hrefLang: string;
   children: ReactNode;
 }) {
-  const router = useRouter();
-
   function preserveLocationState(event: MouseEvent<HTMLAnchorElement>) {
     if (
       event.defaultPrevented ||
@@ -31,17 +28,17 @@ export function LanguageLink({
     if (!suffix) return;
 
     event.preventDefault();
-    router.push(`${href}${suffix}`);
+    window.location.assign(`${event.currentTarget.href}${suffix}`);
   }
 
   return (
-    <Link
+    <SiteLink
       className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-xs font-semibold whitespace-nowrap text-muted-foreground transition-[color,background-color] hover:bg-muted hover:text-foreground"
       href={href}
       hrefLang={hrefLang}
       onClick={preserveLocationState}
     >
       {children}
-    </Link>
+    </SiteLink>
   );
 }

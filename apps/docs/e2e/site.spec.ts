@@ -363,6 +363,66 @@ test.describe('brand structure', () => {
 });
 
 test.describe('core interactions', () => {
+  test('site-wide links avoid speculative route requests and commit client navigation', async ({
+    page,
+  }) => {
+    const prefetchedRoutes: string[] = [];
+    page.on('request', (request) => {
+      if (request.headers()['next-router-prefetch'] === '1') {
+        prefetchedRoutes.push(new URL(request.url()).pathname);
+      }
+    });
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openPage(page);
+    await page.evaluate(() => {
+      document.documentElement.dataset.navigationMarker = 'current-document';
+    });
+
+    await page
+      .getByRole('banner')
+      .getByRole('navigation', { name: 'Primary navigation' })
+      .getByRole('link', { name: 'Docs', exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/docs\/$/);
+    await expect(page.locator('main article h1')).toHaveText('Introduction');
+    await expect(page.locator('[data-site-route="/docs"]')).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-navigation-marker',
+      'current-document',
+    );
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/better-hooks\/$/);
+    await expect(page.locator('main h1')).toHaveText('Better Hooks');
+    await page.waitForTimeout(2_100);
+    await expect(page).toHaveURL(/\/better-hooks\/$/);
+
+    await page
+      .getByRole('banner')
+      .getByRole('navigation', { name: 'Primary navigation' })
+      .getByRole('link', { name: 'Docs', exact: true })
+      .click();
+    await expect(page.locator('main article h1')).toHaveText('Introduction');
+
+    await page.locator('main article').getByRole('link', { name: 'Hook index' }).click();
+    await expect(page).toHaveURL(/\/hooks\/$/);
+    await expect(page.locator('main h1')).toHaveText('Hook index');
+    await expect(page.locator('[data-site-route="/hooks"]')).toBeVisible();
+
+    await page
+      .locator('main article')
+      .getByRole('link', { name: 'useAsync', exact: true })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/hooks\/use-async\/$/);
+    await expect(page.locator('main article h1')).toHaveText('useAsync');
+    await expect(page.locator('[data-site-route="/hooks/use-async"]')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+
+    expect(prefetchedRoutes).toEqual([]);
+  });
+
   test('browser extension head scripts do not shift app hydration', async ({ page }) => {
     const hydrationErrors: string[] = [];
     page.on('console', (message) => {
@@ -669,6 +729,38 @@ export function BrokenExample() {
     await expect(editor).toContainText("from 'better-hooks/use-debounce'");
     await expect(preview.getByText('Search', { exact: true })).toBeVisible();
     await expect(reset).toBeDisabled();
+  });
+
+  test('Hook example keeps long source lines horizontally scrollable', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openPage(page, 'hooks/use-debounce');
+    const workbench = page.locator('.live-example .live-code-workbench');
+    await workbench.getByRole('button', { name: 'Edit code' }).click();
+
+    const editor = workbench.getByRole('textbox', { name: 'Editable TSX', exact: true });
+    await editor.fill(`export function LongLineExample() {
+  return <output>This intentionally long source line keeps extending until the editor needs horizontal scrolling to reveal its final content.</output>;
+}`);
+
+    const scrollMetrics = await workbench
+      .locator('.live-code-source__editor')
+      .evaluate((element) => {
+        const workbenchElement = element.closest('.live-code-workbench');
+        if (!(workbenchElement instanceof HTMLElement)) throw new Error('Missing workbench');
+
+        element.scrollLeft = element.scrollWidth;
+        return {
+          clientWidth: element.clientWidth,
+          scrollLeft: element.scrollLeft,
+          scrollWidth: element.scrollWidth,
+          viewportBottom: element.getBoundingClientRect().bottom,
+          workbenchBottom: workbenchElement.getBoundingClientRect().bottom,
+        };
+      });
+
+    expect(scrollMetrics.scrollWidth).toBeGreaterThan(scrollMetrics.clientWidth);
+    expect(scrollMetrics.scrollLeft).toBeGreaterThan(0);
+    expect(scrollMetrics.viewportBottom).toBeLessThanOrEqual(scrollMetrics.workbenchBottom);
   });
 
   test('Live example paragraphs align with adjacent controls', async ({ page }) => {
@@ -1215,6 +1307,78 @@ test.describe('documentation navigation', () => {
     expect(position.scrollTop).toBeGreaterThan(0);
     expect(position.groupVisible).toBe(true);
     expect(position.groupOffset).toBeGreaterThanOrEqual(-1);
+  });
+
+  test('internal navigation falls back when a route payload stalls', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openPage(page, 'hooks/use-websocket');
+    const initialTimeOrigin = await page.evaluate(() => performance.timeOrigin);
+
+    await page.evaluate(() => {
+      document.documentElement.dataset.navigationMarker = 'current-document';
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = (input, init) => {
+        const url = String(input instanceof Request ? input.url : input);
+        if (url.includes('/hooks/use-interval/') && /\.txt(?:\?|$)/.test(url)) {
+          return new Promise<Response>(() => {});
+        }
+        return originalFetch(input, init);
+      };
+    });
+
+    await page
+      .locator('[data-docs-navigation="desktop"]')
+      .getByRole('link', { name: 'useInterval', exact: true })
+      .click();
+
+    await expect(page).toHaveURL(/\/hooks\/use-interval\/$/);
+    await expect(page.locator('main article h1')).toHaveText('useInterval');
+    await expect(page.locator('[data-site-route="/hooks/use-interval"]')).toBeVisible();
+    await expect(page.locator('html')).not.toHaveAttribute(
+      'data-navigation-marker',
+      'current-document',
+    );
+    await expect
+      .poll(() => page.evaluate(() => performance.timeOrigin))
+      .not.toBe(initialTimeOrigin);
+  });
+
+  test('a later route click cancels fallback from a stalled navigation', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openPage(page, 'hooks/use-websocket');
+    const initialTimeOrigin = await page.evaluate(() => performance.timeOrigin);
+
+    await page.evaluate(() => {
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = (input, init) => {
+        const url = String(input instanceof Request ? input.url : input);
+        if (url.includes('/hooks/use-interval/') && /\.txt(?:\?|$)/.test(url)) {
+          return new Promise<Response>(() => {});
+        }
+        return originalFetch(input, init);
+      };
+    });
+
+    const docsNavigation = page.locator('[data-docs-navigation="desktop"]');
+    await docsNavigation
+      .getByRole('link', { name: 'useInterval', exact: true })
+      .evaluate((link) => {
+        if (!(link instanceof HTMLAnchorElement)) throw new Error('Expected an anchor');
+        link.click();
+      });
+    await expect(page.locator('main article h1')).toHaveText('useWebSocket');
+
+    await docsNavigation
+      .getByRole('link', { name: 'useWebSocket', exact: true })
+      .evaluate((link) => {
+        if (!(link instanceof HTMLAnchorElement)) throw new Error('Expected an anchor');
+        link.click();
+      });
+    await expect(page).toHaveURL(/\/hooks\/use-websocket\/$/);
+    await page.waitForTimeout(2_100);
+    await expect(page).toHaveURL(/\/hooks\/use-websocket\/$/);
+    await expect(page.locator('main article h1')).toHaveText('useWebSocket');
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(initialTimeOrigin);
   });
 
   test('desktop documentation shows an accurately positioned table of contents', async ({
