@@ -35,12 +35,12 @@ Both styles are typed ESM imports. The package declares `sideEffects: false`, so
 
 ## Check the requirements
 
-| Requirement                        | Supported range    |
-| ---------------------------------- | ------------------ |
-| React                              | `>=19.0.0 <20.0.0` |
-| Node.js for development and builds | `>=22.18.0`        |
-| Module format                      | ESM only           |
+| Requirement                        | Supported range           |
+| ---------------------------------- | ------------------------- |
+| React                              | `>=19.0.0 <20.0.0`        |
+| Node.js for development and builds | `^22.18.0` or `>=24.11.0` |
+| Module format                      | ESM only                  |
 
-React is a peer dependency. Better Hooks has no other runtime dependency.
+The repository pins Node.js `24.20.0` for development, CI, and releases while retaining `22.18.0` as the minimum compatibility lane. React is a peer dependency. Better Hooks has no other runtime dependency.
 
 Continue with [Getting started](/docs/getting-started), or scan the latest changes in the [Changelog](/changelog).

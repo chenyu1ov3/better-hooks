@@ -3,6 +3,7 @@ packages:
   - apps/*
 
 autoInstallPeers: false
+engineStrict: true
 strictPeerDependencies: true
 sharedWorkspaceLockfile: true
 preferFrozenLockfile: true
