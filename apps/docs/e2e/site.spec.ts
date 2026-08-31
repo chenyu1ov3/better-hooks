@@ -363,12 +363,10 @@ test.describe('brand structure', () => {
 });
 
 test.describe('core interactions', () => {
-  test('site-wide links avoid speculative route requests and commit client navigation', async ({
-    page,
-  }) => {
+  test('site-wide links prefetch on intent and commit client navigation', async ({ page }) => {
     const prefetchedRoutes: string[] = [];
     page.on('request', (request) => {
-      if (request.headers()['next-router-prefetch'] === '1') {
+      if (request.headers().rsc === '1') {
         prefetchedRoutes.push(new URL(request.url()).pathname);
       }
     });
@@ -378,24 +376,43 @@ test.describe('core interactions', () => {
     await page.evaluate(() => {
       document.documentElement.dataset.navigationMarker = 'current-document';
     });
+    const initialTimeOrigin = await page.evaluate(() => performance.timeOrigin);
+    await page.waitForTimeout(250);
+    expect(prefetchedRoutes).toEqual([]);
 
-    await page
+    const docsLink = page
       .getByRole('banner')
       .getByRole('navigation', { name: 'Primary navigation' })
-      .getByRole('link', { name: 'Docs', exact: true })
-      .click();
+      .getByRole('link', { name: 'Docs', exact: true });
+    const docsPrefetch = page.waitForResponse((response) => {
+      const request = response.request();
+      const headers = request.headers();
+      return (
+        headers.rsc === '1' &&
+        !headers['next-router-segment-prefetch'] &&
+        new URL(request.url()).pathname.endsWith('/docs/')
+      );
+    });
+    await docsLink.hover();
+    await docsPrefetch;
+
+    const navigationStartedAt = Date.now();
+    await docsLink.click();
     await expect(page).toHaveURL(/\/docs\/$/);
     await expect(page.locator('main article h1')).toHaveText('Introduction');
     await expect(page.locator('[data-site-route="/docs"]')).toBeVisible();
+    expect(Date.now() - navigationStartedAt).toBeLessThan(1_000);
     await expect(page.locator('html')).toHaveAttribute(
       'data-navigation-marker',
       'current-document',
     );
+    await page.waitForTimeout(900);
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(initialTimeOrigin);
 
     await page.goBack();
     await expect(page).toHaveURL(/\/better-hooks\/$/);
     await expect(page.locator('main h1')).toHaveText('Better Hooks');
-    await page.waitForTimeout(2_100);
+    await page.waitForTimeout(900);
     await expect(page).toHaveURL(/\/better-hooks\/$/);
 
     await page
@@ -420,7 +437,8 @@ test.describe('core interactions', () => {
     await expect(page.locator('[data-site-route="/hooks/use-async"]')).toBeVisible();
     await page.waitForLoadState('networkidle');
 
-    expect(prefetchedRoutes).toEqual([]);
+    expect(prefetchedRoutes.some((route) => route.endsWith('/docs/'))).toBe(true);
+    expect(prefetchedRoutes.some((route) => route.includes('/hooks/use-websocket/'))).toBe(false);
   });
 
   test('browser extension head scripts do not shift app hydration', async ({ page }) => {
@@ -1326,10 +1344,18 @@ test.describe('documentation navigation', () => {
       };
     });
 
+    const fallbackRequest = page.waitForRequest(
+      (request) =>
+        request.isNavigationRequest() &&
+        new URL(request.url()).pathname.endsWith('/hooks/use-interval/'),
+    );
+    const navigationStartedAt = Date.now();
     await page
       .locator('[data-docs-navigation="desktop"]')
       .getByRole('link', { name: 'useInterval', exact: true })
       .click();
+    await fallbackRequest;
+    expect(Date.now() - navigationStartedAt).toBeLessThan(1_500);
 
     await expect(page).toHaveURL(/\/hooks\/use-interval\/$/);
     await expect(page.locator('main article h1')).toHaveText('useInterval');
@@ -1375,7 +1401,7 @@ test.describe('documentation navigation', () => {
         link.click();
       });
     await expect(page).toHaveURL(/\/hooks\/use-websocket\/$/);
-    await page.waitForTimeout(2_100);
+    await page.waitForTimeout(900);
     await expect(page).toHaveURL(/\/hooks\/use-websocket\/$/);
     await expect(page.locator('main article h1')).toHaveText('useWebSocket');
     expect(await page.evaluate(() => performance.timeOrigin)).toBe(initialTimeOrigin);

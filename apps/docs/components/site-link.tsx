@@ -1,14 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import type { ComponentProps, MouseEvent } from 'react';
+import { useState } from 'react';
+import type { ComponentProps, FocusEvent, MouseEvent, PointerEvent, TouchEvent } from 'react';
 
-const NAVIGATION_FALLBACK_DELAY_MS = 2_000;
-const NAVIGATION_COMMIT_POLL_INTERVAL_MS = 100;
+const NAVIGATION_FALLBACK_DELAY_MS = 750;
 const ROUTE_MARKER_SELECTOR = '[data-site-route]';
 const routeBaseUrl = 'https://better-hooks.invalid';
 
 let navigationFallbackTimer: number | undefined;
+let navigationFallbackObserver: MutationObserver | undefined;
 let navigationFallbackPopstateHandler: (() => void) | undefined;
 
 type SiteLinkProps = Omit<ComponentProps<typeof Link>, 'href' | 'prefetch'> & {
@@ -52,6 +53,10 @@ function clearNavigationFallback() {
     window.clearTimeout(navigationFallbackTimer);
     navigationFallbackTimer = undefined;
   }
+  if (navigationFallbackObserver) {
+    navigationFallbackObserver.disconnect();
+    navigationFallbackObserver = undefined;
+  }
   if (navigationFallbackPopstateHandler) {
     window.removeEventListener('popstate', navigationFallbackPopstateHandler);
     navigationFallbackPopstateHandler = undefined;
@@ -61,34 +66,64 @@ function clearNavigationFallback() {
 function watchNavigation(targetRoute: string, fallbackHref: string, replace = false) {
   clearNavigationFallback();
 
+  navigationFallbackObserver = new MutationObserver(() => {
+    if (routeHasCommitted(targetRoute)) clearNavigationFallback();
+  });
+  navigationFallbackObserver.observe(document.body, {
+    attributeFilter: ['data-site-route'],
+    attributes: true,
+    childList: true,
+    subtree: true,
+  });
+
   navigationFallbackPopstateHandler = clearNavigationFallback;
   window.addEventListener('popstate', navigationFallbackPopstateHandler);
 
-  const fallbackAt = performance.now() + NAVIGATION_FALLBACK_DELAY_MS;
-
-  function checkForCommit() {
-    if (routeHasCommitted(targetRoute)) {
-      clearNavigationFallback();
-      return;
-    }
-
-    if (performance.now() < fallbackAt) {
-      navigationFallbackTimer = window.setTimeout(
-        checkForCommit,
-        NAVIGATION_COMMIT_POLL_INTERVAL_MS,
-      );
-      return;
-    }
-
+  navigationFallbackTimer = window.setTimeout(() => {
     clearNavigationFallback();
     if (replace) window.location.replace(fallbackHref);
     else window.location.assign(fallbackHref);
-  }
-
-  navigationFallbackTimer = window.setTimeout(checkForCommit, NAVIGATION_COMMIT_POLL_INTERVAL_MS);
+  }, NAVIGATION_FALLBACK_DELAY_MS);
 }
 
-export function SiteLink({ href, onClick, replace, ...props }: SiteLinkProps) {
+export function SiteLink({
+  href,
+  onClick,
+  onFocus,
+  onMouseEnter,
+  onPointerDown,
+  onTouchStart,
+  replace,
+  ...props
+}: SiteLinkProps) {
+  const [prefetchHref, setPrefetchHref] = useState<string | null>(null);
+
+  function prepareRoute() {
+    const targetRoute = routeForHref(href);
+    if (!targetRoute || routeHasCommitted(targetRoute)) return;
+    setPrefetchHref(href);
+  }
+
+  function handleFocus(event: FocusEvent<HTMLAnchorElement>) {
+    onFocus?.(event);
+    if (!event.defaultPrevented) prepareRoute();
+  }
+
+  function handleMouseEnter(event: MouseEvent<HTMLAnchorElement>) {
+    onMouseEnter?.(event);
+    if (!event.defaultPrevented) prepareRoute();
+  }
+
+  function handlePointerDown(event: PointerEvent<HTMLAnchorElement>) {
+    onPointerDown?.(event);
+    if (!event.defaultPrevented) prepareRoute();
+  }
+
+  function handleTouchStart(event: TouchEvent<HTMLAnchorElement>) {
+    onTouchStart?.(event);
+    if (!event.defaultPrevented) prepareRoute();
+  }
+
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     onClick?.(event);
     if (!isPlainNavigation(event)) return;
@@ -100,5 +135,17 @@ export function SiteLink({ href, onClick, replace, ...props }: SiteLinkProps) {
     watchNavigation(targetRoute, event.currentTarget.href, replace);
   }
 
-  return <Link {...props} href={href} prefetch={false} replace={replace} onClick={handleClick} />;
+  return (
+    <Link
+      {...props}
+      href={href}
+      prefetch={prefetchHref === href}
+      replace={replace}
+      onClick={handleClick}
+      onFocus={handleFocus}
+      onMouseEnter={handleMouseEnter}
+      onPointerDown={handlePointerDown}
+      onTouchStart={handleTouchStart}
+    />
+  );
 }
