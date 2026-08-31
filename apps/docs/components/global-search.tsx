@@ -1,8 +1,6 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import type { SearchEntry } from '../lib/content';
 import { dictionaryFor, type Locale } from '../lib/i18n';
+import { SiteLink } from './site-link';
 
 function normalized(value: string) {
   return value.trim().toLocaleLowerCase();
@@ -21,7 +20,6 @@ function normalized(value: string) {
 
 export function GlobalSearch({ locale, entries }: { locale: Locale; entries: SearchEntry[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
@@ -68,9 +66,8 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
     reset();
   }
 
-  function visit(href: string) {
-    close();
-    router.push(href);
+  function visit(index: number) {
+    document.getElementById(`global-docs-search-option-${index}`)?.click();
   }
 
   return (
@@ -138,7 +135,7 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
                 if (matches.length) setActiveIndex((current) => Math.max(current - 1, 0));
               } else if (event.key === 'Enter' && matches[activeIndex]) {
                 event.preventDefault();
-                visit(matches[activeIndex].href);
+                visit(activeIndex);
               }
             }}
           />
@@ -159,7 +156,7 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
             <ul className="m-0 list-none p-0" role="presentation">
               {matches.map((entry, index) => (
                 <li key={entry.href} role="none">
-                  <Link
+                  <SiteLink
                     id={`global-docs-search-option-${index}`}
                     role="option"
                     aria-selected={index === activeIndex}
@@ -190,7 +187,7 @@ export function GlobalSearch({ locale, entries }: { locale: Locale; entries: Sea
                     <p className="m-0 line-clamp-2 min-w-0 text-[13px] leading-5 text-muted-foreground">
                       {entry.description}
                     </p>
-                  </Link>
+                  </SiteLink>
                 </li>
               ))}
             </ul>

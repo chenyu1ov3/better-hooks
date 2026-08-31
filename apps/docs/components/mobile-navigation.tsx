@@ -1,7 +1,6 @@
 'use client';
 
 import { Menu, X } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +13,7 @@ import {
 } from '@/components/ui/sheet';
 import type { NavItem } from '../lib/navigation';
 import { siteConfig } from '../lib/site';
+import { SiteLink } from './site-link';
 
 export function MobileNavigation({
   items,
@@ -66,7 +66,7 @@ export function MobileNavigation({
         </SheetHeader>
         <nav className="grid pt-5" aria-label={menuLabel}>
           {items.map((item) => (
-            <Link
+            <SiteLink
               className="flex min-h-13 items-center border-b border-border px-2 text-base font-semibold text-muted-foreground transition-[color,background-color] hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground"
               key={item.href}
               href={item.href}
@@ -78,7 +78,7 @@ export function MobileNavigation({
               onClick={() => setOpen(false)}
             >
               {item.label}
-            </Link>
+            </SiteLink>
           ))}
           <a
             className="flex min-h-13 items-center border-b border-border px-2 text-base font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"

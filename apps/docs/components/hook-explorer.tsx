@@ -1,7 +1,6 @@
 'use client';
 
 import { ArrowUpRight, Search, X } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -9,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { apiEntries, hookCategories, type HookCategory } from '../lib/hooks';
 import { dictionaryFor, type Locale } from '../lib/i18n';
 import { hrefFor } from '../lib/paths';
+import { SiteLink } from './site-link';
 
 type CategoryFilter = HookCategory | 'all';
 
@@ -163,12 +163,12 @@ export function HookExplorer({
             key={hook.slug}
           >
             <h3 className="mb-2 font-mono text-lg font-semibold text-foreground">
-              <Link
+              <SiteLink
                 className="underline-offset-4 hover:underline"
                 href={hrefFor(locale, ['hooks', hook.slug])}
               >
                 {hook.name}
-              </Link>
+              </SiteLink>
             </h3>
             <p className="m-0 text-sm leading-6 text-muted-foreground">
               {hook.description[locale]}
@@ -177,13 +177,13 @@ export function HookExplorer({
               {hook.signature}
             </code>
             <div className="mt-auto flex gap-4 pt-5 text-xs font-semibold text-muted-foreground">
-              <Link
+              <SiteLink
                 className="inline-flex min-h-11 items-center gap-1 transition-colors hover:text-brand sm:min-h-8"
                 href={hrefFor(locale, ['hooks', hook.slug])}
               >
                 {dictionary.actions.viewDocs}
                 <ArrowUpRight aria-hidden="true" size={14} />
-              </Link>
+              </SiteLink>
               <a
                 className="inline-flex min-h-11 items-center transition-colors hover:text-brand sm:min-h-8"
                 href={hook.sourceUrl}

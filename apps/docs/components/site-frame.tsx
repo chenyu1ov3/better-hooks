@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { searchIndex } from '../lib/content';
+import { hrefFor, searchIndex } from '../lib/content';
 import { dictionaryFor, type Locale } from '../lib/i18n';
 import { SiteFooter } from './site-footer';
 import { SiteHeader } from './site-header';
@@ -20,7 +20,7 @@ export function SiteFrame({
 }) {
   const dictionary = dictionaryFor(locale);
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col" data-site-route={hrefFor(locale, currentPath)}>
       <a
         className="fixed top-2.5 left-3 z-[100] -translate-y-[160%] rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground shadow-md transition-transform duration-150 focus:translate-y-0"
         href="#main-content"

@@ -1,5 +1,4 @@
 import { GitFork } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { hrefFor, oppositeLocale, type SearchEntry } from '../lib/content';
@@ -10,6 +9,7 @@ import { GlobalSearch } from './global-search';
 import { LanguageLink } from './language-link';
 import { LogoMark } from './logo-mark';
 import { MobileNavigation } from './mobile-navigation';
+import { SiteLink } from './site-link';
 import { ThemeMenu } from './theme-menu';
 
 export function SiteHeader({
@@ -28,7 +28,7 @@ export function SiteHeader({
   return (
     <header className="sticky top-0 z-50 h-16 border-b border-border/80 bg-background/95 backdrop-blur-md print:hidden">
       <div className="mx-auto flex h-full w-[calc(100%-1.5rem)] max-w-[90rem] items-center gap-2.5 xl:w-[calc(100%-2.5rem)] xl:gap-7">
-        <Link
+        <SiteLink
           className="group inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2.5 text-[13px] font-extrabold text-foreground sm:text-sm"
           href={hrefFor(locale, [])}
           aria-label={locale === 'en' ? 'Better Hooks home' : 'Better Hooks 首页'}
@@ -38,13 +38,13 @@ export function SiteHeader({
             aria-hidden="true"
           />
           <span className="max-[389px]:hidden">BETTER HOOKS</span>
-        </Link>
+        </SiteLink>
         <nav
           className="hidden items-center gap-1 xl:flex"
           aria-label={locale === 'en' ? 'Primary navigation' : '主导航'}
         >
           {navigation.map((item) => (
-            <Link
+            <SiteLink
               className="rounded-md px-2.5 py-2 text-[13px] font-semibold text-muted-foreground transition-[color,background-color] duration-150 hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground"
               key={item.href}
               href={item.href}
@@ -55,7 +55,7 @@ export function SiteHeader({
               }
             >
               {item.label}
-            </Link>
+            </SiteLink>
           ))}
         </nav>
         <div className="ml-auto flex min-w-0 items-center gap-1.5">
