@@ -671,6 +671,38 @@ export function BrokenExample() {
     await expect(reset).toBeDisabled();
   });
 
+  test('Hook example keeps long source lines horizontally scrollable', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openPage(page, 'hooks/use-debounce');
+    const workbench = page.locator('.live-example .live-code-workbench');
+    await workbench.getByRole('button', { name: 'Edit code' }).click();
+
+    const editor = workbench.getByRole('textbox', { name: 'Editable TSX', exact: true });
+    await editor.fill(`export function LongLineExample() {
+  return <output>This intentionally long source line keeps extending until the editor needs horizontal scrolling to reveal its final content.</output>;
+}`);
+
+    const scrollMetrics = await workbench
+      .locator('.live-code-source__editor')
+      .evaluate((element) => {
+        const workbenchElement = element.closest('.live-code-workbench');
+        if (!(workbenchElement instanceof HTMLElement)) throw new Error('Missing workbench');
+
+        element.scrollLeft = element.scrollWidth;
+        return {
+          clientWidth: element.clientWidth,
+          scrollLeft: element.scrollLeft,
+          scrollWidth: element.scrollWidth,
+          viewportBottom: element.getBoundingClientRect().bottom,
+          workbenchBottom: workbenchElement.getBoundingClientRect().bottom,
+        };
+      });
+
+    expect(scrollMetrics.scrollWidth).toBeGreaterThan(scrollMetrics.clientWidth);
+    expect(scrollMetrics.scrollLeft).toBeGreaterThan(0);
+    expect(scrollMetrics.viewportBottom).toBeLessThanOrEqual(scrollMetrics.workbenchBottom);
+  });
+
   test('Live example paragraphs align with adjacent controls', async ({ page }) => {
     for (const viewport of [
       { width: 390, height: 844 },
